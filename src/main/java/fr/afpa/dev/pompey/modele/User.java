@@ -99,6 +99,8 @@ public class User {
     public void setDate(Date date) throws SaisieException {
         if (date == null) {
             throw new SaisieException("La date ne doit pas être null");
+        } else if (!date.toLocalDate().equals(LocalDate.now())) {
+            throw new SaisieException("La date ne corresponds pas");
         }
         this.date = date;
     }
