@@ -33,7 +33,7 @@ public class User {
 
 //    GETTER ET SETTER
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
