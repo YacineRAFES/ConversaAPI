@@ -3,6 +3,7 @@ package fr.afpa.dev.pompey.dao;
 import fr.afpa.dev.pompey.exception.DAOException;
 import fr.afpa.dev.pompey.exception.SaisieException;
 import fr.afpa.dev.pompey.modele.User;
+import fr.afpa.dev.pompey.utilitaires.Log;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -45,7 +46,7 @@ public class UserDAO extends DAO<User>{
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            Log.error("Erreur lors de la création User", e);
         }
         return newid;
     }
@@ -64,10 +65,10 @@ public class UserDAO extends DAO<User>{
             PreparedStatement pstmt = connect.prepareStatement(deleteSQL.toString());
             pstmt.setInt(1, obj.getId());
             pstmt.executeUpdate();
-            return true;
         } catch (SQLException | DAOException e) {
-            throw new RuntimeException(e);
+            Log.error("Erreur lors de la deletion User", e);
         }
+        return true;
     }
 
     /**
@@ -91,7 +92,8 @@ public class UserDAO extends DAO<User>{
             pstmt.executeUpdate();
             return true;
         } catch (SQLException | DAOException e) {
-            throw new RuntimeException(e);
+            Log.error("Erreur lors de la modification User",e);
+            return false;
         }
     }
 
@@ -117,7 +119,8 @@ public class UserDAO extends DAO<User>{
             }
             return user;
         }catch (SQLException | SaisieException e){
-            throw new RuntimeException(e);
+            Log.error("Erreur lors de la recherche User",e);
+            return null;
         }
     }
 
