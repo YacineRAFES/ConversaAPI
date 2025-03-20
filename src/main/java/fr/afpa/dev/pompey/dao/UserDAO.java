@@ -1,5 +1,7 @@
 package fr.afpa.dev.pompey.dao;
 
+import fr.afpa.dev.pompey.exception.DAOException;
+import fr.afpa.dev.pompey.exception.SaisieException;
 import fr.afpa.dev.pompey.modele.User;
 
 import java.sql.PreparedStatement;
@@ -9,25 +11,30 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe DAO pour les opérations CRUD sur les utilisateurs.
+ */
 public class UserDAO extends DAO<User>{
 
     /**
-     * @param obj 
-     * @return
+     * Crée un nouvel utilisateur dans la base de données.
+     *
+     * @param obj L'utilisateur a créé
+     * @return L'ID du nouvel utilisateur créé.
      */
     @Override
     public int create(User obj) {
         int newid = 0;
         StringBuilder insertSQL = new StringBuilder(
                 "INSERT INTO utilisateur " +
-                "(USER_EMAIL, USER_PASSWORD, USER_EMAIL, USER_ROLE, USER_DATE)" +
-                " VALUES (?, ?, ?, ?, ?)");
+                "(USER_EMAIL, USER_PASSWORD, USER_NAME, USER_ROLE, USER_DATE)" +
+                "+ VALUES (?, ?, ?, ?, ?)");
         try {
             PreparedStatement pstmt = connect.prepareStatement(insertSQL.toString(),
                     PreparedStatement.RETURN_GENERATED_KEYS);
             pstmt.setString(1, obj.getEmail());
             pstmt.setString(2, obj.getPassword());
-            pstmt.setString(3, obj.getEmail());
+            pstmt.setString(3, obj.getName());
             pstmt.setString(4, obj.getRole());
             pstmt.setDate(5, obj.getDate());
             pstmt.executeUpdate();
@@ -44,8 +51,10 @@ public class UserDAO extends DAO<User>{
     }
 
     /**
-     * @param obj 
-     * @return
+     * Supprime un utilisateur de la base de données.
+     *
+     * @param obj L'utilisateur à supprimer.
+     * @return true si la suppression a réussi, false sinon.
      */
     @Override
     public boolean delete(User obj) {
@@ -56,15 +65,16 @@ public class UserDAO extends DAO<User>{
             pstmt.setInt(1, obj.getId());
             pstmt.executeUpdate();
             return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+        } catch (SQLException | DAOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     /**
-     * @param obj 
-     * @return
+     * Met à jour les informations d'un utilisateur dans la base de données.
+     *
+     * @param obj L'utilisateur à mettre à jour.
+     * @return true si la mise à jour a réussi, false sinon.
      */
     @Override
     public boolean update(User obj) {
@@ -74,21 +84,22 @@ public class UserDAO extends DAO<User>{
             PreparedStatement pstmt = connect.prepareStatement(updateSQL.toString());
             pstmt.setString(1, obj.getEmail());
             pstmt.setString(2, obj.getPassword());
-            pstmt.setString(3, obj.getEmail());
+            pstmt.setString(3, obj.getName());
             pstmt.setDate(4, obj.getDate());
             pstmt.setString(5, obj.getRole());
             pstmt.setInt(6, obj.getId());
             pstmt.executeUpdate();
             return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+        } catch (SQLException | DAOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     /**
-     * @param id 
-     * @return
+     * Trouve un utilisateur par son ID.
+     *
+     * @param id L'ID de l'utilisateur à trouver.
+     * @return L'utilisateur trouvé, ou null si aucun utilisateur n'a été trouvé.
      */
     @Override
     public User find(int id) {
@@ -102,25 +113,22 @@ public class UserDAO extends DAO<User>{
             ResultSet rs = pstmt.executeQuery();
 
             if(rs.next()){
-                user.setId(rs.getInt("USER_ID"));
-                user.setEmail(rs.getString("USER_EMAIL"));
-                user.setPassword(rs.getString("USER_PASSWORD"));
-                user.setName(rs.getString("USER_NAME"));
-                user.setDate(rs.getDate("USER_DATE"));
-                user.setRole(rs.getString("USER_ROLE"));
+                users(user, rs);
             }
             return user;
-        }catch (SQLException e){
+        }catch (SQLException | SaisieException e){
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * @return 
+     * Trouve tous les utilisateurs dans la base de données.
+     *
+     * @return Une liste de tous les utilisateurs.
      */
     @Override
     public List<User> findAll() {
-        List<User> users = new ArrayList<User>();
+        List<User> users = new ArrayList<>();
         StringBuilder selectSQL = new StringBuilder("SELECT * FROM utilisateur");
 
         try{
@@ -129,19 +137,24 @@ public class UserDAO extends DAO<User>{
 
             while(rs.next()){
                 User user = new User();
-                user.setId(rs.getInt("USER_ID"));
-                user.setEmail(rs.getString("USER_EMAIL"));
-                user.setPassword(rs.getString("USER_PASSWORD"));
-                user.setName(rs.getString("USER_NAME"));
-                user.setDate(rs.getDate("USER_DATE"));
-                user.setRole(rs.getString("USER_ROLE"));
+                users(user, rs);
                 users.add(user);
             }
 
-        }catch (SQLException e){
+        }catch (SQLException | SaisieException e){
             throw new RuntimeException(e);
         }
 
         return users;
     }
+
+    private void users(User user, ResultSet rs) throws SQLException, SaisieException {
+        user.setId(rs.getInt("USER_ID"));
+        user.setEmail(rs.getString("USER_EMAIL"));
+        user.setPassword(rs.getString("USER_PASSWORD"));
+        user.setName(rs.getString("USER_NAME"));
+        user.setDate(rs.getDate("USER_DATE"));
+        user.setRole(rs.getString("USER_ROLE"));
+    }
+
 }
