@@ -1,5 +1,6 @@
 package fr.afpa.dev.pompey.modele;
 
+import fr.afpa.dev.pompey.securite.Securite;
 import fr.afpa.dev.pompey.utilitaires.Regex;
 import fr.afpa.dev.pompey.exception.SaisieException;
 
@@ -78,7 +79,7 @@ public class User {
         if (password == null || password.isEmpty()) {
             throw new SaisieException("Le mot de passe ne doit pas être vide");
         }
-        this.password = password;
+        this.password = Securite.hashPassword(password);
     }
 
     public String getEmail() {
