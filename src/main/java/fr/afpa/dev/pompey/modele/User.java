@@ -39,9 +39,11 @@ public class User {
         return id;
     }
 
-    public void setId(Integer id) {
-        if (id != null && id <= 0) {
-            throw new IllegalArgumentException("L'id ne doit pas être négatif");
+    public void setId(Integer id) throws SaisieException {
+        if (id == null) {
+            throw new SaisieException("L'id ne doit pas être null");
+        } else if (id <= 0) {
+            throw new SaisieException("L'id ne doit pas être négatif");
         }
         this.id = id;
     }
@@ -58,7 +60,7 @@ public class User {
      */
     public void setName(String name) throws SaisieException {
         if (name == null || name.isEmpty()) {
-            throw new SaisieException("Le nom ne doit pas être vide");
+            throw new SaisieException("Le nom ne doit pas être vide ou null");
         } else if (!name.matches(Regex.REGEX_NAME)) {
             throw new SaisieException("Le nom ne corresponds pas");
         }
@@ -77,7 +79,9 @@ public class User {
      */
     public void setPassword(String password) throws SaisieException {
         if (password == null || password.isEmpty()) {
-            throw new SaisieException("Le mot de passe ne doit pas être vide");
+            throw new SaisieException("Le mot de passe ne doit pas être vide ou null");
+        } else if (!password.matches(Regex.REGEX_PASSWORD)) {
+            throw new SaisieException("Le mot de passe ne respects pas les critères");
         }
         this.password = Securite.hashPassword(password);
     }
