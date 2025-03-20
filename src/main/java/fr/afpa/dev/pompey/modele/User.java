@@ -4,6 +4,7 @@ import fr.afpa.dev.pompey.utilitaires.Regex;
 import fr.afpa.dev.pompey.exception.SaisieException;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 public class User {
     private Integer id;
@@ -44,10 +45,16 @@ public class User {
         this.id = id;
     }
 
+    /**
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @param name
+     */
     public void setName(String name) throws SaisieException {
         if (name == null || name.isEmpty()) {
             throw new SaisieException("Le nom ne doit pas être vide");
@@ -57,10 +64,16 @@ public class User {
         this.name = name;
     }
 
+    /**
+     * @return
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * @param password
+     */
     public void setPassword(String password) throws SaisieException {
         if (password == null || password.isEmpty()) {
             throw new SaisieException("Le mot de passe ne doit pas être vide");
