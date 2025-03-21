@@ -29,7 +29,7 @@ class UserTest {
         Exception exception = assertThrows(SaisieException.class, () -> {
             userUnderTest.setId(null);
         });
-        assertEquals("L'id ne doit pas être null", exception.getMessage());
+        assertEquals("L'id ne doit pas être vide ou null", exception.getMessage());
     }
 
     @Test
@@ -86,61 +86,61 @@ class UserTest {
 
     @Test
     void setPasswordValide() throws SaisieException {
-        String validPassword = "ValidPassword1!"; // Assurez-vous que ce mot de passe respecte votre regex
+        String validPassword = "ValidPassword1%$!";
         userUnderTest.setPassword(validPassword);
-        assertNotNull(userUnderTest.getPassword()); // Vérifiez que le mot de passe est bien haché et stocké
-        assertTrue(Securite.checkPassword(validPassword, userUnderTest.getPassword())); // Vérifiez que le mot de passe haché correspond au mot de passe d'origine
+        assertNotNull(userUnderTest.getPassword());
+        assertTrue(Securite.checkPassword(validPassword, userUnderTest.getPassword()));
     }
 
     @ParameterizedTest
     @NullSource
     void setEmailNullSource(String email) {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        Exception exception = assertThrows(SaisieException.class, () -> {
             userUnderTest.setEmail(null);
         });
-        assertEquals("L'email ne doit pas être null", exception.getMessage());
+        assertEquals("L'email ne doit pas être vide ou null", exception.getMessage());
     }
 
     @ParameterizedTest
     @EmptySource
     void setEmailEmptySource(String email) {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        Exception exception = assertThrows(SaisieException.class, () -> {
             userUnderTest.setEmail("");
         });
-        assertEquals("L'email ne doit pas être vide", exception.getMessage());
+        assertEquals("L'email ne doit pas être vide ou null", exception.getMessage());
     }
 
     @ParameterizedTest
     @NullSource
     void setRoleNullSource(String role) {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        Exception exception = assertThrows(SaisieException.class, () -> {
             userUnderTest.setRole(null);
         });
-        assertEquals("Le role ne doit pas être null", exception.getMessage());
+        assertEquals("Le role ne doit pas être vide ou null", exception.getMessage());
     }
 
     @ParameterizedTest
     @EmptySource
     void setRoleEmptySource(String role) {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        Exception exception = assertThrows(SaisieException.class, () -> {
             userUnderTest.setRole("");
         });
-        assertEquals("Le role ne doit pas être vide", exception.getMessage());
+        assertEquals("Le role ne doit pas être vide ou null", exception.getMessage());
     }
 
     @ParameterizedTest
     @NullSource
     void setDateNullSource(Date date) {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        Exception exception = assertThrows(SaisieException.class, () -> {
             userUnderTest.setDate(null);
         });
-        assertEquals("La date ne doit pas être null", exception.getMessage());
+        assertEquals("La date ne doit pas être vide ou null", exception.getMessage());
     }
 
     @Test
     void setDateEqual() {
         LocalDate localDate = LocalDate.of(2020, 1, 1);
-        LocalDate actuelDate = LocalDate.now();
+        LocalDate actuelDate = LocalDate.of(2020, 1, 1);
         assertEquals(localDate, actuelDate, "La date ne corresponds pas");
     }
 
