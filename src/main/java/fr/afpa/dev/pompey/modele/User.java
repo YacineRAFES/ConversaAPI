@@ -41,7 +41,7 @@ public class User {
 
     public void setId(Integer id) throws SaisieException {
         if (id == null) {
-            throw new SaisieException("L'id ne doit pas être null");
+            throw new SaisieException("L'id ne doit pas être vide ou null");
         } else if (id <= 0) {
             throw new SaisieException("L'id ne doit pas être négatif");
         }
@@ -81,7 +81,7 @@ public class User {
         if (password == null || password.isEmpty()) {
             throw new SaisieException("Le mot de passe ne doit pas être vide ou null");
         } else if (!password.matches(Regex.REGEX_PASSWORD)) {
-            throw new SaisieException("Le mot de passe ne respects pas les critères");
+            throw new SaisieException("Le mot de passe ne respecte pas les critères");
         }
         this.password = Securite.hashPassword(password);
     }
@@ -92,7 +92,7 @@ public class User {
 
     public void setEmail(String email) throws SaisieException {
         if (email == null || email.isEmpty()) {
-            throw new SaisieException("L'email ne doit pas être vide");
+            throw new SaisieException("L'email ne doit pas être vide ou null");
         } else if (!email.matches(Regex.REGEX_EMAIL)) {
             throw new SaisieException("L'email ne corresponds pas");
         }
@@ -105,7 +105,7 @@ public class User {
 
     public void setRole(String role) throws SaisieException {
         if (role == null || role.isEmpty()) {
-            throw new SaisieException("Le role ne doit pas être vide");
+            throw new SaisieException("Le role ne doit pas être vide ou null");
         }
         this.role = role;
     }
@@ -116,7 +116,7 @@ public class User {
 
     public void setDate(Date date) throws SaisieException {
         if (date == null) {
-            throw new SaisieException("La date ne doit pas être null");
+            throw new SaisieException("La date ne doit pas être vide ou null");
         } else if (!date.toLocalDate().equals(LocalDate.now())) {
             throw new SaisieException("La date ne corresponds pas");
         }
