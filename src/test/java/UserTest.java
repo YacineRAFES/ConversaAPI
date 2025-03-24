@@ -1,5 +1,5 @@
-import fr.afpa.dev.pompey.exception.SaisieException;
-import fr.afpa.dev.pompey.modele.User;
+import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
+import fr.afpa.dev.pompey.conversaapi.modele.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,7 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 
-import fr.afpa.dev.pompey.securite.Securite;
+import fr.afpa.dev.pompey.conversaapi.securite.Securite;
 
 import java.sql.Date;
 import java.time.LocalDate;

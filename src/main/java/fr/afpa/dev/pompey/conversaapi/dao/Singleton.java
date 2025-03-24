@@ -11,7 +11,7 @@ public class Singleton {
 
     private static final Properties props = new Properties();
     private static Connection connection;
-    final String PATHCONF = "conf.properties";
+    final String PATHCONF = "config.properties";
 
     private Singleton(){
         try(InputStream is = getClass().getClassLoader().getResourceAsStream(PATHCONF)) {

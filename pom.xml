@@ -36,6 +36,12 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.1</version>
+            <scope>test</scope>
+        </dependency>
         <!--  https://mvnrepository.com/artifact/com.password4j/password4j  -->
         <dependency>
             <groupId>com.password4j</groupId>

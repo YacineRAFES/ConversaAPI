@@ -1,8 +1,8 @@
 package fr.afpa.dev.pompey.conversaapi.modele;
 
-import fr.afpa.dev.pompey.securite.Securite;
-import fr.afpa.dev.pompey.utilitaires.Regex;
-import fr.afpa.dev.pompey.exception.SaisieException;
+import fr.afpa.dev.pompey.conversaapi.securite.Securite;
+import fr.afpa.dev.pompey.conversaapi.utilitaires.Regex;
+import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
 
 import java.sql.Date;
 import java.time.LocalDate;

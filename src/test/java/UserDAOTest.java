@@ -1,7 +1,7 @@
-import fr.afpa.dev.pompey.dao.UserDAO;
-import fr.afpa.dev.pompey.exception.SaisieException;
-import fr.afpa.dev.pompey.modele.User;
-import fr.afpa.dev.pompey.utilitaires.Log;
+import fr.afpa.dev.pompey.conversaapi.dao.UserDAO;
+import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
+import fr.afpa.dev.pompey.conversaapi.modele.User;
+import fr.afpa.dev.pompey.conversaapi.utilitaires.Log;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

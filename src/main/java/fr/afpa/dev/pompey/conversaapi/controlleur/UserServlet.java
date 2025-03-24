@@ -1,9 +1,9 @@
 package fr.afpa.dev.pompey.conversaapi.controlleur;
 
-import fr.afpa.dev.pompey.exception.JsonException;
-import fr.afpa.dev.pompey.dao.UserDAO;
-import fr.afpa.dev.pompey.modele.User;
-import fr.afpa.dev.pompey.service.UserService;
+import fr.afpa.dev.pompey.conversaapi.exception.JsonException;
+import fr.afpa.dev.pompey.conversaapi.dao.UserDAO;
+import fr.afpa.dev.pompey.conversaapi.modele.User;
+import fr.afpa.dev.pompey.conversaapi.service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
