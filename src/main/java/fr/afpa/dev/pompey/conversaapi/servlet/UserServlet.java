@@ -1,7 +1,6 @@
-package fr.afpa.dev.pompey.conversaapi.controlleur;
+package fr.afpa.dev.pompey.conversaapi.servlet;
 
 import fr.afpa.dev.pompey.conversaapi.exception.JsonException;
-import fr.afpa.dev.pompey.conversaapi.dao.UserDAO;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import fr.afpa.dev.pompey.conversaapi.service.UserService;
 import jakarta.servlet.ServletException;
@@ -11,12 +10,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import jakarta.json.*;
 
 @WebServlet("/api/users")
 public class UserServlet extends HttpServlet {
+
     private UserService userService;
 
     @Override
@@ -26,14 +25,10 @@ public class UserServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try{
-            List<User> users = userService.getAllUsers();
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(usersToJson(users));
-        }catch (Exception e){
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
+        List<User> users = userService.getAllUsers();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(usersToJson(users));
     }
 
 //    private String userToJson(User user) {

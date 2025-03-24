@@ -123,10 +123,8 @@ public class User {
     public void setPassword(String password) throws SaisieException {
         if (password == null || password.isEmpty()) {
             throw new SaisieException("Le mot de passe ne doit pas être vide ou null");
-        } else if (!password.matches(Regex.REGEX_PASSWORD)) {
-            throw new SaisieException("Le mot de passe ne respecte pas les critères");
         }
-        this.password = Securite.hashPassword(password);
+        this.password = password;
     }
 
     public String getEmail() {
@@ -160,7 +158,7 @@ public class User {
     public void setDate(Date date) throws SaisieException {
         if (date == null) {
             throw new SaisieException("La date ne doit pas être vide ou null");
-        } else if (!date.toLocalDate().equals(LocalDate.now())) {
+        } else if (date.toLocalDate().isAfter(LocalDate.now())) {
             throw new SaisieException("La date ne corresponds pas");
         }
         this.date = date;

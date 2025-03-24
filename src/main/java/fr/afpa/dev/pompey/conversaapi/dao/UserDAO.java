@@ -5,10 +5,7 @@ import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.Log;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,7 +112,12 @@ public class UserDAO extends DAO<User>{
             ResultSet rs = pstmt.executeQuery();
 
             if(rs.next()){
-                users(user, rs);
+                user.setId(rs.getInt("USER_ID"));
+                user.setEmail(rs.getString("USER_EMAIL"));
+                user.setPassword(rs.getString("USER_PASSWORD"));
+                user.setName(rs.getString("USER_NAME"));
+                user.setDate(rs.getDate("USER_DATE"));
+                user.setRole(rs.getString("USER_ROLE"));
             }
             return user;
         }catch (SQLException | SaisieException e){
@@ -132,32 +134,29 @@ public class UserDAO extends DAO<User>{
     @Override
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
-        StringBuilder selectSQL = new StringBuilder("SELECT * FROM utilisateur");
+        String sql = "SELECT * FROM utilisateur";
 
-        try{
-            Statement stmt = connect.createStatement();
-            ResultSet rs = stmt.executeQuery(selectSQL.toString());
+        try(PreparedStatement ps = connect.prepareStatement(sql)){
+
+            ResultSet rs = ps.executeQuery();
 
             while(rs.next()){
                 User user = new User();
-                users(user, rs);
+                user.setId(rs.getInt("USER_ID"));
+                user.setEmail(rs.getString("USER_EMAIL"));
+                user.setPassword(rs.getString("USER_PASSWORD"));
+                user.setName(rs.getString("USER_NAME"));
+                user.setDate(rs.getDate("USER_DATE"));
+                user.setRole(rs.getString("USER_ROLE"));
                 users.add(user);
             }
-
+            return users;
         }catch (SQLException | SaisieException e){
             throw new RuntimeException(e);
         }
 
-        return users;
+
     }
 
-    private void users(User user, ResultSet rs) throws SQLException, SaisieException {
-        user.setId(rs.getInt("USER_ID"));
-        user.setEmail(rs.getString("USER_EMAIL"));
-        user.setPassword(rs.getString("USER_PASSWORD"));
-        user.setName(rs.getString("USER_NAME"));
-        user.setDate(rs.getDate("USER_DATE"));
-        user.setRole(rs.getString("USER_ROLE"));
-    }
 
 }
