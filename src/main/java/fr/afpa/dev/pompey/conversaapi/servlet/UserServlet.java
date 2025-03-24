@@ -13,16 +13,32 @@ import java.io.IOException;
 import java.util.List;
 import jakarta.json.*;
 
+/**
+ * Servlet pour les utilisateurs.
+ */
 @WebServlet("/api/users")
 public class UserServlet extends HttpServlet {
 
     private UserService userService;
 
+    /**
+     * Initialise la servlet.
+     *
+     * @throws ServletException
+     */
     @Override
     public void init() throws ServletException {
         this.userService = new UserService();
     }
 
+    /**
+     * Récupère tous les utilisateurs et les renvoie en JSON.
+     *
+     * @param request  La requête HTTP.
+     * @param response La réponse HTTP.
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         List<User> users = userService.getAllUsers();
@@ -31,12 +47,19 @@ public class UserServlet extends HttpServlet {
         response.getWriter().write(usersToJson(users));
     }
 
-//    private String userToJson(User user) {
-//        return String.format("{\"id\":%d,\"name\":\"%s\",\"email\":\"%s\",\"role\":\"%s\",\"date\":\"%s\"}",
-//                user.getId(), user.getName(), user.getEmail(), user.getRole(), user.getDate());
-//
-//    }
+    //Add doPost method for creating a new user
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+    }
+
+
+    /**
+     * Convertit une liste d'utilisateurs en JSON.
+     *
+     * @param users La liste d'utilisateurs.
+     * @return La liste d'utilisateurs en JSON.
+     */
     private String usersToJson(List<User> users) {
         try{
             JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
