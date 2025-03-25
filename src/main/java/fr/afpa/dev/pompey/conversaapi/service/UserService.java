@@ -25,4 +25,32 @@ public class UserService {
     public void addUser(User user) {
         userDAO.create(user);
     }
+
+    /**
+     * Met à jour un utilisateur dans la base de données.
+     *
+     * @param user L'utilisateur à mettre à jour.
+     */
+    public void updateUser(User user) {
+        userDAO.update(user);
+    }
+
+    /**
+     * Supprime un utilisateur de la base de données.
+     *
+     * @param user L'utilisateur à supprimer.
+     */
+    public void deleteUser(User user) {
+        userDAO.delete(user);
+    }
+
+    /**
+     * Récupère un utilisateur par son ID.
+     *
+     * @param id L'ID de l'utilisateur à récupérer.
+     * @return L'utilisateur correspondant à l'ID.
+     */
+    public User getUser(int id) {
+        return userDAO.find(id);
+    }
 }

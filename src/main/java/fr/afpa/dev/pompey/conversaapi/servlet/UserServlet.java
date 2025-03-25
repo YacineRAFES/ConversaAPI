@@ -9,14 +9,19 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.List;
+import java.util.UUID;
+
 import jakarta.json.*;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Servlet pour les utilisateurs.
  */
-@WebServlet("/api/users")
+@WebServlet("/api/user")
 public class UserServlet extends HttpServlet {
 
     private UserService userService;
@@ -42,15 +47,49 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         List<User> users = userService.getAllUsers();
+        HttpSession session = request.getSession();
+        String csrfToken = (String) session.getAttribute("csrfToken");
+
+        if (csrfToken == null) {
+            csrfToken = UUID.randomUUID().toString();
+            session.setAttribute("csrfToken", csrfToken);
+        }
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+
+        JsonObject jsonResponse = Json.createObjectBuilder()
+            .add("csrfToken", csrfToken)
+                    .add("users", usersToJson(users))
+                            .build();
+
         response.getWriter().write(usersToJson(users));
     }
 
-    //Add doPost method for creating a new user
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        String csrfToken = (String) session.getAttribute("csrfToken");
 
+        //Lire le JSON envoyé par le clint
+        BufferedReader reader = request.getReader();
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        String json = sb.toString();
+
+        //Extraire le token CSRF du JSON
+        String csrfTokenRecu = extraireCsrfToken(json);
+
+        if(csrfToken.equals(csrfTokenRecu)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "CSRF Token Invalide");
+            return;
+        }
+
+//        User newUser = new parse;
     }
 
 
@@ -75,6 +114,14 @@ public class UserServlet extends HttpServlet {
             return arrayBuilder.build().toString();
         }catch (JsonException e){
             throw new JsonException("Erreur lors de la lecture du serveur");
+        }
+    }
+
+    // Méthode pour extraire le token CSRF du JSON envoyé
+    private String extraireCsrfToken(String json) {
+        try (JsonReader jsonReader = Json.createReader(new StringReader(json))) {
+            JsonObject jsonObject = jsonReader.readObject();
+            return jsonObject.getString("csrfToken", null);
         }
     }
 
