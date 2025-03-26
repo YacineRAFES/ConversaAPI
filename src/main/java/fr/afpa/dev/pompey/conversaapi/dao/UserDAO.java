@@ -3,12 +3,14 @@ package fr.afpa.dev.pompey.conversaapi.dao;
 import fr.afpa.dev.pompey.conversaapi.exception.DAOException;
 import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
-import fr.afpa.dev.pompey.conversaapi.utilitaires.Log;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+@Slf4j
 /**
  * Classe DAO pour les opérations CRUD sur les utilisateurs.
  */
@@ -43,7 +45,7 @@ public class UserDAO extends DAO<User>{
                 }
             }
         } catch (SQLException e) {
-            Log.error("Erreur lors de la création User", e);
+            log.error("Erreur lors de la création User", e);
         }
         return newid;
     }
@@ -63,7 +65,7 @@ public class UserDAO extends DAO<User>{
             pstmt.setInt(1, obj.getId());
             pstmt.executeUpdate();
         } catch (SQLException | DAOException e) {
-            Log.error("Erreur lors de la deletion User", e);
+            log.error("Erreur lors de la deletion User", e);
         }
         return true;
     }
@@ -89,7 +91,7 @@ public class UserDAO extends DAO<User>{
             pstmt.executeUpdate();
             return true;
         } catch (SQLException | DAOException e) {
-            Log.error("Erreur lors de la modification User",e);
+            log.error("Erreur lors de la modification User",e);
             return false;
         }
     }
@@ -121,7 +123,7 @@ public class UserDAO extends DAO<User>{
             }
             return user;
         }catch (SQLException | SaisieException e){
-            Log.error("Erreur lors de la recherche User",e);
+            log.error("Erreur lors de la recherche User",e);
             return null;
         }
     }

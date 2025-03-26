@@ -1,7 +1,7 @@
 import fr.afpa.dev.pompey.conversaapi.dao.UserDAO;
 import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
-import fr.afpa.dev.pompey.conversaapi.utilitaires.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Slf4j
 class UserDAOTest {
 
     private UserDAO userDAO;
@@ -31,7 +32,7 @@ class UserDAOTest {
         User user = new User("John Doe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()));
         int id = userDAO.create(user);
         assertTrue(id > 0, "Erreur lors de la création User");
-        Log.info("L'id de l'utilisateur inséré est " + id);
+        log.info("L'id de l'utilisateur inséré est " + id);
 
         // Supprimez l'utilisateur après le test
         userDAO.delete(new User(id));

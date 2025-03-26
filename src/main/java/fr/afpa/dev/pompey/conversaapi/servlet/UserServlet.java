@@ -11,17 +11,21 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import jakarta.json.*;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Servlet pour les utilisateurs.
  */
-@WebServlet("/api/user")
+@Slf4j
+@WebServlet("/user")
 public class UserServlet extends HttpServlet {
 
     private UserService userService;
@@ -46,7 +50,6 @@ public class UserServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<User> users = userService.getAllUsers();
         HttpSession session = request.getSession();
         String csrfToken = (String) session.getAttribute("csrfToken");
 
@@ -55,43 +58,49 @@ public class UserServlet extends HttpServlet {
             session.setAttribute("csrfToken", csrfToken);
         }
 
+        log.info(csrfToken);
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
         JsonObject jsonResponse = Json.createObjectBuilder()
-            .add("csrfToken", csrfToken)
-                    .add("users", usersToJson(users))
-                            .build();
+                .add("csrfToken", csrfToken)
+                .build();
 
-        response.getWriter().write(usersToJson(users));
+        response.getWriter().write(jsonResponse.toString());
     }
 
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        String csrfToken = (String) session.getAttribute("csrfToken");
-
-        //Lire le JSON envoyé par le clint
-        BufferedReader reader = request.getReader();
+        // Lire le JSON envoyé par le client
+        BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
         StringBuilder sb = new StringBuilder();
         String line;
         while ((line = reader.readLine()) != null) {
             sb.append(line);
         }
+        System.out.println(sb);
         String json = sb.toString();
+        System.out.println("JSON reçu: " + json);
 
-        //Extraire le token CSRF du JSON
-        String csrfTokenRecu = extraireCsrfToken(json);
+        log.info("JSON reçu: " + json);
 
-        if(csrfToken.equals(csrfTokenRecu)) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "CSRF Token Invalide");
+        if (json.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Le corps de la requête est vide");
             return;
         }
 
-//        User newUser = new parse;
-    }
+        //Afficher json
+        System.out.println(json);
 
+        User newUser = extraireUtilisateurDepuisJson(json);
+        if (newUser == null) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Données utilisateur invalides");
+            return;
+        }
+        //        User newUser = new parse;
+    }
 
     /**
      * Convertit une liste d'utilisateurs en JSON.
@@ -117,13 +126,39 @@ public class UserServlet extends HttpServlet {
         }
     }
 
-    // Méthode pour extraire le token CSRF du JSON envoyé
+    /**
+     * Méthode pour extraire le token CSRF du JSON envoyé
+     * @param json
+     * @return
+     */
     private String extraireCsrfToken(String json) {
         try (JsonReader jsonReader = Json.createReader(new StringReader(json))) {
             JsonObject jsonObject = jsonReader.readObject();
             return jsonObject.getString("csrfToken", null);
         }
     }
+
+    /**
+     * Extraire
+     * @param json
+     * @return
+     */
+    private User extraireUtilisateurDepuisJson(String json) {
+        try (JsonReader jsonReader = Json.createReader(new StringReader(json))) {
+            JsonObject jsonObject = jsonReader.readObject();
+
+            String username = jsonObject.getString("user", "");
+            String email = jsonObject.getString("email", "");
+            String password1 = jsonObject.getString("password1", "");
+            String password2 = jsonObject.getString("password2", "");
+
+            return new User(username, email, password1, password2); // Adapte selon ton constructeur
+        } catch (Exception e) {
+            log.error("Erreur lors de la lecture du JSON", e);
+            return null;
+        }
+    }
+
 
 
 }
