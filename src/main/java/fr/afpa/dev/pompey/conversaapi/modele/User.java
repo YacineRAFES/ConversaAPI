@@ -37,7 +37,7 @@ public class User {
         this.role = role;
     }
 
-    /**
+    /** Création d'un utilisateur
      * @param name
      * @param password
      * @param email

@@ -77,22 +77,11 @@ public class CSRFTokenFilter implements Filter {
     }
 
     private String extractCsrfTokenFromJson(HttpServletRequest request) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-
-        if (sb.isEmpty()) {
-            return null;
-        }
-
-        try (JsonReader jsonReader = Json.createReader(new StringReader(sb.toString()))) {
+        try (JsonReader jsonReader = Json.createReader(request.getInputStream())) {
             JsonObject jsonObject = jsonReader.readObject();
-            return jsonObject.getString("csrfToken", null);
+            System.out.println("JSON reçu: " + jsonObject);
+            return jsonObject.getString("csrf", null); // Évite le NullPointerException
         } catch (Exception e) {
-            log.error("Erreur lors de la lecture du JSON", e);
             return null;
         }
     }

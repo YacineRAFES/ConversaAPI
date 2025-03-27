@@ -5,14 +5,13 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 @WebFilter("/*")
 public class CORSFilter implements Filter {
 
     // Définir les origines autorisées (remplace par ton domaine)
-    private static final List<String> ALLOWED_ORIGINS = Arrays.asList("http://localhost:8090");
+    private static final List<String> ALLOWED_ORIGINS = List.of("http://localhost:8090");
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -38,7 +37,6 @@ public class CORSFilter implements Filter {
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
-
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
