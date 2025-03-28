@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebFilter("/*")
+@WebFilter("*")
 public class CORSFilter implements Filter {
 
     // Définir les origines autorisées (remplace par ton domaine)
@@ -43,6 +43,4 @@ public class CORSFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) {}
 
-    @Override
-    public void destroy() {}
 }

@@ -1,5 +1,6 @@
 package fr.afpa.dev.pompey.conversaapi.securite;
 
+import fr.afpa.dev.pompey.conversaapi.utilitaires.CachedBodyHttpServletRequest;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
@@ -16,7 +17,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.UUID;
 
-@WebFilter("/*")
+@WebFilter("*")
 @Slf4j
 public class CSRFTokenFilter implements Filter {
     @Override
@@ -26,6 +27,8 @@ public class CSRFTokenFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         String requestURI = httpRequest.getRequestURI();
+
+        CachedBodyHttpServletRequest wrappedRequest = new CachedBodyHttpServletRequest(httpRequest);
 
         log.info("filtre csrf appele");
         HttpSession session = httpRequest.getSession(false);
@@ -40,7 +43,7 @@ public class CSRFTokenFilter implements Filter {
             // Récupérer le token CSRF envoyé par le client
             log.info("REQUETE: {} ", requestURI);
             request.getParameterMap().forEach((key, value) -> log.info("REQUETE PARAMETER key: {} value: {}", key, value));
-            String csrfTokenFromClient = extractCsrfTokenFromJson(httpRequest);
+            String csrfTokenFromClient = extractCsrfTokenFromJson(wrappedRequest);
 
             // Récupérer le token CSRF stocké dans la session
             String csrfTokenFromServer = (String) session.getAttribute("csrfToken");
@@ -67,13 +70,8 @@ public class CSRFTokenFilter implements Filter {
             session.setAttribute("csrfToken", uuidStr);
             request.setAttribute("csrfToken", uuidStr);
         }
-        chain.doFilter(request, response);
+        chain.doFilter(wrappedRequest, response);
 
-    }
-
-    @Override
-    public void destroy() {
-        Filter.super.destroy();
     }
 
     private String extractCsrfTokenFromJson(HttpServletRequest request) throws IOException {
@@ -86,4 +84,3 @@ public class CSRFTokenFilter implements Filter {
         }
     }
 }
-
