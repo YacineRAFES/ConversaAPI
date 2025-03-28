@@ -82,7 +82,7 @@ class UserTest {
         String invalidPassword = "password";
 
         Exception exception = assertThrows(SaisieException.class, () -> {
-            if(!invalidPassword.matches(Regex.REGEX_PASSWORD)) {
+            if(!invalidPassword.matches(Regex.PASSWORD)) {
                 throw new SaisieException("Le mot de passe ne respecte pas les critères");
             }});
         assertEquals("Le mot de passe ne respecte pas les critères", exception.getMessage());
@@ -141,7 +141,7 @@ class UserTest {
         });
         assertEquals("La date ne doit pas être vide ou null", exception.getMessage());
     }
-
+    //TODO: Problème avec la date
 //    @Test
 //    void setDateEqual() {
 //        LocalDate localDate = LocalDate.of(2020, 1, 1);

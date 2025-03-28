@@ -46,6 +46,7 @@ public class UserDAO extends DAO<User>{
             }
         } catch (SQLException e) {
             log.error("Erreur lors de la création User", e);
+            throw new DAOException(e.getMessage());
         }
         return newid;
     }
@@ -66,6 +67,7 @@ public class UserDAO extends DAO<User>{
             pstmt.executeUpdate();
         } catch (SQLException | DAOException e) {
             log.error("Erreur lors de la deletion User", e);
+            throw new DAOException(e.getMessage());
         }
         return true;
     }
@@ -92,7 +94,7 @@ public class UserDAO extends DAO<User>{
             return true;
         } catch (SQLException | DAOException e) {
             log.error("Erreur lors de la modification User",e);
-            return false;
+            throw new DAOException(e.getMessage());
         }
     }
 
@@ -124,7 +126,7 @@ public class UserDAO extends DAO<User>{
             return user;
         }catch (SQLException | SaisieException e){
             log.error("Erreur lors de la recherche User",e);
-            return null;
+            throw new DAOException(e.getMessage());
         }
     }
 
@@ -154,7 +156,7 @@ public class UserDAO extends DAO<User>{
             }
             return users;
         }catch (SQLException | SaisieException e){
-            throw new RuntimeException(e);
+            throw new DAOException(e.getMessage());
         }
 
 

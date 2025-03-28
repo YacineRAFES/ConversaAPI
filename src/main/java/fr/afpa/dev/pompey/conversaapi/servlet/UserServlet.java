@@ -3,6 +3,7 @@ package fr.afpa.dev.pompey.conversaapi.servlet;
 import fr.afpa.dev.pompey.conversaapi.exception.JsonException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import fr.afpa.dev.pompey.conversaapi.service.UserService;
+import fr.afpa.dev.pompey.conversaapi.utilitaires.Regex;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.SendJSON;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,12 +15,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import jakarta.json.*;
 import jakarta.servlet.http.HttpSession;
+import jdk.jfr.Timespan;
 import lombok.extern.slf4j.Slf4j;
 
 import static fr.afpa.dev.pompey.conversaapi.securite.Securite.hashPassword;
@@ -88,13 +93,71 @@ public class UserServlet extends HttpServlet {
         String password1 = jsonObject.getString("password1", "");
         String password2 = jsonObject.getString("password2", "");
 
+        // Verifie les champs ne sont pas vides
+        if(!username.isEmpty() || !email.isEmpty() || !password1.isEmpty() || !password2.isEmpty()) {
+            log.info("Les champs ne sont pas vides");
+        }else{
+            log.error("Les champs sont vides");
+            SendJSON.Error(response, "emptyField");
+            return;
+        }
+
+        // Vérifie la longueur des champs
+        if (username.length() < 50 && email.length() < 50) {
+            log.info("les champs respectent la longueur du caractère");
+            // Vérifie si l'utilisateur existe déjà
+            List<User> users = userService.getAllUsers();
+            for (User user : users) {
+                if (user.getName().equals(username) && user.getEmail().equals(email)) {
+                    log.error("L'utilisateur existe déjà");
+                    SendJSON.Error(response, "userExists");
+                    return;
+                }else{
+                    log.info("L'utilisateur n'existe pas");
+                }
+            }
+        }else{
+            log.error("Les champs dépassent la longueur maximale");
+            SendJSON.Error(response, "lengthInvalid");
+            return;
+        }
+
+        // Vérifie le format de l'email
+        if (email.matches(Regex.EMAIL)) {
+            log.info("L'email est valide");
+        }else{
+            SendJSON.Error(response, "emailInvalid");
+            return;
+        }
+
+        // Verifie si le mot de passe
+        String pwHash = null;
         if(password1.equals(password2)) {
             log.info("Les mots de passe correspondent");
-            String pwHash = hashPassword(password1);
+
+            if(password1.matches(Regex.PASSWORD)) {
+                pwHash = hashPassword(password1);
+                System.out.println(pwHash.getBytes().length);
+            }else{
+                log.error("le mot de passe ne respect pas le critère");
+                SendJSON.Error(response, "passwordInvalid");
+                return;
+            }
         }else{
             log.error("Les mots de passe ne correspondent pas");
             SendJSON.Error(response, "passwordInvalid");
+            return;
         }
+        // TODO: PROBLEME AVEC LA DATE
+//        User user = new User(username, pwHash, email, "user", LocalDate.now());
+//        try{
+//            userService.addUser(user);
+//            log.info("L'utilisateur a été ajouté avec succès");
+//        }catch(Exception e){
+//            log.error("Erreur lors de l'ajout de l'utilisateur", e);
+//            SendJSON.Error(response, "userNotAdded");
+//            throw new ServletException(e.getMessage());
+//        }
 
     }
 

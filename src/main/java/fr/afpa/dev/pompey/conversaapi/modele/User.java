@@ -104,7 +104,7 @@ public class User {
     public void setName(String name) throws SaisieException {
         if (name == null || name.isEmpty()) {
             throw new SaisieException("Le nom ne doit pas être vide ou null");
-        } else if (!name.matches(Regex.REGEX_NAME)) {
+        } else if (!name.matches(Regex.NAME)) {
             throw new SaisieException("Le nom ne corresponds pas");
         }
         this.name = name;
@@ -134,7 +134,7 @@ public class User {
     public void setEmail(String email) throws SaisieException {
         if (email == null || email.isEmpty()) {
             throw new SaisieException("L'email ne doit pas être vide ou null");
-        } else if (!email.matches(Regex.REGEX_EMAIL)) {
+        } else if (!email.matches(Regex.EMAIL)) {
             throw new SaisieException("L'email ne corresponds pas");
         }
         this.email = email;

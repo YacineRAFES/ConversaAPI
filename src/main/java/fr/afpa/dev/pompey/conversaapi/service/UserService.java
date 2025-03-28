@@ -23,7 +23,12 @@ public class UserService {
      * @param user L'utilisateur à ajouter.
      */
     public void addUser(User user) {
-        userDAO.create(user);
+        try{
+            userDAO.create(user);
+        }catch (Exception e){
+            throw new RuntimeException("Erreur lors de l'ajout de l'utilisateur : " + e.getMessage());
+        }
+
     }
 
     /**
