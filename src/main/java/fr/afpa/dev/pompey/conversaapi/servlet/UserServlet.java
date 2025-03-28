@@ -3,6 +3,7 @@ package fr.afpa.dev.pompey.conversaapi.servlet;
 import fr.afpa.dev.pompey.conversaapi.exception.JsonException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import fr.afpa.dev.pompey.conversaapi.service.UserService;
+import fr.afpa.dev.pompey.conversaapi.utilitaires.SendJSON;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,6 +21,8 @@ import java.util.stream.Collectors;
 import jakarta.json.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+
+import static fr.afpa.dev.pompey.conversaapi.securite.Securite.hashPassword;
 
 /**
  * Servlet pour les utilisateurs.
@@ -60,14 +63,17 @@ public class UserServlet extends HttpServlet {
 
         log.info(csrfToken);
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+//        SendJSON.Error(response, "Erreur du serveur");
+        SendJSON.Token(response, "csrfToken", csrfToken);
 
-        JsonObject jsonResponse = Json.createObjectBuilder()
-                .add("csrfToken", csrfToken)
-                .build();
-
-        response.getWriter().write(jsonResponse.toString());
+//        response.setContentType("application/json");
+//        response.setCharacterEncoding("UTF-8");
+//
+//        JsonObject jsonResponse = Json.createObjectBuilder()
+//                .add("csrfToken", csrfToken)
+//                .build();
+//
+//        response.getWriter().write(jsonResponse.toString());
     }
 
 
@@ -77,6 +83,18 @@ public class UserServlet extends HttpServlet {
         JsonReader jsonReader = Json.createReader(request.getInputStream());
         JsonObject jsonObject = jsonReader.readObject();
 
+        String username = jsonObject.getString("user", "");
+        String email = jsonObject.getString("email", "");
+        String password1 = jsonObject.getString("password1", "");
+        String password2 = jsonObject.getString("password2", "");
+
+        if(password1.equals(password2)) {
+            log.info("Les mots de passe correspondent");
+            String pwHash = hashPassword(password1);
+        }else{
+            log.error("Les mots de passe ne correspondent pas");
+            SendJSON.Error(response, "passwordInvalid");
+        }
 
     }
 
