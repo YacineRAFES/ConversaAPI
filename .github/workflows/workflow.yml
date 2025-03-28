@@ -62,13 +62,21 @@ jobs :
     needs : build
 
     steps :
-      - name : Discord notification
+      - name : Discord notification (succès)
+        if : success()
         env :
           DISCORD_WEBHOOK : ${{ secrets.DISCORD_WEBHOOK }}
         uses : sarisia/actions-status-discord@v1
-        if : always()
         with :
           description : 'Le projet ConversaAPI a été build avec succès'
+
+      - name : Discord notification (échec)
+        if : failure()
+        env :
+          DISCORD_WEBHOOK : ${{ secrets.DISCORD_WEBHOOK }}
+        uses : sarisia/actions-status-discord@v1
+        with :
+          description : 'Le projet ConversaAPI a échoué'
 
 #  docker-build-image-api:
 #    if: ${{ github.ref == 'refs/heads/main' }}
