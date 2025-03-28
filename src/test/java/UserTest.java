@@ -38,7 +38,7 @@ class UserTest {
         Exception exception = assertThrows(SaisieException.class, () -> {
             userUnderTest.setId(-1);
         });
-        assertEquals("L'id ne doit spas être négatif", exception.getMessage());
+        assertEquals("L'id ne doit pas être négatif", exception.getMessage());
     }
 
     @ParameterizedTest
