@@ -142,12 +142,12 @@ class UserTest {
         assertEquals("La date ne doit pas être vide ou null", exception.getMessage());
     }
     //TODO: Problème avec la date
-//    @Test
-//    void setDateEqual() {
-//        LocalDate localDate = LocalDate.of(2020, 1, 1);
-//        LocalDate actuelDate = LocalDate.of(2020, 1, 1);
-//        assertEquals(localDate, actuelDate, "La date ne corresponds pas");
-//    }
+    @Test
+    void setDateEqual() {
+        LocalDate localDate = LocalDate.of(2020, 1, 1);
+        LocalDate actuelDate = LocalDate.of(2020, 1, 1);
+        assertEquals(localDate, actuelDate, "La date ne corresponds pas");
+    }
 
     @AfterEach
     void tearDown() {
