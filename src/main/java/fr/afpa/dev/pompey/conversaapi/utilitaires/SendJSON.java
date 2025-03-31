@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class SendJSON {
     /**
-     * Convertit un message error en JSON et l'envoie à la réponse HTTP.
+     * Envoye un message error en JSON et l'envoie à la réponse HTTP.
      * {"status": "error", "message": "Votre Message"}
      *
      * @param response La réponse HTTP.
@@ -40,7 +40,7 @@ public class SendJSON {
     }
 
     /**
-     * Convertit un message success en JSON et l'envoie à la réponse HTTP.
+     * Envoye un message success en JSON et l'envoie à la réponse HTTP.
      * {"status": "success", "message": "Votre Message"}
      *
      * @param response La réponse HTTP.
@@ -67,7 +67,7 @@ public class SendJSON {
     }
 
     /**
-     * Convertit un token en JSON et l'envoie à la réponse HTTP.
+     * Envoye un token en JSON et l'envoie à la réponse HTTP.
      * {"status": "typeToken", "message": "votreToken"}
      *
      * @param response      La réponse HTTP.

@@ -1,6 +1,7 @@
 package fr.afpa.dev.pompey.conversaapi.dao;
 
 import fr.afpa.dev.pompey.conversaapi.exception.DAOException;
+import fr.afpa.dev.pompey.conversaapi.exception.RegexException;
 import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import lombok.extern.slf4j.Slf4j;
@@ -124,7 +125,7 @@ public class UserDAO extends DAO<User>{
                 user.setRole(rs.getString("USER_ROLE"));
             }
             return user;
-        }catch (SQLException | SaisieException e){
+        }catch (SQLException | SaisieException | RegexException e){
             log.error("Erreur lors de la recherche User",e);
             throw new DAOException(e.getMessage());
         }
@@ -155,7 +156,8 @@ public class UserDAO extends DAO<User>{
                 users.add(user);
             }
             return users;
-        }catch (SQLException | SaisieException e){
+        }catch (SQLException | SaisieException | RegexException e){
+            log.error("Erreur lors de la recherche de tous les utilisateurs", e);
             throw new DAOException(e.getMessage());
         }
 

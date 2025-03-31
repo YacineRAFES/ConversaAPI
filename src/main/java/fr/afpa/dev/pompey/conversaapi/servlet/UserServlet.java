@@ -2,6 +2,7 @@ package fr.afpa.dev.pompey.conversaapi.servlet;
 
 import fr.afpa.dev.pompey.conversaapi.exception.JsonException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
+import fr.afpa.dev.pompey.conversaapi.securite.Captcha;
 import fr.afpa.dev.pompey.conversaapi.service.UserService;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.Regex;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.SendJSON;
@@ -69,23 +70,17 @@ public class UserServlet extends HttpServlet {
 
         log.info(csrfToken);
 
-//        SendJSON.Error(response, "Erreur du serveur");
         SendJSON.Token(response, "csrfToken", csrfToken);
 
-//        response.setContentType("application/json");
-//        response.setCharacterEncoding("UTF-8");
-//
-//        JsonObject jsonResponse = Json.createObjectBuilder()
-//                .add("csrfToken", csrfToken)
-//                .build();
-//
-//        response.getWriter().write(jsonResponse.toString());
     }
 
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+
         // Lire le JSON envoyé par le client
+
         JsonReader jsonReader = Json.createReader(request.getInputStream());
         JsonObject jsonObject = jsonReader.readObject();
 
@@ -93,6 +88,19 @@ public class UserServlet extends HttpServlet {
         String email = jsonObject.getString("email", "");
         String password1 = jsonObject.getString("password1", "");
         String password2 = jsonObject.getString("password2", "");
+        String captcha = jsonObject.getString("cf-turnstile-response", "");
+
+        //TODO: CAPTCHA: A REVOIR
+//        log.info("Captcha : " + captcha);
+//        boolean isCaptchaValid = Captcha.verif(captcha);
+//
+//        if (!isCaptchaValid) {
+//            log.error("Captcha invalide");
+//            SendJSON.Error(response, "captchaInvalid");
+//            return;
+//        } else {
+//            log.info("Captcha valide");
+//        }
 
         // Verifie les champs ne sont pas vides
         if(!username.isEmpty() || !email.isEmpty() || !password1.isEmpty() || !password2.isEmpty()) {
@@ -100,42 +108,60 @@ public class UserServlet extends HttpServlet {
         }else{
             log.error("Les champs sont vides");
             SendJSON.Error(response, "emptyField");
-            return;
+            throw new JsonException("userAlreadyExists");
         }
-
+        List<User> users = userService.getAllUsers();
         // Vérifie la longueur des champs
-        if (username.length() < 50 && email.length() < 50) {
-            log.info("les champs respectent la longueur du caractère");
+        if (username.length() < 50) {
+            log.info("le champs username respecte la longueur du caractère");
             // Vérifie si l'utilisateur existe déjà
-            List<User> users = userService.getAllUsers();
             for (User user : users) {
-                if (user.getName().equals(username) && user.getEmail().equals(email)) {
-                    log.error("L'utilisateur existe déjà");
-                    SendJSON.Error(response, "userExists");
-                    return;
-                }else{
-                    log.info("L'utilisateur n'existe pas");
+                if (user.getName().equals(username)) {
+                    log.error("Le nom d'utilisateur existe déjà");
+                    SendJSON.Error(response, "userAlreadyExists");
+                    throw new JsonException("userAlreadyExists");
                 }
             }
+
+            log.info("L'username n'existe pas, on peut l'ajouter");
+        }else{
+            log.error("Le champ username dépasse la longueur maximale");
+            SendJSON.Error(response, "lengthInvalid");
+            throw new JsonException("userAlreadyExists");
+        }
+        // Vérifie si l'email est valide
+        if(email.length() < 50){
+            log.info("le champs email respecte la longueur du caractère");
+            // Vérifie si l'email existe déjà
+            for (User user : users) {
+                if (user.getEmail().equals(email)) {
+                    log.error("L'email existe déjà");
+                    SendJSON.Error(response, "userAlreadyExists");
+                    throw new JsonException("userAlreadyExists");
+                }
+            }
+            log.info("L'email n'existe pas, on peut l'ajouter");
         }else{
             log.error("Les champs dépassent la longueur maximale");
             SendJSON.Error(response, "lengthInvalid");
-            return;
+            throw new JsonException("lengthInvalid");
         }
 
         // Vérifie le format de l'email
         if (email.matches(Regex.EMAIL)) {
             log.info("L'email est valide");
         }else{
+            log.error("L'email est invalide lors de la REGEX.EMAIL");
             SendJSON.Error(response, "emailInvalid");
-            return;
+            throw new JsonException("emailInvalid");
         }
 
-        // Verifie si le mot de passe
+        // Verifie le mot de passe
         String pwHash = null;
         if(password1.equals(password2)) {
             log.info("Les mots de passe correspondent");
 
+            // Vérifie les critères du mot de passe si oui, on le hash
             if(password1.matches(Regex.PASSWORD)) {
                 pwHash = hashPassword(password1);
                 System.out.println(pwHash.getBytes().length);
@@ -143,21 +169,22 @@ public class UserServlet extends HttpServlet {
             }else{
                 log.error("le mot de passe ne respect pas le critère");
                 SendJSON.Error(response, "passwordInvalid");
-                return;
+                throw new JsonException("passwordInvalid");
             }
         }else{
             log.error("Les mots de passe ne correspondent pas");
             SendJSON.Error(response, "passwordInvalid");
-            return;
+            throw new JsonException("passwordInvalid");
         }
-        // TODO: PROBLEME AVEC LA DATE
+
         User user = new User(username, pwHash, email, "user", Date.valueOf(LocalDate.now()));
         try{
             userService.addUser(user);
             log.info("L'utilisateur a été ajouté avec succès");
+            SendJSON.Success(response, "userCreated");
         }catch(Exception e){
             log.error("Erreur lors de l'ajout de l'utilisateur", e);
-            SendJSON.Error(response, "userNotAdded");
+            SendJSON.Error(response, "ServerError");
             throw new ServletException(e.getMessage());
         }
 

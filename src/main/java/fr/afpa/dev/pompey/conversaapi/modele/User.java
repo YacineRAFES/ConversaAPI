@@ -1,5 +1,6 @@
 package fr.afpa.dev.pompey.conversaapi.modele;
 
+import fr.afpa.dev.pompey.conversaapi.exception.RegexException;
 import fr.afpa.dev.pompey.conversaapi.securite.Securite;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.Regex;
 import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
@@ -101,11 +102,11 @@ public class User {
     /**
      * @param name
      */
-    public void setName(String name) throws SaisieException {
+    public void setName(String name) throws RegexException, SaisieException {
         if (name == null || name.isEmpty()) {
             throw new SaisieException("Le nom ne doit pas être vide ou null");
-        } else if (!name.matches(Regex.NAME)) {
-            throw new SaisieException("Le nom ne corresponds pas");
+        } else if (!name.matches(Regex.USERNAME)) {
+            throw new RegexException("Le nom ne corresponds pas");
         }
         this.name = name;
     }
