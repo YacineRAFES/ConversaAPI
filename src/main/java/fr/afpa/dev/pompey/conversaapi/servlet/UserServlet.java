@@ -15,8 +15,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.sql.Date;
 import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -138,6 +139,7 @@ public class UserServlet extends HttpServlet {
             if(password1.matches(Regex.PASSWORD)) {
                 pwHash = hashPassword(password1);
                 System.out.println(pwHash.getBytes().length);
+                System.out.println(pwHash);
             }else{
                 log.error("le mot de passe ne respect pas le critère");
                 SendJSON.Error(response, "passwordInvalid");
@@ -149,15 +151,15 @@ public class UserServlet extends HttpServlet {
             return;
         }
         // TODO: PROBLEME AVEC LA DATE
-//        User user = new User(username, pwHash, email, "user", LocalDate.now());
-//        try{
-//            userService.addUser(user);
-//            log.info("L'utilisateur a été ajouté avec succès");
-//        }catch(Exception e){
-//            log.error("Erreur lors de l'ajout de l'utilisateur", e);
-//            SendJSON.Error(response, "userNotAdded");
-//            throw new ServletException(e.getMessage());
-//        }
+        User user = new User(username, pwHash, email, "user", Date.valueOf(LocalDate.now()));
+        try{
+            userService.addUser(user);
+            log.info("L'utilisateur a été ajouté avec succès");
+        }catch(Exception e){
+            log.error("Erreur lors de l'ajout de l'utilisateur", e);
+            SendJSON.Error(response, "userNotAdded");
+            throw new ServletException(e.getMessage());
+        }
 
     }
 

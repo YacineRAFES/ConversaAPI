@@ -8,9 +8,9 @@ import com.password4j.SaltGenerator;
 import static com.password4j.Password.check;
 
 public class Securite {
-    private static final String salt = "salt";
 //    Pour plus d'info : https://github.com/Password4j/password4j
 //    hashPassword("password", hash)
+// le sel n'est pas nécessaire car il est généré par Bcrypt
     /**
      * Hash le mot de passe
      * @param password le mot de passe à hasher
@@ -19,9 +19,8 @@ public class Securite {
     public static String hashPassword(String password) {
         try {
             Hash hash = Password.hash(password)
-                        .addRandomSalt()
                         .addPepper(PoivreToken.POIVRE)
-                        .withArgon2();
+                        .withBcrypt();
 
             return hash.getResult();
         }catch (Exception e){
@@ -39,7 +38,7 @@ public class Securite {
         try {
             return Password.check(password, hash)
                     .addPepper(PoivreToken.POIVRE)
-                    .withArgon2();
+                    .withBcrypt();
         }catch (Exception e){
             throw new RuntimeException("Erreur lors de la vérification du mot de passe");
         }

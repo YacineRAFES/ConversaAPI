@@ -2,6 +2,7 @@ package fr.afpa.dev.pompey.conversaapi.service;
 
 import fr.afpa.dev.pompey.conversaapi.dao.UserDAO;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
+import fr.afpa.dev.pompey.conversaapi.utilitaires.Utils;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class UserService {
         try{
             userDAO.create(user);
         }catch (Exception e){
-            throw new RuntimeException("Erreur lors de l'ajout de l'utilisateur : " + e.getMessage());
+            throw new RuntimeException("Erreur lors de l'ajout de l'utilisateur : " + e.getMessage() + Utils.getNameClass());
         }
 
     }
