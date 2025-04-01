@@ -7,11 +7,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import static fr.afpa.dev.pompey.conversaapi.utilitaires.Config.*;
+
 public class Singleton {
 
     private static final Properties props = new Properties();
     private static Connection connection;
-    final String PATHCONF = "conf.properties";
 
     private Singleton() {
         try (InputStream is = getClass().getClassLoader().getResourceAsStream(PATHCONF)) {
@@ -21,10 +22,10 @@ public class Singleton {
         }
 
         try {
-            Class.forName(props.getProperty("jdbc.driver"));
-            String url = props.getProperty("jdbc.url");
-            String user = props.getProperty("jdbc.username");
-            String password = props.getProperty("jdbc.password");
+            Class.forName(getJDBC_DRIVER());
+            String url = getJDBC_URL();
+            String user = getJDBC_USER();
+            String password = getJDBC_PASSWORD();
 
             connection = DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
