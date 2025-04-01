@@ -4,7 +4,6 @@ import fr.afpa.dev.pompey.conversaapi.exception.JsonException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import fr.afpa.dev.pompey.conversaapi.securite.Captcha;
 import fr.afpa.dev.pompey.conversaapi.service.UserService;
-import fr.afpa.dev.pompey.conversaapi.utilitaires.CachedBodyHttpServletRequest;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.Regex;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.SendJSON;
 import jakarta.servlet.ServletException;
@@ -13,21 +12,15 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import jakarta.json.*;
 import jakarta.servlet.http.HttpSession;
-import jdk.jfr.Timespan;
 import lombok.extern.slf4j.Slf4j;
 
 import static fr.afpa.dev.pompey.conversaapi.securite.Securite.hashPassword;
