@@ -11,16 +11,9 @@ import static fr.afpa.dev.pompey.conversaapi.utilitaires.Config.*;
 
 public class Singleton {
 
-    private static final Properties props = new Properties();
     private static Connection connection;
 
     private Singleton() {
-        try (InputStream is = getClass().getClassLoader().getResourceAsStream(PATHCONF)) {
-            props.load(is);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         try {
             Class.forName(getJDBC_DRIVER());
             String url = getJDBC_URL();
