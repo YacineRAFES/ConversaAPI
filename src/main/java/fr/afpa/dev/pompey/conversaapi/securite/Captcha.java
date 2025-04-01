@@ -18,32 +18,25 @@ public class Captcha {
 
     public static boolean verif(String captcha) throws IOException {
         //SECRET_KEY
-        String SECRET_KEY = System.getenv("SECRET_KEY_CAPTCHA");
+        String SECRET_KEY = "0x4AAAAAABCkJxo3fVKlHXMFeDcBswT1Eak";
         String url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
         String params = "secret=" + URLEncoder.encode(SECRET_KEY, StandardCharsets.UTF_8) + "&response=" + URLEncoder.encode(captcha, StandardCharsets.UTF_8);
+        System.out.println(params);
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("POST");
         con.setDoOutput(true);
+
         con.getOutputStream().write(params.getBytes(StandardCharsets.UTF_8));
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
-
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-        in.close();
-
         // Convertir la réponse JSON en objet Java
-        try(JsonReader jsonReader = Json.createReader(new StringReader(response.toString()))) {
+        try(JsonReader jsonReader = Json.createReader(con.getInputStream())) {
             JsonObject jsonObject = jsonReader.readObject();
             System.out.println("Depuis Captcha.verif: " + jsonObject);
             return jsonObject.getBoolean("success");
         }catch (Exception e) {
             System.out.println("Erreur de parsing Captcha JSON: " + e.getMessage());
-            return false;
+            throw new RuntimeException(e.getMessage());
         }
     }
 }
