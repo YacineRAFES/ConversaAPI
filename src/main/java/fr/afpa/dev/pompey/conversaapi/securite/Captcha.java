@@ -14,11 +14,13 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+import static fr.afpa.dev.pompey.conversaapi.utilitaires.Config.getSecretKeyCaptcha;
+
 public class Captcha {
 
     public static boolean verif(String captcha) throws IOException {
         //SECRET_KEY
-        String SECRET_KEY = "0x4AAAAAABCkJxo3fVKlHXMFeDcBswT1Eak";
+        String SECRET_KEY = getSecretKeyCaptcha();
         String url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
         String params = "secret=" + URLEncoder.encode(SECRET_KEY, StandardCharsets.UTF_8) + "&response=" + URLEncoder.encode(captcha, StandardCharsets.UTF_8);
         System.out.println(params);
