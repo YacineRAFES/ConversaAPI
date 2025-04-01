@@ -4,6 +4,7 @@ import fr.afpa.dev.pompey.conversaapi.exception.JsonException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import fr.afpa.dev.pompey.conversaapi.securite.Captcha;
 import fr.afpa.dev.pompey.conversaapi.service.UserService;
+import fr.afpa.dev.pompey.conversaapi.utilitaires.CachedBodyHttpServletRequest;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.Regex;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.SendJSON;
 import jakarta.servlet.ServletException;
@@ -78,11 +79,11 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-
         // Lire le JSON envoyé par le client
 
         JsonReader jsonReader = Json.createReader(request.getInputStream());
         JsonObject jsonObject = jsonReader.readObject();
+        System.out.println(jsonObject);
 
         String username = jsonObject.getString("user", "");
         String email = jsonObject.getString("email", "");
@@ -90,25 +91,25 @@ public class UserServlet extends HttpServlet {
         String password2 = jsonObject.getString("password2", "");
         String captcha = jsonObject.getString("cf-turnstile-response", "");
 
+        log.info("Captcha : " + captcha);
+
         //TODO: CAPTCHA: A REVOIR
-//        log.info("Captcha : " + captcha);
-//        boolean isCaptchaValid = Captcha.verif(captcha);
-//
-//        if (!isCaptchaValid) {
-//            log.error("Captcha invalide");
-//            SendJSON.Error(response, "captchaInvalid");
-//            return;
-//        } else {
-//            log.info("Captcha valide");
-//        }
+        boolean isCaptchaValid = Captcha.verif(captcha);
+        if (!isCaptchaValid) {
+            log.error("Captcha invalide");
+            SendJSON.Error(response, "captchaInvalid");
+            throw new ServletException("captchaInvalid");
+        } else {
+            log.info("Captcha valide");
+        }
 
         // Verifie les champs ne sont pas vides
-        if(!username.isEmpty() || !email.isEmpty() || !password1.isEmpty() || !password2.isEmpty()) {
+        if(!username.trim().isEmpty() && !email.trim().isEmpty() && !password1.trim().isEmpty() && !password2.trim().isEmpty()) {
             log.info("Les champs ne sont pas vides");
         }else{
             log.error("Les champs sont vides");
             SendJSON.Error(response, "emptyField");
-            throw new JsonException("userAlreadyExists");
+            throw new JsonException("emptyField");
         }
         List<User> users = userService.getAllUsers();
         // Vérifie la longueur des champs
