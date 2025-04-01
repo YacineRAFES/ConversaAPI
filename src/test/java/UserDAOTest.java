@@ -6,7 +6,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Connection;
 import java.sql.Date;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -24,12 +27,11 @@ class UserDAOTest {
 
     @AfterEach
     void tearDown() {
-        // Nettoyez les utilisateurs créés pendant les tests si nécessaire
     }
 
     @Test
     void create() {
-        User user = new User("John Doe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()));
+        User user = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()));
         int id = userDAO.create(user);
         assertTrue(id > 0, "Erreur lors de la création User");
         log.info("L'id de l'utilisateur inséré est " + id);
@@ -47,11 +49,11 @@ class UserDAOTest {
 
     @Test
     void find() {
-        User user = new User("Alice", "ValidPassword1%$!", "alice11@example.com", "user", Date.valueOf(LocalDate.now()));
+        User user = new User("Alisdqdqce", "ValidPassword1%$!", "alice11@example.com", "user", Date.valueOf(LocalDate.now()));
         int userid = userDAO.create(user);
         User userFind = userDAO.find(userid);
         assertNotNull(userFind, "L'utilisateur n'a pas été trouvé");
-        assertEquals("Alice", userFind.getName(), "Le nom de l'utilisateur ne correspond pas");
+        assertEquals("Alisdqdqce", userFind.getName(), "Le nom de l'utilisateur ne correspond pas");
 
         // Supprimez l'utilisateur après le test
         userDAO.delete(new User(userid));
@@ -59,7 +61,7 @@ class UserDAOTest {
 
     @Test
     void findAll() {
-        User user = new User("Test User", "ValidPassword1%$!", "test.user@example.com", "user", Date.valueOf(LocalDate.now()));
+        User user = new User("TestUser", "ValidPassword1%$!", "test.user@example.com", "user", Date.valueOf(LocalDate.now()));
         int id = userDAO.create(user);
 
         assertTrue(id > 0, "Erreur lors de la création de l'utilisateur de test");
@@ -73,7 +75,7 @@ class UserDAOTest {
 
     @Test
     void delete() {
-        User user = new User("John Doe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()));
+        User user = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()));
         int id = userDAO.create(user);
         boolean deleted = userDAO.delete(new User(id));
         assertTrue(deleted, "L'utilisateur n'a pas été supprimé correctement");
