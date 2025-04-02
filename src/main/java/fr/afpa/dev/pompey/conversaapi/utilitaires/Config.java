@@ -74,6 +74,24 @@ public class Config {
         return props.getProperty("jdbc.password");
     }
 
+    /**
+     * Méthode pour récupérer la clé privée.
+     *
+     * @return la clé privée
+     */
+    public static String getCLE_PRIVEE() {
+        return props.getProperty("CLE_PRIVEE");
+    }
+
+    /**
+     * Méthode pour récupérer la clé publique.
+     *
+     * @return la clé publique
+     */
+    public static String getCLE_PUBLIQUE() {
+        return props.getProperty("CLE_PUBLIQUE");
+    }
+
 
 }
 

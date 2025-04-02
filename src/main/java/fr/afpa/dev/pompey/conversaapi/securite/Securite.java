@@ -1,13 +1,15 @@
 package fr.afpa.dev.pompey.conversaapi.securite;
 
 import com.password4j.Hash;
-import com.password4j.HashChecker;
 import com.password4j.Password;
-import com.password4j.SaltGenerator;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+import java.util.Date;
 
-import static com.password4j.Password.check;
 
 public class Securite {
+    private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 //    Pour plus d'info : https://github.com/Password4j/password4j
 //    hashPassword("password", hash)
 // le sel n'est pas nécessaire car il est généré par Bcrypt
@@ -42,5 +44,16 @@ public class Securite {
         }catch (Exception e){
             throw new RuntimeException("Erreur lors de la vérification du mot de passe");
         }
+    }
+
+    public static String createJWT(){
+        Date date = new Date();
+        return Jwts.builder()
+                .setSubject("username")  // Définir l'utilisateur
+                .setIssuer("ConversaAPI") // Identifiant de l’émetteur
+                .setIssuedAt(new Date()) // Date d’émission
+                .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // Expiration (1h)
+                .signWith("SECRET_KEY")  // Signature avec la clé secrète
+                .compact();
     }
 }
