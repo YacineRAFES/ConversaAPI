@@ -68,120 +68,99 @@ public class UserServlet extends HttpServlet {
 
     }
 
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try{
+            JsonReader jsonReader = Json.createReader(request.getInputStream());
+            JsonObject jsonObject = jsonReader.readObject();
+            System.out.println(jsonObject);
 
-        // Lire le JSON envoyé par le client
+            String username = jsonObject.getString("user", "");
+            String email = jsonObject.getString("email", "");
+            String password1 = jsonObject.getString("password1", "");
+            String password2 = jsonObject.getString("password2", "");
+            String captcha = jsonObject.getString("cf-turnstile-response", "");
 
-        JsonReader jsonReader = Json.createReader(request.getInputStream());
-        JsonObject jsonObject = jsonReader.readObject();
-        System.out.println(jsonObject);
+            log.info("Captcha : " + captcha);
 
-        String username = jsonObject.getString("user", "");
-        String email = jsonObject.getString("email", "");
-        String password1 = jsonObject.getString("password1", "");
-        String password2 = jsonObject.getString("password2", "");
-        String captcha = jsonObject.getString("cf-turnstile-response", "");
-
-        log.info("Captcha : " + captcha);
-
-        //TODO: CAPTCHA: A REVOIR
-        boolean isCaptchaValid = Captcha.verif(captcha);
-        if (!isCaptchaValid) {
-            log.error("Captcha invalide");
-            SendJSON.Error(response, "captchaInvalid");
-            throw new ServletException("captchaInvalid");
-        } else {
+            //TODO: CAPTCHA: A REVOIR
+            boolean isCaptchaValid = Captcha.verif(captcha);
+            if (!isCaptchaValid) {
+                log.error("Captcha invalide");
+                SendJSON.Error(response, "captchaInvalid");
+                return;
+            }
             log.info("Captcha valide");
-        }
 
-        // Verifie les champs ne sont pas vides
-        if(!username.trim().isEmpty() && !email.trim().isEmpty() && !password1.trim().isEmpty() && !password2.trim().isEmpty()) {
-            log.info("Les champs ne sont pas vides");
-        }else{
-            log.error("Les champs sont vides");
-            SendJSON.Error(response, "emptyField");
-            throw new JsonException("emptyField");
-        }
-        List<User> users = userService.getAllUsers();
-        // Vérifie la longueur des champs
-        if (username.length() < 50) {
-            log.info("le champs username respecte la longueur du caractère");
-            // Vérifie si l'utilisateur existe déjà
+            // Verifie les champs ne sont pas vides
+            if(username.trim().isEmpty() && email.trim().isEmpty() && password1.trim().isEmpty() && password2.trim().isEmpty()) {
+                log.error("Les champs sont vides");
+                SendJSON.Error(response, "emptyField");
+                return;
+            }
+
+            List<User> users = userService.getAllUsers();
+
+            // Vérifie la longueur des champs
+            if (username.length() > 50 || email.length() > 50) {
+                log.info("le champs username respecte la longueur du caractère");
+                SendJSON.Error(response, "lengthInvalid");
+                return;
+            }
+
+                // Vérifie si l'utilisateur existe déjà
             for (User user : users) {
                 if (user.getName().equals(username)) {
                     log.error("Le nom d'utilisateur existe déjà");
                     SendJSON.Error(response, "userAlreadyExists");
-                    throw new JsonException("userAlreadyExists");
+                    return;
                 }
-            }
-
-            log.info("L'username n'existe pas, on peut l'ajouter");
-        }else{
-            log.error("Le champ username dépasse la longueur maximale");
-            SendJSON.Error(response, "lengthInvalid");
-            throw new JsonException("userAlreadyExists");
-        }
-        // Vérifie si l'email est valide
-        if(email.length() < 50){
-            log.info("le champs email respecte la longueur du caractère");
-            // Vérifie si l'email existe déjà
-            for (User user : users) {
                 if (user.getEmail().equals(email)) {
                     log.error("L'email existe déjà");
                     SendJSON.Error(response, "userAlreadyExists");
-                    throw new JsonException("userAlreadyExists");
+                    return;
                 }
             }
-            log.info("L'email n'existe pas, on peut l'ajouter");
-        }else{
-            log.error("Les champs dépassent la longueur maximale");
-            SendJSON.Error(response, "lengthInvalid");
-            throw new JsonException("lengthInvalid");
-        }
 
-        // Vérifie le format de l'email
-        if (email.matches(Regex.EMAIL)) {
-            log.info("L'email est valide");
-        }else{
-            log.error("L'email est invalide lors de la REGEX.EMAIL");
-            SendJSON.Error(response, "emailInvalid");
-            throw new JsonException("emailInvalid");
-        }
+            // Vérifie le format de l'email
+            if (!email.matches(Regex.EMAIL)) {
+                log.error("L'email est invalide lors de la REGEX.EMAIL");
+                SendJSON.Error(response, "emailInvalid");
+                return;
+            }
 
-        // Verifie le mot de passe
-        String pwHash = null;
-        if(password1.equals(password2)) {
-            log.info("Les mots de passe correspondent");
+            // Verifie le mot de passe
+
+            if(!password1.equals(password2)) {
+                log.error("Les mots de passe ne correspondent pas");
+                SendJSON.Error(response, "passwordInvalid");
+                return;
+            }
 
             // Vérifie les critères du mot de passe si oui, on le hash
-            if(password1.matches(Regex.PASSWORD)) {
-                pwHash = hashPassword(password1);
-                System.out.println(pwHash.getBytes().length);
-                System.out.println(pwHash);
-            }else{
+            if(!password1.matches(Regex.PASSWORD)) {
                 log.error("le mot de passe ne respect pas le critère");
                 SendJSON.Error(response, "passwordInvalid");
-                throw new JsonException("passwordInvalid");
+                return;
             }
-        }else{
-            log.error("Les mots de passe ne correspondent pas");
-            SendJSON.Error(response, "passwordInvalid");
-            throw new JsonException("passwordInvalid");
-        }
 
-        User user = new User(username, pwHash, email, "user", Date.valueOf(LocalDate.now()));
-        try{
+            String pwHash = hashPassword(password1);
+            System.out.println(pwHash.getBytes().length);
+            System.out.println(pwHash);
+
+
+            User user = new User(username, pwHash, email, "user", Date.valueOf(LocalDate.now()));
+
             userService.addUser(user);
             log.info("L'utilisateur a été ajouté avec succès");
             SendJSON.Success(response, "userCreated");
-        }catch(Exception e){
-            log.error("Erreur lors de l'ajout de l'utilisateur", e);
-            SendJSON.Error(response, "ServerError");
-            throw new ServletException(e.getMessage());
-        }
 
+        }catch(JsonException e){
+            log.error("Erreur JSON détectée", e);
+        }catch (Exception e){
+            log.error("Erreur inattendue", e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Une erreur interne est survenue");
+        }
     }
 
     /**
