@@ -4,14 +4,18 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.util.List;
 
-@WebFilter("*")
+@Slf4j
+@WebFilter("/*")
 public class CORSFilter implements Filter {
 
     // Définir les origines autorisées (remplace par ton domaine)
     private static final List<String> ALLOWED_ORIGINS = List.of("http://localhost:8090");
+
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -22,8 +26,10 @@ public class CORSFilter implements Filter {
 
         // Vérifie si l'origine est autorisée
         if (origin != null && ALLOWED_ORIGINS.contains(origin)) {
+            log.info("Accès autorisé depuis l'origine: {}", origin);
             response.setHeader("Access-Control-Allow-Origin", origin);
         } else {
+            log.warn("Tentative d'accès non autorisée depuis l'origine: {}", origin);
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès interdit");
             return;
         }

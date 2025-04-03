@@ -3,11 +3,12 @@ import com.password4j.Password;
 import fr.afpa.dev.pompey.conversaapi.exception.JsonException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import fr.afpa.dev.pompey.conversaapi.securite.Captcha;
+import fr.afpa.dev.pompey.conversaapi.securite.JWTutils;
 import fr.afpa.dev.pompey.conversaapi.securite.Securite;
+import fr.afpa.dev.pompey.conversaapi.utilitaires.AlertMsg;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.SendJSON;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.Utils;
 import fr.afpa.dev.pompey.conversaapi.service.UserService;
-
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
@@ -23,11 +24,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import static fr.afpa.dev.pompey.conversaapi.securite.Securite.checkPassword;
+
 @Slf4j
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     private static final String CSRFTOKEN = "csrfToken";
-    private UserService userService;
+    private transient UserService userService;
 
     @Override
     public void init() throws ServletException {
@@ -85,19 +88,39 @@ public class LoginServlet extends HttpServlet {
             log.info("Champs valides");
 
             List<User> users = userService.getAllUsers();
+            User userFind = null;
             for (User user : users) {
                 if (user.getEmail().equals(email)) {
                     log.info("Utilisateur trouvé: " + user);
-                    if(Securite.checkPassword(password, user.getPassword())){
-                        log.info("Mot de passe valide");
-                        //Generer un token JWT
-
-                        //Envoye le token JWT au client
-                        SendJSON.Success(response, "loginSuccess");
-                        return;
-                    }
+                    userFind = user;
+                }else{
+                    log.info("Utilisateur non trouvé: " + email);
+                    SendJSON.Error(response, AlertMsg.ErreurIdentifiant);
+                    return;
                 }
             }
+            log.info("Utilisateur trouvé: " + userFind);
+
+            if (userFind == null) {
+                log.error("Utilisateur non trouvé");
+                SendJSON.Error(response, AlertMsg.ErreurIdentifiant);
+                return;
+            }
+            log.info("Utilisateur valide");
+
+            if(!checkPassword(password, userFind.getPassword())) {
+                log.error("Mot de passe incorrect");
+                SendJSON.Error(response, AlertMsg.ErreurIdentifiant);
+                return;
+            }
+            log.info("Mot de passe correct");
+
+            //Generation du token JWT
+            String jwtToken = JWTutils.generateToken(userFind.getId(), userFind.getName(), userFind.getEmail(), userFind.getRole());
+            log.info("Token JWT généré: " + jwtToken);
+            //Envoi du token JWT
+            SendJSON.LoginUser(response, jwtToken);
+
         }catch(JsonException e){
             log.error("Erreur JSON détectée", e);
         }catch (Exception e){

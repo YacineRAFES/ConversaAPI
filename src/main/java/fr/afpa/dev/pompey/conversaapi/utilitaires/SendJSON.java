@@ -92,4 +92,26 @@ public class SendJSON {
             throw new JsonException("Erreur dans la méthode SendJSON.Token : " + e.getMessage());
         }
     }
+
+    public static void LoginUser(HttpServletResponse response, String token) throws JsonException {
+        try {
+            // Je définis le type de contenu de la réponse HTTP.
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Authorization", "Bearer " + token);
+
+            // Je construis un objet JSON avec le token JWT.
+            JsonObject jsonResponse = Json.createObjectBuilder()
+                    .add("status", "success")
+                    .add("message", "loginSuccess")
+                    .build();
+
+            // J'écris la réponse JSON.
+            response.getWriter().write(jsonResponse.toString());
+        } catch (Exception e) {
+            throw new JsonException("Erreur dans la méthode SendJSON.JWT : " + e.getMessage());
+        }
+    }
+
+
 }

@@ -23,11 +23,11 @@ public class UserService {
      *
      * @param user L'utilisateur à ajouter.
      */
-    public void addUser(User user) {
+    public void addUser(User user) throws IllegalStateException  {
         try{
             userDAO.create(user);
         }catch (Exception e){
-            throw new RuntimeException("Erreur lors de l'ajout de l'utilisateur : " + e.getMessage() + Utils.getNameClass());
+            throw new IllegalStateException ("Erreur lors de l'ajout de l'utilisateur : " + e.getMessage() + Utils.getNameClass());
         }
 
     }

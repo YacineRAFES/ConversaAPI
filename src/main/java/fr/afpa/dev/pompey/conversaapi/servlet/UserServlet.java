@@ -32,7 +32,7 @@ import static fr.afpa.dev.pompey.conversaapi.securite.Securite.hashPassword;
 @WebServlet("/user")
 public class UserServlet extends HttpServlet {
 
-    private UserService userService;
+    private transient UserService userService;
 
     /**
      * Initialise la servlet.
