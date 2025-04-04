@@ -93,6 +93,14 @@ public class SendJSON {
         }
     }
 
+    /**
+     * Envoie un message de succès de connexion en JSON et envoie JWT à la réponse HTTP.
+     * {"status": "success", "message": "loginSuccess"}
+     *
+     * @param response La réponse HTTP.
+     * @param token    Le token JWT à envoyer.
+     * @throws JsonException
+     */
     public static void LoginUser(HttpServletResponse response, String token) throws JsonException {
         try {
             // Je définis le type de contenu de la réponse HTTP.

@@ -95,7 +95,7 @@ public class LoginServlet extends HttpServlet {
                     userFind = user;
                 }else{
                     log.info("Utilisateur non trouvé: " + email);
-                    SendJSON.Error(response, AlertMsg.ErreurIdentifiant);
+                    SendJSON.Error(response, AlertMsg.INVALIDCREDENTIALS);
                     return;
                 }
             }
@@ -103,14 +103,14 @@ public class LoginServlet extends HttpServlet {
 
             if (userFind == null) {
                 log.error("Utilisateur non trouvé");
-                SendJSON.Error(response, AlertMsg.ErreurIdentifiant);
+                SendJSON.Error(response, AlertMsg.INVALIDCREDENTIALS);
                 return;
             }
             log.info("Utilisateur valide");
 
             if(!checkPassword(password, userFind.getPassword())) {
                 log.error("Mot de passe incorrect");
-                SendJSON.Error(response, AlertMsg.ErreurIdentifiant);
+                SendJSON.Error(response, AlertMsg.INVALIDCREDENTIALS);
                 return;
             }
             log.info("Mot de passe correct");
