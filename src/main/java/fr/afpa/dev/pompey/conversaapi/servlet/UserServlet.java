@@ -31,7 +31,7 @@ import static fr.afpa.dev.pompey.conversaapi.securite.Securite.hashPassword;
 @Slf4j
 @WebServlet("/user")
 public class UserServlet extends HttpServlet {
-
+    private static final String CSRFTOKEN = "csrfToken";
     private transient UserService userService;
 
     /**
@@ -54,17 +54,23 @@ public class UserServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        String csrfToken = (String) session.getAttribute("csrfToken");
+        try{
+            // Récupérer le token CSRF de la session
+            HttpSession session = request.getSession();
+            String csrfToken = (String) session.getAttribute(CSRFTOKEN);
 
-        if (csrfToken == null) {
-            csrfToken = UUID.randomUUID().toString();
-            session.setAttribute("csrfToken", csrfToken);
+            if (csrfToken == null) {
+                csrfToken = UUID.randomUUID().toString();
+                session.setAttribute(CSRFTOKEN, csrfToken);
+            }
+
+            log.info(csrfToken);
+
+            SendJSON.Token(response, CSRFTOKEN, csrfToken);
+        }catch(Exception e){
+            log.error("Erreur inattendue", e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Une erreur interne est survenue");
         }
-
-        log.info(csrfToken);
-
-        SendJSON.Token(response, "csrfToken", csrfToken);
 
     }
 
@@ -73,7 +79,7 @@ public class UserServlet extends HttpServlet {
         try{
             JsonReader jsonReader = Json.createReader(request.getInputStream());
             JsonObject jsonObject = jsonReader.readObject();
-            System.out.println(jsonObject);
+            log.info(String.valueOf(jsonObject));
 
             String username = jsonObject.getString("user", "");
             String email = jsonObject.getString("email", "");
@@ -144,8 +150,8 @@ public class UserServlet extends HttpServlet {
             }
 
             String pwHash = hashPassword(password1);
-            System.out.println(pwHash.getBytes().length);
-            System.out.println(pwHash);
+            log.info(String.valueOf(pwHash.getBytes().length));
+            log.info(pwHash);
 
 
             User user = new User(username, pwHash, email, "user", Date.valueOf(LocalDate.now()));
@@ -161,64 +167,4 @@ public class UserServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Une erreur interne est survenue");
         }
     }
-
-    /**
-     * Convertit une liste d'utilisateurs en JSON.
-     *
-     * @param users La liste d'utilisateurs.
-     * @return La liste d'utilisateurs en JSON.
-     */
-//    private String usersToJson(List<User> users) {
-//        try{
-//            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-//            for (User user : users) {
-//                arrayBuilder.add(Json.createObjectBuilder()
-//                        .add("id", user.getId())
-//                        .add("name", user.getName())
-//                        .add("password", user.getPassword())
-//                        .add("email", user.getEmail())
-//                        .add("role", user.getRole())
-//                        .add("date", user.getDate().toString()));
-//            }
-//            return arrayBuilder.build().toString();
-//        }catch (JsonException e){
-//            throw new JsonException("Erreur lors de la lecture du serveur");
-//        }
-//    }
-
-    /**
-     * Méthode pour extraire le token CSRF du JSON envoyé
-     * @param json
-     * @return
-     */
-    private String extraireCsrfToken(String json) {
-        try (JsonReader jsonReader = Json.createReader(new StringReader(json))) {
-            JsonObject jsonObject = jsonReader.readObject();
-            return jsonObject.getString("csrfToken", null);
-        }
-    }
-
-    /**
-     * Extraire
-     * @param json
-     * @return
-     */
-    private User extraireUtilisateurDepuisJson(String json) {
-        try (JsonReader jsonReader = Json.createReader(new StringReader(json))) {
-            JsonObject jsonObject = jsonReader.readObject();
-
-            String username = jsonObject.getString("user", "");
-            String email = jsonObject.getString("email", "");
-            String password1 = jsonObject.getString("password1", "");
-            String password2 = jsonObject.getString("password2", "");
-
-            return new User(username, email, password1, password2); // Adapte selon ton constructeur
-        } catch (Exception e) {
-            log.error("Erreur lors de la lecture du JSON", e);
-            return null;
-        }
-    }
-
-
-
 }
