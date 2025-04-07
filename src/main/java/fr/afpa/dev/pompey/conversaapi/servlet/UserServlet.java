@@ -83,7 +83,6 @@ public class UserServlet extends HttpServlet {
 
             log.info("Captcha : " + captcha);
 
-            //TODO: CAPTCHA: A REVOIR
             boolean isCaptchaValid = Captcha.verif(captcha);
             if (!isCaptchaValid) {
                 log.error("Captcha invalide");
