@@ -38,6 +38,9 @@ public class CORSFilter implements Filter {
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
         response.setHeader("Access-Control-Allow-Credentials", "true"); // Autoriser les cookies et sessions
 
+        // Autoriser les en-têtes personnalisés
+        response.setHeader("Access-Control-Expose-Headers", "Authorization");
+
         // Si c'est une requête OPTIONS (préflight), on renvoie directement la réponse
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
@@ -45,8 +48,5 @@ public class CORSFilter implements Filter {
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }
-
-    @Override
-    public void init(FilterConfig filterConfig) {}
 
 }
