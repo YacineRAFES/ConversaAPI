@@ -8,6 +8,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class SendJSON {
+    private SendJSON() {
+        throw new IllegalStateException("Utility class");
+    }
     /**
      * Envoye un message error en JSON et l'envoie à la réponse HTTP.
      * {"status": "error", "message": "Votre Message"}
