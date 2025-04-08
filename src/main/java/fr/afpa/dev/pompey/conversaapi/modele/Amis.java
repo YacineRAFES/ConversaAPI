@@ -1,21 +1,24 @@
 package fr.afpa.dev.pompey.conversaapi.modele;
 
+import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
+
 import java.sql.Date;
 import java.time.LocalDate;
 
 public class Amis {
-    private int statut;
+    private StatutAmitie statut;
     private Date dateDemande;
-    private int userIdDemandeur;
-    private int userIdAmiDe;
+    private Integer userIdDemandeur;
+    private Integer userIdAmiDe;
 
-    public Amis(){}
-
-    public int getStatut() {
+    public StatutAmitie getStatut() {
         return statut;
     }
 
-    public void setStatut(int statut) {
+    public void setStatut(StatutAmitie statut) throws SaisieException {
+        if(statut == null) {
+            throw new SaisieException("Le statut ne doit pas être vide ou null");
+        }
         this.statut = statut;
     }
 
@@ -23,7 +26,12 @@ public class Amis {
         return dateDemande;
     }
 
-    public void setDateDemande(Date dateDemande) {
+    public void setDateDemande(Date dateDemande) throws SaisieException {
+        if (dateDemande == null) {
+            throw new SaisieException("La date ne doit pas être vide ou null");
+        } else if (dateDemande.toLocalDate().isAfter(LocalDate.now())) {
+            throw new SaisieException("La date ne corresponds pas");
+        }
         this.dateDemande = dateDemande;
     }
 
@@ -31,7 +39,12 @@ public class Amis {
         return userIdDemandeur;
     }
 
-    public void setUserIdDemandeur(int userIdDemandeur) {
+    public void setUserIdDemandeur(Integer userIdDemandeur) throws SaisieException {
+        if (userIdDemandeur == null) {
+            throw new SaisieException("L'id ne doit pas être vide ou null");
+        } else if (userIdDemandeur <= 0) {
+            throw new SaisieException("L'id ne doit pas être négatif");
+        }
         this.userIdDemandeur = userIdDemandeur;
     }
 
@@ -39,7 +52,12 @@ public class Amis {
         return userIdAmiDe;
     }
 
-    public void setUserIdAmiDe(int userIdAmiDe) {
+    public void setUserIdAmiDe(Integer userIdAmiDe) throws SaisieException {
+        if (userIdAmiDe == null) {
+            throw new SaisieException("L'id ne doit pas être vide ou null");
+        } else if (userIdAmiDe <= 0) {
+            throw new SaisieException("L'id ne doit pas être négatif");
+        }
         this.userIdAmiDe = userIdAmiDe;
     }
 }
