@@ -28,7 +28,7 @@ class UserTest {
     @NullSource
     void setIdNullSource(Integer id) {
         Exception exception = assertThrows(SaisieException.class, () -> {
-            userUnderTest.setId(null);
+            userUnderTest.setId(id);
         });
         assertEquals("L'id ne doit pas être vide ou null", exception.getMessage());
     }
@@ -45,7 +45,7 @@ class UserTest {
     @NullSource
     void setNameNullSource(String name) {
         Exception exception = assertThrows(SaisieException.class, () -> {
-            userUnderTest.setName(null);
+            userUnderTest.setName(name);
         });
         assertEquals("Le nom ne doit pas être vide ou null", exception.getMessage());
     }
@@ -54,7 +54,7 @@ class UserTest {
     @EmptySource
     void setNameEmptySource(String name) {
         Exception exception = assertThrows(SaisieException.class, () -> {
-            userUnderTest.setName("");
+            userUnderTest.setName(name);
         });
         assertEquals("Le nom ne doit pas être vide ou null", exception.getMessage());
     }
@@ -63,7 +63,7 @@ class UserTest {
     @NullSource
     void setPasswordNullSource(String password) {
         Exception exception = assertThrows(SaisieException.class, () -> {
-            userUnderTest.setPassword(null);
+            userUnderTest.setPassword(password);
         });
         assertEquals("Le mot de passe ne doit pas être vide ou null", exception.getMessage());
     }
@@ -72,7 +72,7 @@ class UserTest {
     @EmptySource
     void setPasswordEmptySource(String password) {
         Exception exception = assertThrows(SaisieException.class, () -> {
-            userUnderTest.setPassword("");
+            userUnderTest.setPassword(password);
         });
         assertEquals("Le mot de passe ne doit pas être vide ou null", exception.getMessage());
     }
@@ -101,7 +101,7 @@ class UserTest {
     @NullSource
     void setEmailNullSource(String email) {
         Exception exception = assertThrows(SaisieException.class, () -> {
-            userUnderTest.setEmail(null);
+            userUnderTest.setEmail(email);
         });
         assertEquals("L'email ne doit pas être vide ou null", exception.getMessage());
     }
@@ -110,7 +110,7 @@ class UserTest {
     @EmptySource
     void setEmailEmptySource(String email) {
         Exception exception = assertThrows(SaisieException.class, () -> {
-            userUnderTest.setEmail("");
+            userUnderTest.setEmail(email);
         });
         assertEquals("L'email ne doit pas être vide ou null", exception.getMessage());
     }
@@ -119,7 +119,7 @@ class UserTest {
     @NullSource
     void setRoleNullSource(String role) {
         Exception exception = assertThrows(SaisieException.class, () -> {
-            userUnderTest.setRole(null);
+            userUnderTest.setRole(role);
         });
         assertEquals("Le role ne doit pas être vide ou null", exception.getMessage());
     }
@@ -128,7 +128,7 @@ class UserTest {
     @EmptySource
     void setRoleEmptySource(String role) {
         Exception exception = assertThrows(SaisieException.class, () -> {
-            userUnderTest.setRole("");
+            userUnderTest.setRole(role);
         });
         assertEquals("Le role ne doit pas être vide ou null", exception.getMessage());
     }
@@ -137,7 +137,7 @@ class UserTest {
     @NullSource
     void setDateNullSource(Date date) {
         Exception exception = assertThrows(SaisieException.class, () -> {
-            userUnderTest.setDate(null);
+            userUnderTest.setDate(date);
         });
         assertEquals("La date ne doit pas être vide ou null", exception.getMessage());
     }
