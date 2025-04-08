@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 
 public class Amis {
+    private Integer idGroupeMessagesPrives;
     private StatutAmitie statut;
     private Date dateDemande;
     private Integer userIdDemandeur;
@@ -13,6 +14,19 @@ public class Amis {
 
     public StatutAmitie getStatut() {
         return statut;
+    }
+
+    public Integer getIdGroupeMessagesPrives() {
+        return idGroupeMessagesPrives;
+    }
+
+    public void setIdGroupeMessagesPrives(Integer idGroupeMessagesPrives) throws SaisieException {
+        if (idGroupeMessagesPrives == null) {
+            throw new SaisieException("L'id ne doit pas être vide ou null");
+        } else if (idGroupeMessagesPrives <= 0) {
+            throw new SaisieException("L'id ne doit pas être négatif");
+        }
+        this.idGroupeMessagesPrives = idGroupeMessagesPrives;
     }
 
     public void setStatut(StatutAmitie statut) throws SaisieException {

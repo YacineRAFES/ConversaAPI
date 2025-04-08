@@ -23,6 +23,23 @@ class AmisTest {
 
     @ParameterizedTest
     @NullSource
+    void setIdGroupeMessagesPrivesNullSource(Integer id) {
+        Exception exception = assertThrows(SaisieException.class, () -> {
+            amisUnderTest.setIdGroupeMessagesPrives(id);
+        });
+        assertEquals("L'id ne doit pas être vide ou null", exception.getMessage());
+    }
+
+    @Test
+    void setIdGroupeMessagesPrivesNegative() {
+        Exception exception = assertThrows(SaisieException.class, () -> {
+            amisUnderTest.setIdGroupeMessagesPrives(-1);
+        });
+        assertEquals("L'id ne doit pas être négatif", exception.getMessage());
+    }
+
+    @ParameterizedTest
+    @NullSource
     void setStatut(StatutAmitie statut) {
         Exception exception = assertThrows(SaisieException.class, () -> {
             amisUnderTest.setStatut(statut);
