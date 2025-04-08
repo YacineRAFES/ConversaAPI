@@ -31,6 +31,12 @@ class AmisTest {
     }
 
     @Test
+    void setStatutValide() throws SaisieException {
+        amisUnderTest.setStatut(StatutAmitie.AMI);
+        assertEquals(StatutAmitie.AMI, amisUnderTest.getStatut());
+    }
+
+    @Test
     void setDateDemande() {
         Exception exception = assertThrows(SaisieException.class, () -> {
             amisUnderTest.setDateDemande(null);
