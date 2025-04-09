@@ -54,24 +54,6 @@ public class UserServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try{
-            // Récupérer le token CSRF de la session
-            HttpSession session = request.getSession();
-            String csrfToken = (String) session.getAttribute(CSRFTOKEN);
-
-            if (csrfToken == null) {
-                csrfToken = UUID.randomUUID().toString();
-                session.setAttribute(CSRFTOKEN, csrfToken);
-            }
-
-            log.info(csrfToken);
-
-            SendJSON.Token(response, CSRFTOKEN, csrfToken);
-        }catch(Exception e){
-            log.error("Erreur inattendue", e);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Une erreur interne est survenue");
-        }
-
     }
 
     @Override
@@ -85,17 +67,7 @@ public class UserServlet extends HttpServlet {
             String email = jsonObject.getString("email", "");
             String password1 = jsonObject.getString("password1", "");
             String password2 = jsonObject.getString("password2", "");
-            String captcha = jsonObject.getString("cf-turnstile-response", "");
 
-            log.info("Captcha : " + captcha);
-
-            boolean isCaptchaValid = Captcha.verif(captcha);
-            if (!isCaptchaValid) {
-                log.error("Captcha invalide");
-                SendJSON.Error(response, "captchaInvalid");
-                return;
-            }
-            log.info("Captcha valide");
 
             // Verifie les champs ne sont pas vides
             if(username.trim().isEmpty() && email.trim().isEmpty() && password1.trim().isEmpty() && password2.trim().isEmpty()) {

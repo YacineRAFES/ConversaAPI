@@ -160,8 +160,6 @@ public class UserDAO extends DAO<User>{
             log.error("Erreur lors de la recherche de tous les utilisateurs", e);
             throw new DAOException(e.getMessage());
         }
-
-
     }
 
 

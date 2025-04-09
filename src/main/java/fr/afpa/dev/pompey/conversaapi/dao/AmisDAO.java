@@ -4,6 +4,7 @@ import fr.afpa.dev.pompey.conversaapi.exception.DAOException;
 import fr.afpa.dev.pompey.conversaapi.exception.RegexException;
 import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
 import fr.afpa.dev.pompey.conversaapi.modele.Amis;
+import fr.afpa.dev.pompey.conversaapi.modele.StatutAmitie;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,35 +20,31 @@ import java.util.List;
 public class AmisDAO extends DAO<Amis> {
 
     /**
-     * @param obj 
+     * @param obj
      * @return
      */
     @Override
     public int create(Amis obj) {
-        int newid = 0;
+        return 0;
+    }
+
+    public boolean createDemandeAmis(Amis obj) {
         String insertSQL =
                 "INSERT INTO amis " +
-                "(AMIS_STATUT, AMIS_DATE_DEMANDE, USER_ID_amiDe, USER_ID_utilisateur)" +
+                "(AMIS_STATUT, AMIS_DATE_DEMANDE, USER_ID_utilisateur, USER_ID_amiDe)" +
                 "VALUES (?, ?, ?, ?)";
         try {
-            PreparedStatement pstmt = connect.prepareStatement(insertSQL,
-                    PreparedStatement.RETURN_GENERATED_KEYS);
+            PreparedStatement pstmt = connect.prepareStatement(insertSQL);
             pstmt.setString(1, obj.getStatut().name());
             pstmt.setDate(2, obj.getDateDemande());
-            pstmt.setInt(3, obj.getUserIdAmiDe());
-            pstmt.setInt(4, obj.getUserIdDemandeur());
+            pstmt.setInt(3, obj.getUserIdDemandeur());
+            pstmt.setInt(4, obj.getUserIdAmiDe());
             pstmt.executeUpdate();
-
-            try(ResultSet rs = pstmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    newid = rs.getInt(1);
-                }
-            }
+            return true;
         } catch (SQLException e) {
-            log.error("Erreur lors de la création Amis", e);
+            log.error("Erreur lors de la création d'une demande d'amis", e);
             throw new DAOException(e.getMessage());
         }
-        return newid;
     }
 
     /**
@@ -104,13 +101,15 @@ public class AmisDAO extends DAO<Amis> {
                 User user = new User();
                 user.setName(rs.getString("USER_NAME"));
                 users.add(user);
+                log.info(user.toString());
                 log.info("Liste des amis fait");
             }
         } catch (SQLException | RegexException | SaisieException e) {
             log.error("Erreur lors de la récupération de la liste d'amis", e);
             throw new DAOException(e.getMessage());
         }
-        return (Amis) users;
+        Amis amis = new Amis(users);
+        return amis;
     }
 
     /**
@@ -118,7 +117,27 @@ public class AmisDAO extends DAO<Amis> {
      */
     @Override
     public List<Amis> findAll() {
-        return List.of();
+        List<Amis> amis = new ArrayList<>();
+        String sql = "SELECT * FROM amis";
+
+        try(PreparedStatement ps = connect.prepareStatement(sql)){
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Amis ami = new Amis();
+                ami.setIdGroupeMessagesPrives(rs.getInt("MG_ID"));
+                ami.setStatut(StatutAmitie.valueOf(rs.getString("AMIS_STATUT")));
+                ami.setDateDemande(rs.getDate("AMIS_DATE_DEMANDE"));
+                ami.setUserIdAmiDe(rs.getInt("USER_ID_amiDe"));
+                ami.setUserIdDemandeur(rs.getInt("USER_ID_utilisateur"));
+                amis.add(ami);
+            }
+            return amis;
+        }catch (SQLException | SaisieException e){
+            log.error("Erreur lors de la recherche de tous les amis", e);
+            throw new DAOException(e.getMessage());
+        }
     }
 
     /**
@@ -137,7 +156,7 @@ public class AmisDAO extends DAO<Amis> {
             pstmt.setInt(3, obj.getUserIdDemandeur());
             pstmt.setInt(4, obj.getUserIdAmiDe());
             pstmt.executeUpdate();
-            log.info("Demande d'amis refusée {} et {}", obj.getUserIdDemandeur(), obj.getUserIdAmiDe());
+            log.info("Suppression de la demande d'amis {} et {}", obj.getUserIdDemandeur(), obj.getUserIdAmiDe());
         } catch (SQLException e) {
             log.error("Erreur lors de la deletion Amis", e);
             throw new DAOException(e.getMessage());

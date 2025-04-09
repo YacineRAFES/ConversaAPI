@@ -4,13 +4,36 @@ import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.List;
 
 public class Amis {
+    private List<User> amisList;
     private Integer idGroupeMessagesPrives;
     private StatutAmitie statut;
     private Date dateDemande;
     private Integer userIdDemandeur;
     private Integer userIdAmiDe;
+
+    // CONSTRUCTEURS
+
+    public Amis() {
+    }
+
+    public Amis(List<User> amisList){
+        this.amisList = amisList;
+    }
+
+    /**
+     * Quand un utilisateur envoye une demande d'ami
+     * @return
+     */
+    public Amis(Integer userIdDemandeur, Integer userIdAmiDe) {
+        this.idGroupeMessagesPrives = null;
+        this.userIdDemandeur = userIdDemandeur;
+        this.userIdAmiDe = userIdAmiDe;
+        this.dateDemande = Date.valueOf(LocalDate.now());
+        this.statut = StatutAmitie.EN_ATTENTE;
+    }
 
     public StatutAmitie getStatut() {
         return statut;

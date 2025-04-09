@@ -4,10 +4,12 @@ import fr.afpa.dev.pompey.conversaapi.exception.RegexException;
 import fr.afpa.dev.pompey.conversaapi.securite.Securite;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.Regex;
 import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Date;
 import java.time.LocalDate;
 
+@Slf4j
 public class User {
     private Integer id;
     private String name;
@@ -19,6 +21,10 @@ public class User {
 //    CONSTRUCTEURS
     public User(){
 
+    }
+
+    public User(String name){
+        this.name = name;
     }
 
     /**
@@ -106,6 +112,7 @@ public class User {
         if (name == null || name.isEmpty()) {
             throw new SaisieException("Le nom ne doit pas être vide ou null");
         } else if (!name.matches(Regex.USERNAME)) {
+            log.info(name);
             throw new RegexException("Le nom ne corresponds pas");
         }
         this.name = name;
