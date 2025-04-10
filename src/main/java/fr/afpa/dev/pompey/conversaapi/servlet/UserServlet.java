@@ -2,7 +2,6 @@ package fr.afpa.dev.pompey.conversaapi.servlet;
 
 import fr.afpa.dev.pompey.conversaapi.exception.JsonException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
-import fr.afpa.dev.pompey.conversaapi.securite.Captcha;
 import fr.afpa.dev.pompey.conversaapi.service.UserService;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.Regex;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.SendJSON;
@@ -31,7 +30,6 @@ import static fr.afpa.dev.pompey.conversaapi.securite.Securite.hashPassword;
 @Slf4j
 @WebServlet("/user")
 public class UserServlet extends HttpServlet {
-    private static final String CSRFTOKEN = "csrfToken";
     private transient UserService userService;
 
     /**

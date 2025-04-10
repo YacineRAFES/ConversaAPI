@@ -14,7 +14,7 @@ import java.util.List;
 public class CORSFilter implements Filter {
 
     // Définir les origines autorisées (remplace par ton domaine)
-    private static final List<String> ALLOWED_ORIGINS = List.of("http://localhost:8090");
+//    private static final List<String> ALLOWED_ORIGINS = List.of("http://localhost:8090");
 
 
     @Override
@@ -22,17 +22,17 @@ public class CORSFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        String origin = request.getHeader("Origin");
+//        String origin = request.getHeader("Origin");
 
-        // Vérifie si l'origine est autorisée
-        if (origin != null && ALLOWED_ORIGINS.contains(origin)) {
-            log.info("Accès autorisé depuis l'origine: {}", origin);
-            response.setHeader("Access-Control-Allow-Origin", origin);
-        } else {
-            log.warn("Tentative d'accès non autorisée depuis l'origine: {}", origin);
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès interdit");
-            return;
-        }
+//        // Vérifie si l'origine est autorisée
+//        if (origin != null && ALLOWED_ORIGINS.contains(origin)) {
+//            log.info("Accès autorisé depuis l'origine: {}", origin);
+//            response.setHeader("Access-Control-Allow-Origin", origin);
+//        } else {
+//            log.warn("Tentative d'accès non autorisée depuis l'origine: {}", origin);
+//            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès interdit");
+//            return;
+//        }
 
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");

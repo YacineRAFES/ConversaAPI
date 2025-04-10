@@ -21,15 +21,6 @@ public class Config {
     }
 
     /**
-     * Méthode pour récupérer la clé secrète pour le captcha.
-     *
-     * @return la clé secrète pour le captcha
-     */
-    public static String getSecretKeyCaptcha() {
-        return props.getProperty("SECRET_KEY_CAPTCHA");
-    }
-
-    /**
      * Méthode pour récupérer la clé secrète poivre pour le hashage de mot de passe.
      *
      * @return la clé secrète pour le pepper

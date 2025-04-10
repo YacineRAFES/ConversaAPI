@@ -2,9 +2,7 @@ package fr.afpa.dev.pompey.conversaapi.servlet;
 import com.password4j.Password;
 import fr.afpa.dev.pompey.conversaapi.exception.JsonException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
-import fr.afpa.dev.pompey.conversaapi.securite.Captcha;
 import fr.afpa.dev.pompey.conversaapi.securite.JWTutils;
-import fr.afpa.dev.pompey.conversaapi.securite.Securite;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.AlertMsg;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.SendJSON;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.Utils;
@@ -29,7 +27,6 @@ import static fr.afpa.dev.pompey.conversaapi.securite.Securite.checkPassword;
 @Slf4j
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
-    private static final String CSRFTOKEN = "csrfToken";
     private transient UserService userService;
 
     @Override
@@ -39,24 +36,6 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try{
-            HttpSession session = request.getSession();
-            String csrfToken = (String) session.getAttribute(CSRFTOKEN);
-
-            if (csrfToken == null) {
-                csrfToken = UUID.randomUUID().toString();
-                session.setAttribute(CSRFTOKEN, csrfToken);
-            }
-
-            log.info(csrfToken);
-
-            SendJSON.Token(response, CSRFTOKEN, csrfToken);
-        }catch (JsonException e){
-            log.error("Erreur JSON détectée", e);
-        }catch (Exception e){
-            log.error("Erreur inattendue", e);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Une erreur interne est survenue");
-        }
     }
 
     @Override
@@ -68,17 +47,6 @@ public class LoginServlet extends HttpServlet {
 
             String email = jsonObject.getString("email", "");
             String password = jsonObject.getString("password", "");
-            String captcha = jsonObject.getString("cf-turnstile-response", "");
-
-            log.info("Captcha : " + captcha);
-
-            boolean isCaptchaValid = Captcha.verif(captcha);
-            if (!isCaptchaValid) {
-                log.error("Captcha invalide");
-                SendJSON.Error(response, "captchaInvalid");
-                return;
-            }
-            log.info("Captcha valide");
 
             if(email.trim().isEmpty() && password.trim().isEmpty()) {
                 log.error("Les champs sont vides");
