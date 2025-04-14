@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 import static fr.afpa.dev.pompey.conversaapi.utilitaires.Config.getCLE_PRIVEE;
 
-// TODO: A FAIRE
+// TODO: A REVOIR
 @Slf4j
 public class JWTutils {
     // https://github.com/jwtk/jjwt?tab=readme-ov-file#creating-a-jwt
@@ -29,7 +29,7 @@ public class JWTutils {
                 .claim("name", username)
                 .claim("roles", role)
                 .issuedAt(new java.util.Date(System.currentTimeMillis())) // Date d’émission
-                .expiration(new java.util.Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // Expiration (1 jour)
+                .expiration(new java.util.Date(System.currentTimeMillis() + 60 * 60)) // Expiration (1h)
                 .signWith(secretKey)
                 .compact();
     }

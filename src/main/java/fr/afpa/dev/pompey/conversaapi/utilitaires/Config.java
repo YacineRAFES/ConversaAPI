@@ -12,12 +12,36 @@ import java.util.Properties;
 public class Config {
     private static final Properties props = new Properties();
     static {
-        String PATHCONF = "conf.properties";
-        try(InputStream input = Config.class.getClassLoader().getResourceAsStream(PATHCONF)) {
+        String pathconf = "conf.properties";
+        try(InputStream input = Config.class.getClassLoader().getResourceAsStream(pathconf)) {
             props.load(input);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    private static Properties chargerFichier(String nomFichier) {
+        Properties prop = new Properties();
+        try (InputStream input = Config.class.getClassLoader().getResourceAsStream(nomFichier)) {
+            if (input == null) {
+                throw new RuntimeException("Fichier n'existe pas : " + nomFichier);
+            }
+            prop.load(input);
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur lors du chargement du fichier : " + nomFichier, e);
+        }
+        return prop;
+    }
+
+    public static Properties utilisateur() {
+        return chargerFichier("configUser.properties");
+    }
+
+    public static Properties moderateur() {
+        return chargerFichier("configModo.properties");
+    }
+
+    public static Properties superadmin() {
+        return chargerFichier("configSuperAdmin.properties");
     }
 
     /**
@@ -83,6 +107,29 @@ public class Config {
         return props.getProperty("CLE_PUBLIQUE");
     }
 
+    public static String getJDBC_ROLE_USER() {
+        return utilisateur().getProperty("jdbc.username");
+    }
+
+    public static String getJDBC_ROLE_USER_PASSWORD() {
+        return utilisateur().getProperty("jdbc.password");
+    }
+
+    public static String getJDBC_ROLE_MODO_NAME() {
+        return moderateur().getProperty("jdbc.username");
+    }
+
+    public static String getJDBC_ROLE_MODO_PASSWORD() {
+        return moderateur().getProperty("jdbc.password");
+    }
+
+    public static String getJDBC_ROLE_SUPERADMIN() {
+        return superadmin().getProperty("jdbc.username");
+    }
+
+    public static String getJDBC_ROLE_SUPERADMIN_PASSWORD() {
+        return superadmin().getProperty("jdbc.password");
+    }
 
 }
 

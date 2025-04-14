@@ -78,7 +78,7 @@ public class AmisDAO extends DAO<Amis> {
             throw new DAOException(e.getMessage());
         }
     }
-//TODO: A REVOIR IL MANQUE LE TEST UNITAIRE POUR LA DAO AMIS
+
     /**
      * @param id
      * @return

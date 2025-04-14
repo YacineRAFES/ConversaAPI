@@ -57,11 +57,12 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try{
+            log.info("DEMANDE DE CREATION D'UN UTILISATEUR");
             JsonReader jsonReader = Json.createReader(request.getInputStream());
             JsonObject jsonObject = jsonReader.readObject();
             log.info(String.valueOf(jsonObject));
 
-            String username = jsonObject.getString("user", "");
+            String username = jsonObject.getString("username", "");
             String email = jsonObject.getString("email", "");
             String password1 = jsonObject.getString("password1", "");
             String password2 = jsonObject.getString("password2", "");
@@ -77,13 +78,25 @@ public class UserServlet extends HttpServlet {
             List<User> users = userService.getAllUsers();
 
             // Vérifie la longueur des champs
-            if (username.length() > 50 || email.length() > 50) {
+            log.info("Verifie les longueurs de l'utilisateur et l'email");
+            if (username.length() > 50 && email.length() > 50) {
                 log.info("le champs username respecte la longueur du caractère");
                 SendJSON.Error(response, "lengthInvalid");
                 return;
             }
+            log.info("Verification de la longueur : OK");
+
+            // Vérifie le format de l'email
+            log.info("Verifie le format de l'email");
+            if (!email.matches(Regex.EMAIL)) {
+                log.error("L'email est invalide lors de la REGEX.EMAIL");
+                SendJSON.Error(response, "emailInvalid");
+                return;
+            }
+            log.info("Verification de l'email : OK");
 
                 // Vérifie si l'utilisateur existe déjà
+            log.info("Verifie si l'utilisateur et email existe déjà");
             for (User user : users) {
                 if (user.getName().equals(username)) {
                     log.error("Le nom d'utilisateur existe déjà");
@@ -96,29 +109,30 @@ public class UserServlet extends HttpServlet {
                     return;
                 }
             }
+            log.info("Verification de l'utilisateur et email : OK");
 
-            // Vérifie le format de l'email
-            if (!email.matches(Regex.EMAIL)) {
-                log.error("L'email est invalide lors de la REGEX.EMAIL");
-                SendJSON.Error(response, "emailInvalid");
-                return;
-            }
+
 
             // Verifie le mot de passe
-
+            log.info("Verifie le mot de passe et la confirmation");
             if(!password1.equals(password2)) {
                 log.error("Les mots de passe ne correspondent pas");
                 SendJSON.Error(response, "passwordInvalid");
                 return;
             }
+            log.info("Verification de la correspondance du mot de passe : OK");
 
             // Vérifie les critères du mot de passe si oui, on le hash
+            log.info("Verifie les critères du mot de passe");
             if(!password1.matches(Regex.PASSWORD)) {
                 log.error("le mot de passe ne respect pas le critère");
                 SendJSON.Error(response, "passwordInvalid");
                 return;
             }
+            log.info("Verification du mot de passe : OK");
 
+            // Hash le mot de passe
+            log.info("Hash le mot de passe");
             String pwHash = hashPassword(password1);
             log.info(String.valueOf(pwHash.getBytes().length));
             log.info(pwHash);
