@@ -149,6 +149,11 @@ class UserTest {
         assertEquals(localDate, actuelDate, "La date ne corresponds pas");
     }
 
+    @Test
+    void setValide() {
+        assertDoesNotThrow(() -> userUnderTest.setValide(true));
+    }
+
     @AfterEach
     void tearDown() {
     }

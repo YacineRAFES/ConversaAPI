@@ -1,5 +1,6 @@
 package fr.afpa.dev.pompey.conversaapi.servlet;
 import com.password4j.Password;
+import fr.afpa.dev.pompey.conversaapi.emuns.Role;
 import fr.afpa.dev.pompey.conversaapi.exception.JsonException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import fr.afpa.dev.pompey.conversaapi.securite.JWTutils;
@@ -31,7 +32,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        this.userService = new UserService();
+        this.userService = new UserService(Role.UTILISATEUR);
     }
 
     @Override
@@ -55,7 +56,7 @@ public class LoginServlet extends HttpServlet {
             }
             log.info("Champs valides");
 
-            List<User> users = userService.getAllUsers();
+            List<User> users = userService.getAll();
             User userFind = null;
             for (User user : users) {
                 if (user.getEmail().equals(email)) {

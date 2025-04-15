@@ -1,20 +1,20 @@
 package fr.afpa.dev.pompey.conversaapi.service;
 
+import fr.afpa.dev.pompey.conversaapi.dao.AmisDAO;
 import fr.afpa.dev.pompey.conversaapi.dao.DAOFactory;
-import fr.afpa.dev.pompey.conversaapi.dao.UserDAO;
 import fr.afpa.dev.pompey.conversaapi.emuns.Role;
-import fr.afpa.dev.pompey.conversaapi.modele.User;
+import fr.afpa.dev.pompey.conversaapi.modele.Amis;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.Utils;
 
 import java.util.List;
 
-public class UserService {
+public class AmisService {
 
-    private final UserDAO userDAO;
+    private final AmisDAO amisDAO;
 
-    public UserService(Role role){
+    public AmisService(Role role){
         DAOFactory daoFactory = DAOFactory.getInstance(role);
-        this.userDAO = daoFactory.getUserDAO();
+        this.amisDAO = daoFactory.getAmisDAO();
     }
 
     /**
@@ -22,19 +22,19 @@ public class UserService {
      *
      * @return La liste de tous les utilisateurs.
      */
-    public List<User> getAll() {
-        return userDAO.findAll();
+    public List<Amis> getAll() {
+        return amisDAO.findAll();
     }
 
     /**
      * Ajoute un utilisateur à la base de données.
      *
-     * @param user L'utilisateur à ajouter.
+     * @param amis L'utilisateur à ajouter.
      * @return
      */
-    public int add(User user) throws IllegalStateException  {
+    public boolean add(Amis amis) throws IllegalStateException  {
         try{
-            return userDAO.create(user);
+            return amisDAO.createDemandeAmis(amis);
         }catch (Exception e){
             throw new IllegalStateException ("Erreur lors de l'ajout de l'utilisateur : " + e.getMessage() + Utils.getNameClass());
         }
@@ -42,23 +42,23 @@ public class UserService {
     }
 
     /**
-     * Met à jour un utilisateur dans la base de données.
+     * Supprime un utilisateur de la base de données.
      *
-     * @param user L'utilisateur à mettre à jour.
+     * @param amis L'utilisateur à supprimer.
      * @return
      */
-    public boolean update(User user) {
-        return userDAO.update(user);
+    public boolean delete(Amis amis) {
+        return amisDAO.delete(amis);
     }
 
     /**
-     * Supprime un utilisateur de la base de données.
+     * Met à jour un utilisateur dans la base de données.
      *
-     * @param user L'utilisateur à supprimer.
+     * @param amis L'utilisateur à mettre à jour.
      * @return
      */
-    public boolean delete(User user) {
-        return userDAO.delete(user);
+    public boolean update(Amis amis) {
+        return amisDAO.update(amis);
     }
 
     /**
@@ -67,7 +67,7 @@ public class UserService {
      * @param id L'ID de l'utilisateur à récupérer.
      * @return L'utilisateur correspondant à l'ID.
      */
-    public User get(int id) {
-        return userDAO.find(id);
+    public Amis get(int id) {
+        return amisDAO.find(id);
     }
 }

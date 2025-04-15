@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.util.List;
 
 public abstract class DAO<T> {
-    protected Connection connect = Singleton.getInstanceDB();
+    protected Connection connect;
 
     public abstract int create(T obj);
 

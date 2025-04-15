@@ -17,6 +17,7 @@ public class User {
     private String email;
     private String role;
     private Date date;
+    private boolean valide;
 
 //    CONSTRUCTEURS
     public User(){
@@ -44,6 +45,24 @@ public class User {
         this.role = role;
     }
 
+    /**
+     * @param id
+     * @param name
+     * @param password
+     * @param email
+     * @param role
+     * @param date
+     */
+    public User(Integer id, String name, String password, String email, String role, Date date, boolean valide) {
+        this.id = id;
+        this.name = name;
+        this.password = password;
+        this.email = email;
+        this.date = date;
+        this.role = role;
+        this.valide = valide;
+    }
+
     /** Création d'un utilisateur
      * @param name
      * @param password
@@ -51,12 +70,27 @@ public class User {
      * @param role
      * @param date
      */
-    public User(String name, String password, String email, String role, Date date) {
+    public User(String name, String password, String email, String role, Date date, boolean valide) {
         this.name = name;
         this.password = password;
         this.email = email;
         this.date = date;
         this.role = role;
+        this.valide = valide;
+    }
+
+    /**
+     * Modification un compte par un utilisateur
+     * @param id
+     * @param name
+     * @param password
+     * @param email
+     */
+    public User(Integer id, String name, String password, String email) {
+        this.id = id;
+        this.name = name;
+        this.password = password;
+        this.email = email;
     }
 
     /**
@@ -170,5 +204,13 @@ public class User {
             throw new SaisieException("La date ne corresponds pas");
         }
         this.date = date;
+    }
+
+    public boolean isValide() {
+        return valide;
+    }
+
+    public void setValide(boolean valide) throws SaisieException {
+        this.valide = valide;
     }
 }

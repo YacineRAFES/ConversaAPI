@@ -8,10 +8,7 @@ import fr.afpa.dev.pompey.conversaapi.modele.StatutAmitie;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +16,9 @@ import java.util.List;
 @Slf4j
 public class AmisDAO extends DAO<Amis> {
 
+    public AmisDAO(Connection connect) {
+        this.connect = connect;
+    }
     /**
      * @param obj
      * @return

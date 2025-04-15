@@ -1,5 +1,6 @@
 package fr.afpa.dev.pompey.conversaapi.servlet;
 
+import fr.afpa.dev.pompey.conversaapi.emuns.Role;
 import fr.afpa.dev.pompey.conversaapi.exception.JsonException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import fr.afpa.dev.pompey.conversaapi.service.UserService;
@@ -39,7 +40,7 @@ public class UserServlet extends HttpServlet {
      */
     @Override
     public void init() throws ServletException {
-        this.userService = new UserService();
+        this.userService = new UserService(Role.UTILISATEUR);
     }
 
     /**
@@ -75,7 +76,7 @@ public class UserServlet extends HttpServlet {
                 return;
             }
 
-            List<User> users = userService.getAllUsers();
+            List<User> users = userService.getAll();
 
             // Vérifie la longueur des champs
             log.info("Verifie les longueurs de l'utilisateur et l'email");
@@ -138,9 +139,9 @@ public class UserServlet extends HttpServlet {
             log.info(pwHash);
 
 
-            User user = new User(username, pwHash, email, "user", Date.valueOf(LocalDate.now()));
+            User user = new User(username, pwHash, email, "user", Date.valueOf(LocalDate.now()), true);
 
-            userService.addUser(user);
+            userService.add(user);
             log.info("L'utilisateur a été ajouté avec succès");
             SendJSON.Success(response, "userCreated");
 

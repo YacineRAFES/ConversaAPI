@@ -115,7 +115,7 @@ public class Config {
         return utilisateur().getProperty("jdbc.password");
     }
 
-    public static String getJDBC_ROLE_MODO_NAME() {
+    public static String getJDBC_ROLE_MODO_USER() {
         return moderateur().getProperty("jdbc.username");
     }
 
@@ -123,7 +123,7 @@ public class Config {
         return moderateur().getProperty("jdbc.password");
     }
 
-    public static String getJDBC_ROLE_SUPERADMIN() {
+    public static String getJDBC_ROLE_SUPERADMIN_USER() {
         return superadmin().getProperty("jdbc.username");
     }
 

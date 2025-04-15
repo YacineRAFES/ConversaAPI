@@ -17,6 +17,10 @@ import java.util.List;
  */
 public class UserDAO extends DAO<User>{
 
+    public UserDAO(Connection connect) {
+        this.connect = connect;
+    }
+
     /**
      * Crée un nouvel utilisateur dans la base de données.
      *

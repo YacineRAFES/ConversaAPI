@@ -1,15 +1,15 @@
+import fr.afpa.dev.pompey.conversaapi.dao.DAOFactory;
 import fr.afpa.dev.pompey.conversaapi.dao.UserDAO;
+import fr.afpa.dev.pompey.conversaapi.emuns.Role;
 import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
+import fr.afpa.dev.pompey.conversaapi.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
 import java.sql.Date;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -18,11 +18,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 class UserDAOTest {
 
-    private UserDAO userDAO;
+    private UserService userService;
 
     @BeforeEach
     void setUp() {
-        userDAO = new UserDAO();
+        userService = new UserService(Role.UTILISATEUR);
     }
 
     @AfterEach
@@ -31,53 +31,104 @@ class UserDAOTest {
 
     @Test
     void create() {
-        User user = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()));
-        int id = userDAO.create(user);
-        assertTrue(id > 0, "Erreur lors de la création User");
-        log.info("L'id de l'utilisateur inséré est " + id);
+        User user = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        userService.add(user);
+
+        List<User> users = userService.getAll();
+
+        // Vérifiez que l'utilisateur a été ajouté
+        User addedUser = users.stream()
+                .filter(u -> u.getName().equals("JohnDoe"))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(addedUser, "L'utilisateur n'a pas été ajouté correctement");
+        log.info("Utilisateur ajouté : " + addedUser.getName());
 
         // Supprimez l'utilisateur après le test
-        userDAO.delete(new User(id));
+        userService.delete(addedUser);
     }
 
     @Test
-    void update() throws SaisieException {
-        User user = new User(1, "Alice", "ValidPassword1%$!", "alice@example.com", "user", Date.valueOf(LocalDate.now()));
-        boolean updated = userDAO.update(user);
-        assertTrue(updated, "L'utilisateur n'a pas été mis à jour correctement");
+    void update() {
+        // Créez un utilisateur à mettre à jour
+        User user = new User("Aliceeeeee", "ValidPassword1%$!", "alice@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        int id = userService.add(user);
+
+
+        // Update un utilisateur
+        User userModif = new User(
+                id,
+                "AliceUpdated",
+                "NewValidPassword1%$!",
+                "aliceUpdated@example.com",
+                "user",
+                Date.valueOf(LocalDate.now()),
+                true
+                );
+        boolean userModifier = userService.update(userModif);
+
+        assertTrue(userModifier, "L'utilisateur n'a pas été mis à jour correctement");
+
+        userService.delete(new User(id));
     }
 
     @Test
     void find() {
-        User user = new User("Alisdqdqce", "ValidPassword1%$!", "alice11@example.com", "user", Date.valueOf(LocalDate.now()));
-        int userid = userDAO.create(user);
-        User userFind = userDAO.find(userid);
-        assertNotNull(userFind, "L'utilisateur n'a pas été trouvé");
-        assertEquals("Alisdqdqce", userFind.getName(), "Le nom de l'utilisateur ne correspond pas");
+        // Créez un utilisateur à mettre à jour
+        User user = new User("Aliceeeeee", "ValidPassword1%$!", "alice@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        userService.add(user);
 
-        // Supprimez l'utilisateur après le test
-        userDAO.delete(new User(userid));
+        List<User> users = userService.getAll();
+        User findUser = users.stream()
+                .filter(u -> u.getName().equals("Aliceeeeee"))
+                .findFirst()
+                .orElse(null);
+
+        User userFind = userService.get(findUser.getId());
+        assertEquals("Aliceeeeee", userFind.getName(), "Le nom n'a pas été trouvé");
+
+        userService.delete(findUser);
     }
 
     @Test
     void findAll() {
-        User user = new User("TestUser", "ValidPassword1%$!", "test.user@example.com", "user", Date.valueOf(LocalDate.now()));
-        int id = userDAO.create(user);
+        User user = new User("Aliceeeeee", "ValidPassword1%$!", "alice@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        userService.add(user);
+        User user1 = new User("joooooohndoe", "ValidPasfdfsword1%$!", "joooooohndoe@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        userService.add(user1);
 
-        assertTrue(id > 0, "Erreur lors de la création de l'utilisateur de test");
+        List<User> users = userService.getAll();
 
-        List<User> users = userDAO.findAll();
+        User findUser1 = users.stream()
+                .filter(u -> u.getName().equals("Aliceeeeee"))
+                .findFirst()
+                .orElse(null);
 
-        assertFalse(users.isEmpty(), "Le nombre d'utilisateurs trouvés est incorrect");
+        User findUser2 = users.stream()
+                .filter(u -> u.getName().equals("joooooohndoe"))
+                .findFirst()
+                .orElse(null);
 
-        userDAO.delete(new User(id));
+        assertFalse(users.isEmpty(), "La liste des utilisateurs est vide");
+
+        // Supprimez les utilisateurs après le test
+        userService.delete(findUser1);
+        userService.delete(findUser2);
+
     }
 
     @Test
     void delete() {
-        User user = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()));
-        int id = userDAO.create(user);
-        boolean deleted = userDAO.delete(new User(id));
+        User user = new User("Aliceeeeee", "ValidPassword1%$!", "alice@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        userService.add(user);
+
+        List<User> users = userService.getAll();
+        User deletedUser = users.stream()
+                .filter(u -> u.getName().equals("Aliceeeeee"))
+                .findFirst()
+                .orElse(null);
+        boolean deleted = userService.delete(deletedUser);
+
         assertTrue(deleted, "L'utilisateur n'a pas été supprimé correctement");
     }
 }

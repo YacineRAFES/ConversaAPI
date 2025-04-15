@@ -13,12 +13,12 @@ public class Singleton {
 
     private static Connection connection;
 
-    private Singleton() {
+    private Singleton(Properties props) {
         try {
             Class.forName(getJDBC_DRIVER());
             String url = getJDBC_URL();
-            String user = getJDBC_USER();
-            String password = getJDBC_PASSWORD();
+            String user = props.getProperty("jdbc.username");
+            String password = props.getProperty("jdbc.password");
 
             connection = DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
@@ -29,11 +29,17 @@ public class Singleton {
     }
 
     // Méthode qui permet de retourner une instance de connexion à la base de données
-    public static Connection getInstanceDB() {
-        if (getConnection() == null) {
-            new Singleton();
+    public static Connection getInstanceDB(String role) {
+        if (connection == null) {
+            Properties propsRole = switch (role.toLowerCase()){
+                case "utilisateur" -> utilisateur();
+                case "moderateur" -> moderateur();
+                case "superadmin" -> superadmin();
+                default -> throw new IllegalArgumentException("Rôle inconnu : " + role);
+            };
+            new Singleton(propsRole);
         }
-        return getConnection();
+        return connection;
     }
 
     // Méthode qui permet de fermer la connexion à la base de données
