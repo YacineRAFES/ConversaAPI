@@ -86,9 +86,9 @@ public class AmisDAO extends DAO<Amis> {
     @Override
     public Amis find(int id) {
         log.info("Fonction find(id) appellée");
-        List<User> users = new ArrayList<>();
+        List<Amis> amis = new ArrayList<>();
         String selectSQL =
-                "SELECT u.USER_NAME " +
+                "SELECT * " +
                 "FROM amis a " +
                 "JOIN utilisateur u ON a.USER_ID_amiDe = u.USER_ID " +
                 "WHERE a.USER_ID_utilisateur = ?"
@@ -98,18 +98,21 @@ public class AmisDAO extends DAO<Amis> {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                User user = new User();
-                user.setName(rs.getString("USER_NAME"));
-                users.add(user);
-                log.info(user.toString());
+                Amis ami = new Amis();
+                ami.setIdGroupeMessagesPrives(rs.getInt("MG_ID"));
+                ami.setStatut(StatutAmitie.valueOf(rs.getString("AMIS_STATUT")));
+                ami.setDateDemande(rs.getDate("AMIS_DATE_DEMANDE"));
+                ami.setUserIdAmiDe(rs.getInt("USER_ID_amiDe"));
+                ami.setUserIdDemandeur(rs.getInt("USER_ID_utilisateur"));
+                amis.add(ami);
                 log.info("Liste des amis fait");
             }
-        } catch (SQLException | RegexException | SaisieException e) {
+        } catch (SQLException | SaisieException e) {
             log.error("Erreur lors de la récupération de la liste d'amis", e);
             throw new DAOException(e.getMessage());
         }
-        Amis amis = new Amis(users);
-        return amis;
+        Amis amisList = new Amis(amis);
+        return amisList;
     }
 
     /**
@@ -140,6 +143,30 @@ public class AmisDAO extends DAO<Amis> {
         }
     }
 
+    public Amis findByUsers(int userIdDemandeur, int userIdAmiDe) {
+        String sql = "SELECT * FROM amis WHERE USER_ID_utilisateur = ? AND USER_ID_amiDe = ?";
+        try(PreparedStatement ps = connect.prepareStatement(sql)){
+
+
+            ps.setInt(1, userIdDemandeur);
+            ps.setInt(2, userIdAmiDe);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new Amis(
+                        rs.getInt("MG_ID"),
+                        rs.getInt("USER_ID_utilisateur"),
+                        rs.getInt("USER_ID_amiDe"),
+                        rs.getDate("AMIS_DATE_DEMANDE"),
+                        StatutAmitie.valueOf(rs.getString("AMIS_STATUT"))
+                );
+            }
+        }catch (SQLException e){
+            log.error("Erreur lors de la recherche de tous les amis", e);
+            throw new DAOException(e.getMessage());
+        }
+        return null;
+    }
+
     /**
      * Dès, l'utilisateur refuse une demande d'amis, il supprime la ligne de la table amis.
      * Supprime un enregistrement d'amis de la base de données.
@@ -148,19 +175,36 @@ public class AmisDAO extends DAO<Amis> {
      * @param obj
      */
     public void refuserDemandeAmisOuRetireEnAmis(Amis obj) {
-        String deleteSQL = "DELETE FROM amis WHERE USER_ID_amiDe = ? AND USER_ID_utilisateur = ? OR USER_ID_amiDe = ? AND USER_ID_utilisateur = ?";
-        try {
-            PreparedStatement pstmt = connect.prepareStatement(deleteSQL);
-            pstmt.setInt(1, obj.getUserIdAmiDe());
-            pstmt.setInt(2, obj.getUserIdDemandeur());
-            pstmt.setInt(3, obj.getUserIdDemandeur());
-            pstmt.setInt(4, obj.getUserIdAmiDe());
-            pstmt.executeUpdate();
-            log.info("Suppression de la demande d'amis {} et {}", obj.getUserIdDemandeur(), obj.getUserIdAmiDe());
-        } catch (SQLException e) {
-            log.error("Erreur lors de la deletion Amis", e);
-            throw new DAOException(e.getMessage());
+        if(obj.getIdGroupeMessagesPrives() != null) {
+            String deleteSQL = "DELETE FROM groupe_messages_prives WHERE MG_ID = ?";
+            try {
+                PreparedStatement pstmt = connect.prepareStatement(deleteSQL);
+                pstmt.setInt(1, obj.getIdGroupeMessagesPrives());
+                pstmt.executeUpdate();
+                log.info("Suppression de la demande d'amis directement dans le groupe de messages privés {}", obj.getIdGroupeMessagesPrives());
+
+            } catch (SQLException e) {
+                log.error("Erreur lors de la deletion Amis", e);
+                throw new DAOException(e.getMessage());
+            }
+        } else {
+            String deleteSQL1 = "DELETE FROM amis WHERE USER_ID_amiDe = ? AND USER_ID_utilisateur = ? OR USER_ID_amiDe = ? AND USER_ID_utilisateur = ?";
+            try {
+                PreparedStatement pstmt = connect.prepareStatement(deleteSQL1);
+                pstmt.setInt(1, obj.getUserIdAmiDe());
+                pstmt.setInt(2, obj.getUserIdDemandeur());
+                pstmt.setInt(3, obj.getUserIdDemandeur());
+                pstmt.setInt(4, obj.getUserIdAmiDe());
+                pstmt.executeUpdate();
+                log.info("Suppression de la demande d'amis {} et {}", obj.getUserIdDemandeur(), obj.getUserIdAmiDe());
+            } catch (SQLException e) {
+                log.error("Erreur lors de la deletion Amis", e);
+                throw new DAOException(e.getMessage());
+            }
         }
+
+
+
     }
 
     /**

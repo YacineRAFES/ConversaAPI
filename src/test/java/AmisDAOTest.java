@@ -47,8 +47,10 @@ public class AmisDAOTest {
         assertTrue(confirmation, "Erreur lors de la création d'une amitié");
         log.info("Demande d'amis confirmée");
 
-        //Supprimez la demande d'amis et les utilisateurs
-        amisService.delete(amis);
+        Amis amisFind = amisService.find(id1, id2);
+
+        amisService.delete(amisFind);
+
         userService.delete(new User(id1));
         userService.delete(new User(id2));
     }
@@ -82,13 +84,15 @@ public class AmisDAOTest {
         // Crée une nouvelle amitié entre les deux utilisateurs
         Amis amis = new Amis(id1, id2);
         amisService.add(amis);
+
+        Amis amisFind = amisService.find(id1, id2);
         // Met à jour la demande d'amis
         boolean confirmation = amisService.update(amis);
         assertTrue(confirmation, "Erreur lors de la mise à jour de la demande d'amis");
         log.info("Demande d'amis confirme");
         // Supprimez la demande d'amis et les utilisateurs
         log.info("Demande de retirer en amis...");
-        amisService.delete(amis);
+        amisService.delete(amisFind);
         log.info("Demande de retirer en amis : OK");
         log.info("Suppression des utilisateurs...");
         log.info("Suppression de l'utilisateur " + id1);

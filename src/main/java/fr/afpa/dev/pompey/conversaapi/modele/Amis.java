@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class Amis {
-    private List<User> amisList;
+    private List<Amis> amisList;
     private Integer idGroupeMessagesPrives;
     private StatutAmitie statut;
     private Date dateDemande;
@@ -19,7 +19,7 @@ public class Amis {
     public Amis() {
     }
 
-    public Amis(List<User> amisList){
+    public Amis(List<Amis> amisList){
         this.amisList = amisList;
     }
 
@@ -28,11 +28,36 @@ public class Amis {
      * @return
      */
     public Amis(Integer userIdDemandeur, Integer userIdAmiDe) {
-        this.idGroupeMessagesPrives = null;
         this.userIdDemandeur = userIdDemandeur;
         this.userIdAmiDe = userIdAmiDe;
         this.dateDemande = Date.valueOf(LocalDate.now());
         this.statut = StatutAmitie.EN_ATTENTE;
+    }
+
+    public Amis(Integer idGroupeMessagesPrives, Integer userIdDemandeur, Integer userIdAmiDe, Date dateDemande, StatutAmitie statut) {
+        this.idGroupeMessagesPrives = idGroupeMessagesPrives;
+        this.userIdDemandeur = userIdDemandeur;
+        this.userIdAmiDe = userIdAmiDe;
+        this.dateDemande = dateDemande;
+        this.statut = statut;
+    }
+
+    public Amis(Integer idGroupeMessagesPrives, Integer userIdDemandeur, Integer userIdAmiDe) {
+        this.idGroupeMessagesPrives = idGroupeMessagesPrives;
+        this.userIdDemandeur = userIdDemandeur;
+        this.userIdAmiDe = userIdAmiDe;
+        this.statut = StatutAmitie.AMI;
+    }
+
+    /**
+     * On l'utilise find
+     * @return
+     */
+    public Amis(Integer idGroupeMessagesPrives, Integer userIdDemandeur, Integer userIdAmiDe, StatutAmitie statut) {
+        this.idGroupeMessagesPrives = idGroupeMessagesPrives;
+        this.userIdDemandeur = userIdDemandeur;
+        this.userIdAmiDe = userIdAmiDe;
+        this.statut = statut;
     }
 
     public StatutAmitie getStatut() {
@@ -44,11 +69,6 @@ public class Amis {
     }
 
     public void setIdGroupeMessagesPrives(Integer idGroupeMessagesPrives) throws SaisieException {
-        if (idGroupeMessagesPrives == null) {
-            throw new SaisieException("L'id ne doit pas être vide ou null");
-        } else if (idGroupeMessagesPrives <= 0) {
-            throw new SaisieException("L'id ne doit pas être négatif");
-        }
         this.idGroupeMessagesPrives = idGroupeMessagesPrives;
     }
 

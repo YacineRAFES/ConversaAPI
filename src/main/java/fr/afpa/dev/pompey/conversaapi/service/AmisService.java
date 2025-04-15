@@ -70,4 +70,8 @@ public class AmisService {
     public Amis get(int id) {
         return amisDAO.find(id);
     }
+
+    public Amis find(int id1, int id2) {
+        return amisDAO.findByUsers(id1, id2);
+    }
 }
