@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class Amis {
+    private User user;
     private List<Amis> amisList;
     private Integer idGroupeMessagesPrives;
     private StatutAmitie statut;
@@ -116,5 +117,13 @@ public class Amis {
             throw new SaisieException("L'id ne doit pas être négatif");
         }
         this.userIdAmiDe = userIdAmiDe;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

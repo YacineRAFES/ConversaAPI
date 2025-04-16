@@ -71,6 +71,16 @@ public class AmisService {
         return amisDAO.find(id);
     }
 
+    /**
+     * Récupère un utilisateur par son ID.
+     *
+     * @param id L'ID de l'utilisateur à récupérer.
+     * @return Retourne la liste d'amis correspondants à l'ID.
+     */
+    public List<Amis> findById(int id) {
+        return amisDAO.findById(id);
+    }
+
     public Amis find(int id1, int id2) {
         return amisDAO.findByUsers(id1, id2);
     }

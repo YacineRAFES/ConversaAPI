@@ -45,6 +45,11 @@ public class User {
         this.role = role;
     }
 
+    public User(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     /**
      * @param id
      * @param name

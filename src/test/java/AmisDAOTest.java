@@ -116,7 +116,7 @@ public class AmisDAOTest {
         amisService.update(amis);
 
         // Trouve l'amitié entre les deux utilisateurs
-        Amis amisFind = amisService.get(id1);
+        Amis amisFind = (Amis) amisService.get(id1);
         assertTrue(amisFind != null, "Erreur lors de la recherche d'amis");
         log.info("Demande d'amis trouvée");
 

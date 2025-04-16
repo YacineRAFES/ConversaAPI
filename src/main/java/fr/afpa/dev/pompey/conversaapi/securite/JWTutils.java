@@ -43,12 +43,22 @@ public class JWTutils {
         }
     }
 
+    /**
+     * Récupère les informations de l'utilisateur à partir du token
+     * @param token le token à décoder
+     * @return les informations de l'utilisateur
+     */
     public static Claims getUserInfoFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try{
+            return Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        }catch (Exception e){
+            log.error("Erreur lors de la récupération des informations de l'utilisateur à partir du token : " + e.getMessage());
+            throw new RuntimeException("Erreur lors de la récupération des informations de l'utilisateur à partir du token");
+        }
     }
 
 }

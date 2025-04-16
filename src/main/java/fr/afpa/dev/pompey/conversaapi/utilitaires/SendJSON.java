@@ -2,6 +2,7 @@ package fr.afpa.dev.pompey.conversaapi.utilitaires;
 
 import fr.afpa.dev.pompey.conversaapi.exception.JsonException;
 import jakarta.json.Json;
+import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -121,6 +122,17 @@ public class SendJSON {
             response.getWriter().write(jsonResponse.toString());
         } catch (Exception e) {
             throw new JsonException("Erreur dans la méthode SendJSON.JWT : " + e.getMessage());
+        }
+    }
+
+    //Envoye sous forme de tableau
+    public static void OnlyInArray(HttpServletResponse response, JsonArray jsonArray) throws JsonException {
+        try {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(jsonArray.toString());
+        } catch (Exception e) {
+            throw new JsonException("Erreur dans OnlyInArray : " + e.getMessage());
         }
     }
 
