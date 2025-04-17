@@ -84,4 +84,8 @@ public class AmisService {
     public Amis find(int id1, int id2) {
         return amisDAO.findByUsers(id1, id2);
     }
+
+    public List<Amis> findAllFriendsRequestById(int id) {
+        return amisDAO.findAllFriendsRequestById(id);
+    }
 }

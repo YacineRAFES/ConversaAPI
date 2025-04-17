@@ -136,5 +136,26 @@ public class SendJSON {
         }
     }
 
+    public static void GlobalJSON(HttpServletResponse response, JsonObject jsonObject) throws JsonException {
+        try {
+            // Je définis le type de contenu de la réponse HTTP.
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            // Je construis un objet JSON avec le message de succès.
+            JsonObject jsonResponse = Json.createObjectBuilder()
+                    .add("status", "success")
+                    .add("objects", jsonObject)
+                    .build();
+
+            // J'écris la réponse JSON.
+            response.getWriter().write(jsonResponse.toString());
+        } catch (Exception e) {
+            throw new JsonException("Erreur dans la méthode SendJSON.Success : " + e.getMessage());
+        }
+    }
+
+
+
 
 }

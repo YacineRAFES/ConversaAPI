@@ -333,4 +333,48 @@ public class AmisDAO extends DAO<Amis> {
         }
         return newid;
     }
+
+    /**
+     * Recupere tout les demandes d'amis d'un utilisateur
+     */
+    public List<Amis> findAllFriendsRequestById(int id) {
+        log.info("Fonction findAllFriendsRequestById(id) appelée");
+        List<Amis> amis = new ArrayList<>();
+        String selectSQL =
+                "SELECT * " +
+                        "FROM amis a " +
+                        "JOIN utilisateur u " +
+                        "ON a.USER_ID_utilisateur = u.USER_ID " +
+                        "WHERE a.USER_ID_amiDe = ? " +
+                        "AND AMIS_STATUT = 'EN_ATTENTE'";
+
+        try {
+            PreparedStatement pstmt = connect.prepareStatement(selectSQL);
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Amis ami = new Amis(
+                        rs.getInt("MG_ID"),
+                        rs.getInt("USER_ID_utilisateur"),
+                        rs.getInt("USER_ID_amiDe"),
+                        rs.getDate("AMIS_DATE_DEMANDE"),
+                        StatutAmitie.valueOf(rs.getString("AMIS_STATUT"))
+                );
+
+                User user = new User(
+                        rs.getInt("USER_ID"),
+                        rs.getString("USER_NAME")
+                );
+
+                ami.setUser(user);
+                amis.add(ami);
+            }
+            log.info("Liste des amis récupérée avec succès");
+        } catch (SQLException e) {
+            log.error("Erreur lors de la récupération de la liste d'amis", e);
+            throw new DAOException(e.getMessage());
+        }
+
+        return amis;
+    }
 }

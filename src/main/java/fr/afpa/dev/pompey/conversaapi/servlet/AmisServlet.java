@@ -81,23 +81,39 @@ public class AmisServlet extends HttpServlet {
 
                 List<Amis> amisList = amisService.findById(id);
 
-                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+                List<Amis> amiRequest = amisService.findAllFriendsRequestById(id);
+
+                JsonArrayBuilder amisBuilder = Json.createArrayBuilder();
 
                 for (Amis ami : amisList) {
-                    JsonObject amiJson = Json.createObjectBuilder()
+                    amisBuilder.add(Json.createObjectBuilder()
                             .add("idGroupeMessagesPrives", ami.getIdGroupeMessagesPrives())
                             .add("statut", ami.getStatut().toString())
                             .add("dateDemande", ami.getDateDemande().toString())
                             .add("userIdAmiDe", ami.getUserIdAmiDe())
                             .add("userIdDemandeur", ami.getUserIdDemandeur())
                             .add("username", ami.getUser().getName())
-                            .add("userId", ami.getUser().getId())
-                            .build();
-
-                    arrayBuilder.add(amiJson);
+                            .add("userId", ami.getUser().getId()));
                 }
-                JsonArray amisJsonArray = arrayBuilder.build();
-                SendJSON.OnlyInArray(response, amisJsonArray);
+
+                JsonArrayBuilder demandesBuilder = Json.createArrayBuilder();
+
+                for (Amis ami : amiRequest) {
+                    demandesBuilder.add(Json.createObjectBuilder()
+                            .add("idGroupeMessagesPrives", ami.getIdGroupeMessagesPrives())
+                            .add("statut", ami.getStatut().toString())
+                            .add("dateDemande", ami.getDateDemande().toString())
+                            .add("userIdAmiDe", ami.getUserIdAmiDe())
+                            .add("userIdDemandeur", ami.getUserIdDemandeur())
+                            .add("username", ami.getUser().getName())
+                            .add("userId", ami.getUser().getId()));
+                }
+                JsonObject globalJson = Json.createObjectBuilder()
+                        .add("amis", amisBuilder)
+                        .add("demandes", demandesBuilder)
+                        .build();
+
+                SendJSON.GlobalJSON(response, globalJson);
             }
         }catch(Exception e){
             log.error("Erreur dans la requête: " + e.getMessage());
