@@ -1,5 +1,7 @@
 package fr.afpa.dev.pompey.conversaapi.utilitaires;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -9,8 +11,12 @@ import java.util.Properties;
  *
  * @author Yacine RAFES
  */
+@Slf4j
 public class Config {
     private static final Properties props = new Properties();
+    static {
+        log.info("Clé privée chargée depuis le .env : " + props.getProperty("CLE_PRIVEE"));
+    }
     static {
         String pathconf = "conf.properties";
         try(InputStream input = Config.class.getClassLoader().getResourceAsStream(pathconf)) {

@@ -14,51 +14,56 @@ import static fr.afpa.dev.pompey.conversaapi.utilitaires.Config.getCLE_PRIVEE;
 // TODO: A REVOIR
 @Slf4j
 public class JWTutils {
-    // https://github.com/jwtk/jjwt?tab=readme-ov-file#creating-a-jwt
 
-    private static final String SECRET_KEY = getCLE_PRIVEE();
-    private static final Key secretKey = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    private static Key getSecretKey() {
+        String secret = getCLE_PRIVEE();
+
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalStateException("La clé secrète est invalide ou non chargée");
+        }
+
+        log.info("Clé utilisée pour le JWT : " + secret);
+        return Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
     public static String generateToken(int id, String email, String username, String role) {
-
         return Jwts.builder()
-                .issuer("ConversaAPI") // Identifiant de l’émetteur
+                .issuer("ConversaAPI")
                 .subject(username)
                 .claim("id", id)
                 .claim("email", email)
                 .claim("name", username)
                 .claim("roles", role)
-                .issuedAt(new java.util.Date(System.currentTimeMillis())) // Date d’émission
-                .expiration(new java.util.Date(System.currentTimeMillis() + 60 * 60)) // Expiration (1h)
-                .signWith(secretKey)
+                .issuedAt(new java.util.Date(System.currentTimeMillis()))
+                .expiration(new java.util.Date(System.currentTimeMillis() + 60 * 60 * 1000)) // 1h
+                .signWith(getSecretKey())
                 .compact();
     }
 
     public static boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(secretKey).build().parseClaimsJws(token);
+            Jwts.parser()
+                    .setSigningKey(getSecretKey())
+                    .build()
+                    .parseClaimsJws(token);
             return true;
-        }catch (Exception e) {
+        } catch (Exception e) {
+            log.error("Erreur de validation du token : " + e.getMessage());
             return false;
         }
     }
 
-    /**
-     * Récupère les informations de l'utilisateur à partir du token
-     * @param token le token à décoder
-     * @return les informations de l'utilisateur
-     */
     public static Claims getUserInfoFromToken(String token) {
-        try{
+        try {
             return Jwts.parser()
-                    .setSigningKey(secretKey)
+                    .setSigningKey(getSecretKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-        }catch (Exception e){
-            log.error("Erreur lors de la récupération des informations de l'utilisateur à partir du token : " + e.getMessage());
-            throw new RuntimeException("Erreur lors de la récupération des informations de l'utilisateur à partir du token");
+        } catch (Exception e) {
+            log.error("Erreur lors de la récupération des informations de l'utilisateur : " + e.getMessage());
+            throw new RuntimeException("Token invalide");
         }
     }
-
 }
+

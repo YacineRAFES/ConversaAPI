@@ -35,7 +35,7 @@ public class AmisServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             JsonReader jsonReader = Json.createReader(request.getInputStream());
             JsonObject jsonObject = jsonReader.readObject();
@@ -54,61 +54,56 @@ public class AmisServlet extends HttpServlet {
 
             Claims claims = JWTutils.getUserInfoFromToken(jwt);
             User user;
-            if (claims != null) {
-                Integer id = Integer.valueOf(claims.get("id", String.class));
-                log.info("Après le claims, ID USER : " + id);
-                String email = claims.get("email", String.class);
-                log.info("Après le claims, EMAIL USER : " + email);
-                String username = claims.get("name", String.class);
-                log.info("Après le claims, USERNAME USER : " + username);
-                String role = claims.get("roles", String.class);
-                log.info("Après le claims, ROLE USER : " + role);
+            if (claims == null) {
+                log.error("Token claims null");
+                SendJSON.Error(response, "invalidToken");
+                return;
+            }
 
-                //Verifie si l'utilisateur existe
-                user = userService.get(id);
-                if (user == null) {
-                    log.error("L'utilisateur n'existe pas");
-                    SendJSON.Error(response, "userNotFound");
-                    return;
-                } else {
-                    //Récupere la liste des amis et les mettre en jsonarray
-                    log.info("L'utilisateur existe");
+            Integer id = claims.get("id", Integer.class);
+            String email = claims.get("email", String.class);
+            String username = claims.get("name", String.class);
+            String role = claims.get("roles", String.class);
 
-                    List<Amis> amisList = amisService.findById(id);
+            if (id == null || email == null || username == null || role == null) {
+                log.error("Données manquantes dans le token");
+                SendJSON.Error(response, "missingDataInToken");
+                return;
+            }
+            user = userService.get(id);
+            if (user == null) {
+                log.error("L'utilisateur n'existe pas");
+                SendJSON.Error(response, "userNotFound");
+                return;
+            } else {
+                //Récupere la liste des amis et les mettre en jsonarray
+                log.info("L'utilisateur existe");
 
-                    JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+                List<Amis> amisList = amisService.findById(id);
 
-                    for (Amis ami : amisList) {
-                        JsonObject amiJson = Json.createObjectBuilder()
-                                .add("idGroupeMessagesPrives", ami.getIdGroupeMessagesPrives())
-                                .add("statut", ami.getStatut().toString())
-                                .add("dateDemande", ami.getDateDemande().toString())
-                                .add("userIdAmiDe", ami.getUserIdAmiDe())
-                                .add("userIdDemandeur", ami.getUserIdDemandeur())
-                                .add("username", ami.getUser().getName())
-                                .add("userId", ami.getUser().getId())
-                                .build();
+                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
 
-                        arrayBuilder.add(amiJson);
-                    }
+                for (Amis ami : amisList) {
+                    JsonObject amiJson = Json.createObjectBuilder()
+                            .add("idGroupeMessagesPrives", ami.getIdGroupeMessagesPrives())
+                            .add("statut", ami.getStatut().toString())
+                            .add("dateDemande", ami.getDateDemande().toString())
+                            .add("userIdAmiDe", ami.getUserIdAmiDe())
+                            .add("userIdDemandeur", ami.getUserIdDemandeur())
+                            .add("username", ami.getUser().getName())
+                            .add("userId", ami.getUser().getId())
+                            .build();
 
-                    JsonArray amisJsonArray = arrayBuilder.build();
-
-                    SendJSON.OnlyInArray(response, amisJsonArray);
-
+                    arrayBuilder.add(amiJson);
                 }
+                JsonArray amisJsonArray = arrayBuilder.build();
+                SendJSON.OnlyInArray(response, amisJsonArray);
             }
         }catch(Exception e){
             log.error("Erreur dans la requête: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Erreur dans la requête");
         }
-
-
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
     }
 

@@ -62,10 +62,7 @@ public class LoginServlet extends HttpServlet {
                 if (user.getEmail().equals(email)) {
                     log.info("Utilisateur trouvé: " + user);
                     userFind = user;
-                }else{
-                    log.info("Utilisateur non trouvé: " + email);
-                    SendJSON.Error(response, AlertMsg.INVALIDCREDENTIALS);
-                    return;
+                    break; // on sort de la boucle dès qu'on trouve
                 }
             }
             log.info("Utilisateur trouvé: " + userFind);

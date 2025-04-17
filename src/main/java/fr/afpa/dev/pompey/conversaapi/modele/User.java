@@ -150,7 +150,7 @@ public class User {
     public void setName(String name) throws RegexException, SaisieException {
         if (name == null || name.isEmpty()) {
             throw new SaisieException("Le nom ne doit pas être vide ou null");
-        } else if (!name.matches(Regex.USERNAME)) {
+        } else if (!name.trim().matches(Regex.USERNAME)) {
             log.info(name);
             throw new RegexException("Le nom ne corresponds pas");
         }
