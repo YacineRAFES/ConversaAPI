@@ -22,6 +22,8 @@ import jakarta.json.JsonObject;
 import java.io.IOException;
 import java.util.List;
 
+import static fr.afpa.dev.pompey.conversaapi.utilitaires.AlertMsg.ERRORSERVER;
+
 @Slf4j
 @WebServlet(name = "AmisServlet", value = "/amis")
 public class AmisServlet extends HttpServlet {
@@ -114,6 +116,100 @@ public class AmisServlet extends HttpServlet {
                         .build();
 
                 SendJSON.GlobalJSON(response, globalJson);
+            }
+
+            if(jsonObject.toString().contains("type")) {
+                String type = jsonObject.getString("type");
+                String action = jsonObject.getString("action");
+                if(type.equals("friendSearchForm")){
+                    if(action.equals("search")) {
+                        //Recherche d'amis dans la liste de l'utilisateur
+                        //Je récupère l'id de l'utilisateur puis je cherche le nom dans sa liste des amis qui correspond à la demande de l'utilisateur
+                        String nomRechercher = jsonObject.getString("username", "");
+                        List<Amis> amisRechercher = amisService.TrouverUnAmis(nomRechercher, id);
+                        //Puis j'envoye à l'utilisateur la liste des amis qui correspondent à la recherche
+
+                        JsonArrayBuilder amisRechercherBuilder = Json.createArrayBuilder();
+
+                        for (Amis ami : amisRechercher) {
+                            amisRechercherBuilder.add(Json.createObjectBuilder()
+                                    .add("idGroupeMessagesPrives", ami.getIdGroupeMessagesPrives())
+                                    .add("statut", ami.getStatut().toString())
+                                    .add("dateDemande", ami.getDateDemande().toString())
+                                    .add("userIdAmiDe", ami.getUserIdAmiDe())
+                                    .add("userIdDemandeur", ami.getUserIdDemandeur())
+                                    .add("username", ami.getUser().getName())
+                                    .add("userId", ami.getUser().getId()));
+                        }
+
+                        JsonObject jsonRechercher = Json.createObjectBuilder()
+                                .add("amisRechercher", amisRechercherBuilder)
+                                .build();
+
+                        SendJSON.GlobalJSON(response, jsonRechercher);
+
+                    }else if(action.equals("add")){
+                        // Ajout d'amis
+                        String usernamePourRechercherId = jsonObject.getString("username", "");
+
+                        //Jecherche l'id de l'utilisateur qui correspond au nom d'utilisateur
+
+                        User userRechercherID = userService.findByName(usernamePourRechercherId);
+                        if(userRechercherID == null) {
+                            log.error("L'utilisateur n'existe pas");
+                            SendJSON.Error(response, "userNotFound");
+                            return;
+                        }
+
+                        Amis demanderEnAmis = new Amis(id, userRechercherID.getId());
+                        boolean isAdd = false;
+                        isAdd = amisService.add(demanderEnAmis);
+                        if(isAdd) {
+                            //Je renvoie un message de succès
+                            SendJSON.Success(response, "AskFriendRequestSend");
+                        }else{
+                            //Je renvoie un message d'erreur
+                            SendJSON.Error(response, "Error");
+                        }
+
+                    }else{
+                        //Annoncer l'erreur
+                        log.error("Erreur dans la requête");
+                        SendJSON.Error(response, "Error");
+                    }
+                }else if(type.equals("friendRequestResponse")){
+                    if(action.equals("yes")) {
+                        Integer idFriendRequest = Integer.valueOf(jsonObject.getString("idFriendRequest", ""));
+                        Amis amis = new Amis(id, idFriendRequest);
+                        boolean isAccept = false;
+                        isAccept = amisService.update(amis);
+
+                        //Je renvoie un message de succès
+                        if(isAccept) {
+                            SendJSON.Success(response, "AcceptFriendRequest");
+                        }else{
+                            SendJSON.Error(response, "ErrorOfAcceptFriendRequest");
+                        }
+                    }else if(action.equals("no")) {
+                        Integer idFriendRequest = Integer.valueOf(jsonObject.getString("idFriendRequest", ""));
+                        Amis amis = new Amis(id, idFriendRequest);
+                        boolean isRefus = false;
+                        isRefus = amisService.delete(amis);
+
+                        //Je renvoie un message de succès
+                        if (isRefus) {
+                            SendJSON.Success(response, "RefuseFriendRequest");
+                        } else {
+                            SendJSON.Error(response, "ErrorOfRefuseFriendRequest");
+                        }
+                    }else{
+                        SendJSON.Error(response, ERRORSERVER);
+                    }
+                }else{
+                    SendJSON.Error(response, ERRORSERVER);
+                }
+            }else{
+                SendJSON.Error(response, ERRORSERVER);
             }
         }catch(Exception e){
             log.error("Erreur dans la requête: " + e.getMessage());

@@ -166,5 +166,24 @@ public class UserDAO extends DAO<User>{
         }
     }
 
+    public User findByUsername(String username) {
+        User user = new User();
+        String sql = "SELECT * FROM utilisateur WHERE USER_NAME = ?";
+
+        try(PreparedStatement ps = connect.prepareStatement(sql)){
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()){
+                user.setId(rs.getInt("USER_ID"));
+                user.setName(rs.getString("USER_NAME"));
+            }
+            return user;
+        }catch (SQLException | SaisieException | RegexException e){
+            log.error("Erreur lors de la recherche de l'utilisateur par nom", e);
+            throw new DAOException(e.getMessage());
+        }
+    }
+
 
 }

@@ -287,7 +287,7 @@ public class AmisDAO extends DAO<Amis> {
     }
 
     /**
-     * Méthode pour dupliquer une ligne d'amis afin de faciliter la recherche
+     * Méthode pour dupliquer une ligne d'amis afin de faciliter la recherche de l'utilisateur
      * @param idDemandeur
      * @param idDemandeAccepter
      * @param idGroupeMessagesPrives
@@ -335,7 +335,7 @@ public class AmisDAO extends DAO<Amis> {
     }
 
     /**
-     * Recupere tout les demandes d'amis d'un utilisateur
+     * Recupere tout les demandes d'amis de l'utilisateur
      */
     public List<Amis> findAllFriendsRequestById(int id) {
         log.info("Fonction findAllFriendsRequestById(id) appelée");
@@ -351,6 +351,50 @@ public class AmisDAO extends DAO<Amis> {
         try {
             PreparedStatement pstmt = connect.prepareStatement(selectSQL);
             pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Amis ami = new Amis(
+                        rs.getInt("MG_ID"),
+                        rs.getInt("USER_ID_utilisateur"),
+                        rs.getInt("USER_ID_amiDe"),
+                        rs.getDate("AMIS_DATE_DEMANDE"),
+                        StatutAmitie.valueOf(rs.getString("AMIS_STATUT"))
+                );
+
+                User user = new User(
+                        rs.getInt("USER_ID"),
+                        rs.getString("USER_NAME")
+                );
+
+                ami.setUser(user);
+                amis.add(ami);
+            }
+            log.info("Liste des amis récupérée avec succès");
+        } catch (SQLException e) {
+            log.error("Erreur lors de la récupération de la liste d'amis", e);
+            throw new DAOException(e.getMessage());
+        }
+
+        return amis;
+    }
+
+    //Recherche un amis dans la liste d'amis de l'utilisateur
+    public List<Amis> TrouverUnAmis(String name, int id) {
+        log.info("Fonction TrouverUnAmis(name, id) appelée");
+        List<Amis> amis = new ArrayList<>();
+        String selectSQL =
+                "SELECT * " +
+                        "FROM amis a " +
+                        "JOIN utilisateur u " +
+                        "ON a.USER_ID_amiDe = u.USER_ID " +
+                        "WHERE a.USER_ID_utilisateur = ? " +
+                        "AND AMIS_STATUT = 'AMI' " +
+                        "AND u.USER_NAME LIKE ?";
+
+        try {
+            PreparedStatement pstmt = connect.prepareStatement(selectSQL);
+            pstmt.setInt(1, id);
+            pstmt.setString(2, "%" + name + "%");
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 Amis ami = new Amis(

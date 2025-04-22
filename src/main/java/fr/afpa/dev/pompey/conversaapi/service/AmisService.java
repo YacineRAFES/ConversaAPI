@@ -85,7 +85,26 @@ public class AmisService {
         return amisDAO.findByUsers(id1, id2);
     }
 
+    /**
+     * Récupère tous les amis d'un utilisateur.
+     *
+     * @param id L'ID de l'utilisateur.
+     * @return Retourne tout les demandes d'amis de l'utilisateur.
+     */
     public List<Amis> findAllFriendsRequestById(int id) {
         return amisDAO.findAllFriendsRequestById(id);
     }
+
+    /**
+     * Récupère tous les amis d'un utilisateur.
+     *
+     * @param id L'ID de l'utilisateur.
+     * @param nom Le nom de l'utilisateur à rechercher.
+     * @return Retourne tout les demandes d'amis de l'utilisateur.
+     */
+    public List<Amis> TrouverUnAmis(String nom, int id) {
+        return amisDAO.TrouverUnAmis(nom, id);
+    }
+
+
 }
