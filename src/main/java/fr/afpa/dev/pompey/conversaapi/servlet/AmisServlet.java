@@ -43,96 +43,55 @@ public class AmisServlet extends HttpServlet {
             JsonObject jsonObject = jsonReader.readObject();
             log.info("JSON RECU depuis: " + jsonObject + Utils.getNameClass());
 
-            String jwt = jsonObject.getString("jwt", "");
+            if(jsonObject.containsKey("method")){
+                String method = jsonObject.getString("method");
+                JsonObject objects = jsonObject.getJsonObject("objects");
+                log.info("objects: " + objects);
+                String jwt = objects.getString("jwt");
 
-            // Vérification du JWT
-            if (JWTutils.validateToken(jwt)) {
-                log.info("JWT valide");
-            } else {
-                log.error("JWT invalide");
-                SendJSON.Error(response, "jwtInvalide");
-                return;
-            }
-
-            Claims claims = JWTutils.getUserInfoFromToken(jwt);
-            User user;
-            if (claims == null) {
-                log.error("Token claims null");
-                SendJSON.Error(response, "invalidToken");
-                return;
-            }
-
-            Integer id = claims.get("id", Integer.class);
-            String email = claims.get("email", String.class);
-            String username = claims.get("name", String.class);
-            String role = claims.get("roles", String.class);
-
-            if (id == null || email == null || username == null || role == null) {
-                log.error("Données manquantes dans le token");
-                SendJSON.Error(response, "missingDataInToken");
-                return;
-            }
-            user = userService.get(id);
-            if (user == null) {
-                log.error("L'utilisateur n'existe pas");
-                SendJSON.Error(response, "userNotFound");
-                return;
-            } else {
-                //Récupere la liste des amis et les mettre en jsonarray
-                log.info("L'utilisateur existe");
-
-                List<Amis> amisList = amisService.findById(id);
-
-                List<Amis> amiRequest = amisService.findAllFriendsRequestById(id);
-
-                JsonArrayBuilder amisBuilder = Json.createArrayBuilder();
-
-                for (Amis ami : amisList) {
-                    amisBuilder.add(Json.createObjectBuilder()
-                            .add("idGroupeMessagesPrives", ami.getIdGroupeMessagesPrives())
-                            .add("statut", ami.getStatut().toString())
-                            .add("dateDemande", ami.getDateDemande().toString())
-                            .add("userIdAmiDe", ami.getUserIdAmiDe())
-                            .add("userIdDemandeur", ami.getUserIdDemandeur())
-                            .add("username", ami.getUser().getName())
-                            .add("userId", ami.getUser().getId()));
+                if (JWTutils.validateToken(jwt)) {
+                    log.info("JWT valide");
+                } else {
+                    log.error("JWT invalide");
+                    SendJSON.Error(response, "jwtInvalide");
+                    return;
                 }
 
-                JsonArrayBuilder demandesBuilder = Json.createArrayBuilder();
-
-                for (Amis ami : amiRequest) {
-                    demandesBuilder.add(Json.createObjectBuilder()
-                            .add("idGroupeMessagesPrives", ami.getIdGroupeMessagesPrives())
-                            .add("statut", ami.getStatut().toString())
-                            .add("dateDemande", ami.getDateDemande().toString())
-                            .add("userIdAmiDe", ami.getUserIdAmiDe())
-                            .add("userIdDemandeur", ami.getUserIdDemandeur())
-                            .add("username", ami.getUser().getName())
-                            .add("userId", ami.getUser().getId()));
+                Claims claims = JWTutils.getUserInfoFromToken(jwt);
+                User user;
+                if (claims == null) {
+                    log.error("Token claims null");
+                    SendJSON.Error(response, "invalidToken");
+                    return;
                 }
-                JsonObject globalJson = Json.createObjectBuilder()
-                        .add("amis", amisBuilder)
-                        .add("demandes", demandesBuilder)
-                        .build();
 
-                SendJSON.GlobalJSON(response, globalJson);
-            }
+                Integer id = claims.get("id", Integer.class);
+                String email = claims.get("email", String.class);
+                String username = claims.get("name", String.class);
+                String role = claims.get("roles", String.class);
+                if(method.equals("GetListFriends")){
 
-            if(jsonObject.toString().contains("type")) {
-                String type = jsonObject.getString("type");
-                String action = jsonObject.getString("action");
-                if(type.equals("friendSearchForm")){
-                    if(action.equals("search")) {
-                        //Recherche d'amis dans la liste de l'utilisateur
-                        //Je récupère l'id de l'utilisateur puis je cherche le nom dans sa liste des amis qui correspond à la demande de l'utilisateur
-                        String nomRechercher = jsonObject.getString("username", "");
-                        List<Amis> amisRechercher = amisService.TrouverUnAmis(nomRechercher, id);
-                        //Puis j'envoye à l'utilisateur la liste des amis qui correspondent à la recherche
 
-                        JsonArrayBuilder amisRechercherBuilder = Json.createArrayBuilder();
+                    if (id == null || email == null || username == null || role == null) {
+                        log.error("Données manquantes dans le token");
+                        SendJSON.Error(response, "missingDataInToken");
+                        return;
+                    }
+                    user = userService.get(id);
+                    if (user == null) {
+                        log.error("L'utilisateur n'existe pas");
+                        SendJSON.Error(response, "userNotFound");
+                        return;
+                    } else {
+                        //Récupere la liste des amis et les mettre en jsonarray
+                        log.info("L'utilisateur existe");
+                        List<Amis> amisList = amisService.findById(id);
+                        List<Amis> amiRequest = amisService.findAllFriendsRequestById(id);
 
-                        for (Amis ami : amisRechercher) {
-                            amisRechercherBuilder.add(Json.createObjectBuilder()
+                        JsonArrayBuilder amisBuilder = Json.createArrayBuilder();
+
+                        for (Amis ami : amisList) {
+                            amisBuilder.add(Json.createObjectBuilder()
                                     .add("idGroupeMessagesPrives", ami.getIdGroupeMessagesPrives())
                                     .add("statut", ami.getStatut().toString())
                                     .add("dateDemande", ami.getDateDemande().toString())
@@ -142,77 +101,130 @@ public class AmisServlet extends HttpServlet {
                                     .add("userId", ami.getUser().getId()));
                         }
 
-                        JsonObject jsonRechercher = Json.createObjectBuilder()
-                                .add("amisRechercher", amisRechercherBuilder)
+                        JsonArrayBuilder demandesBuilder = Json.createArrayBuilder();
+
+                        for (Amis ami : amiRequest) {
+                            demandesBuilder.add(Json.createObjectBuilder()
+                                    .add("idGroupeMessagesPrives", ami.getIdGroupeMessagesPrives())
+                                    .add("statut", ami.getStatut().toString())
+                                    .add("dateDemande", ami.getDateDemande().toString())
+                                    .add("userIdAmiDe", ami.getUserIdAmiDe())
+                                    .add("userIdDemandeur", ami.getUserIdDemandeur())
+                                    .add("username", ami.getUser().getName())
+                                    .add("userId", ami.getUser().getId()));
+                        }
+                        JsonObject globalJson = Json.createObjectBuilder()
+                                .add("amis", amisBuilder)
+                                .add("demandes", demandesBuilder)
                                 .build();
 
-                        SendJSON.GlobalJSON(response, jsonRechercher);
-
-                    }else if(action.equals("add")){
-                        // Ajout d'amis
-                        String usernamePourRechercherId = jsonObject.getString("username", "");
-
-                        //Jecherche l'id de l'utilisateur qui correspond au nom d'utilisateur
-
-                        User userRechercherID = userService.findByName(usernamePourRechercherId);
-                        if(userRechercherID == null) {
-                            log.error("L'utilisateur n'existe pas");
-                            SendJSON.Error(response, "userNotFound");
-                            return;
-                        }
-
-                        Amis demanderEnAmis = new Amis(id, userRechercherID.getId());
-                        boolean isAdd = false;
-                        isAdd = amisService.add(demanderEnAmis);
-                        if(isAdd) {
-                            //Je renvoie un message de succès
-                            SendJSON.Success(response, "AskFriendRequestSend");
-                        }else{
-                            //Je renvoie un message d'erreur
-                            SendJSON.Error(response, "Error");
-                        }
-
-                    }else{
-                        //Annoncer l'erreur
-                        log.error("Erreur dans la requête");
-                        SendJSON.Error(response, "Error");
+                        SendJSON.GlobalJSON(response, globalJson);
                     }
-                }else if(type.equals("friendRequestResponse")){
-                    if(action.equals("yes")) {
-                        Integer idFriendRequest = Integer.valueOf(jsonObject.getString("idFriendRequest", ""));
-                        Amis amis = new Amis(id, idFriendRequest);
-                        boolean isAccept = false;
-                        isAccept = amisService.update(amis);
 
-                        //Je renvoie un message de succès
-                        if(isAccept) {
-                            SendJSON.Success(response, "AcceptFriendRequest");
+                }else if(method.equals("SearchAndAddFriends")) {
+                    if(objects.containsKey("type")) {
+                        String type = objects.getString("type");
+                        String action = objects.getString("action");
+                        if(type.equals("friendSearchForm")){
+                            if(action.equals("search")) {
+                                //Recherche d'amis dans la liste de l'utilisateur
+                                //Je récupère l'id de l'utilisateur puis je cherche le nom dans sa liste des amis qui correspond à la demande de l'utilisateur
+                                String nomRechercher = objects.getString("username", "");
+                                List<Amis> amisRechercher = amisService.TrouverUnAmis(nomRechercher, id);
+                                //Puis j'envoye à l'utilisateur la liste des amis qui correspondent à la recherche
+
+                                JsonArrayBuilder amisRechercherBuilder = Json.createArrayBuilder();
+
+                                for (Amis ami : amisRechercher) {
+                                    amisRechercherBuilder.add(Json.createObjectBuilder()
+                                            .add("idGroupeMessagesPrives", ami.getIdGroupeMessagesPrives())
+                                            .add("statut", ami.getStatut().toString())
+                                            .add("dateDemande", ami.getDateDemande().toString())
+                                            .add("userIdAmiDe", ami.getUserIdAmiDe())
+                                            .add("userIdDemandeur", ami.getUserIdDemandeur())
+                                            .add("username", ami.getUser().getName())
+                                            .add("userId", ami.getUser().getId()));
+                                }
+
+                                JsonObject jsonRechercher = Json.createObjectBuilder()
+                                        .add("amisRechercher", amisRechercherBuilder)
+                                        .build();
+                                log.info(jsonRechercher.toString());
+                                SendJSON.GlobalJSON(response, jsonRechercher);
+
+                            }else if(action.equals("add")){
+                                log.info("friendSearchForm: " + objects);
+                                // Ajout d'amis
+                                String usernamePourRechercherId = objects.getString("username", "");
+
+                                //Jecherche l'id de l'utilisateur qui correspond au nom d'utilisateur
+
+                                User userRechercherID = userService.findByName(usernamePourRechercherId);
+                                log.info("ID de l'utilisateur recherché: " + userRechercherID.getId());
+                                if(userRechercherID == null) {
+                                    log.error("L'utilisateur n'existe pas");
+                                    SendJSON.Error(response, "userNotFound");
+                                    return;
+                                }
+
+                                Amis demanderEnAmis = new Amis(id, userRechercherID.getId());
+                                boolean isAdd = false;
+                                isAdd = amisService.add(demanderEnAmis);
+                                log.info("Demande d'amis envoyée: " + isAdd);
+                                if(isAdd) {
+                                    //Je renvoie un message de succès
+                                    SendJSON.Success(response, "AskFriendRequestSend");
+                                }else{
+                                    //Je renvoie un message d'erreur
+                                    SendJSON.Error(response, "Error");
+                                }
+
+                            }else{
+                                //Annoncer l'erreur
+                                log.error("friendSearchForm: Erreur dans la requête");
+                                SendJSON.Error(response, "Error");
+                            }
+                        }else if(type.equals("friendRequestResponse")){
+                            log.info("friendRequestResponse: " + objects);
+                            Integer idFriendRequest = Integer.valueOf(objects.getString("idFriendRequest", ""));
+                            if(action.equals("yes")) {
+                                log.info("friendRequestResponse.yes: " + objects);
+                                Amis amis = new Amis(id, idFriendRequest);
+                                boolean isAccept = false;
+                                isAccept = amisService.update(amis);
+
+                                //Je renvoie un message de succès
+                                if(isAccept) {
+                                    SendJSON.Success(response, "AcceptFriendRequest");
+                                }else{
+                                    SendJSON.Error(response, "ErrorOfAcceptFriendRequest");
+                                }
+                            }else if(action.equals("no")) {
+                                log.info("friendRequestResponse.no: " + objects);
+                                idFriendRequest = Integer.valueOf(objects.getString("idFriendRequest", ""));
+                                Amis amis = new Amis(id, idFriendRequest);
+                                boolean isRefus = false;
+                                isRefus = amisService.delete(amis);
+
+                                //Je renvoie un message de succès
+                                if (isRefus) {
+                                    SendJSON.Success(response, "RefuseFriendRequest");
+                                } else {
+                                    SendJSON.Error(response, "ErrorOfRefuseFriendRequest");
+                                }
+                            }else{
+                                SendJSON.Error(response, ERRORSERVER);
+                            }
                         }else{
-                            SendJSON.Error(response, "ErrorOfAcceptFriendRequest");
-                        }
-                    }else if(action.equals("no")) {
-                        Integer idFriendRequest = Integer.valueOf(jsonObject.getString("idFriendRequest", ""));
-                        Amis amis = new Amis(id, idFriendRequest);
-                        boolean isRefus = false;
-                        isRefus = amisService.delete(amis);
-
-                        //Je renvoie un message de succès
-                        if (isRefus) {
-                            SendJSON.Success(response, "RefuseFriendRequest");
-                        } else {
-                            SendJSON.Error(response, "ErrorOfRefuseFriendRequest");
+                            SendJSON.Error(response, ERRORSERVER);
                         }
                     }else{
                         SendJSON.Error(response, ERRORSERVER);
                     }
-                }else{
-                    SendJSON.Error(response, ERRORSERVER);
                 }
-            }else{
-                SendJSON.Error(response, ERRORSERVER);
             }
         }catch(Exception e){
-            log.error("Erreur dans la requête: " + e.getMessage());
+            log.error("doPost: Erreur dans la requête: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Erreur dans la requête");
         }

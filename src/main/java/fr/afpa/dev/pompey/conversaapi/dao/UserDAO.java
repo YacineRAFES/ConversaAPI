@@ -167,6 +167,7 @@ public class UserDAO extends DAO<User>{
     }
 
     public User findByUsername(String username) {
+        log.info("findByUsername: Recherche de l'utilisateur par nom: " + username);
         User user = new User();
         String sql = "SELECT * FROM utilisateur WHERE USER_NAME = ?";
 
@@ -177,6 +178,10 @@ public class UserDAO extends DAO<User>{
             if(rs.next()){
                 user.setId(rs.getInt("USER_ID"));
                 user.setName(rs.getString("USER_NAME"));
+                user.setEmail(rs.getString("USER_EMAIL"));
+                user.setPassword(rs.getString("USER_PASSWORD"));
+                user.setDate(rs.getDate("USER_DATE"));
+                user.setRole(rs.getString("USER_ROLE"));
             }
             return user;
         }catch (SQLException | SaisieException | RegexException e){

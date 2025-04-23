@@ -122,7 +122,8 @@ public class AmisDAO extends DAO<Amis> {
                         "SELECT * " +
                         "FROM amis a " +
                         "JOIN utilisateur u ON a.USER_ID_amiDe = u.USER_ID " +
-                        "WHERE a.USER_ID_utilisateur = ?";
+                        "WHERE a.USER_ID_utilisateur = ? " +
+                        "AND a.AMIS_STATUT = 'AMI'";
 
         try {
             PreparedStatement pstmt = connect.prepareStatement(selectSQL);
@@ -277,8 +278,8 @@ public class AmisDAO extends DAO<Amis> {
             PreparedStatement pstmt = connect.prepareStatement(updateSQL);
             pstmt.setString(1, "AMI");
             pstmt.setInt(2, idGroupeMessagesPrives);
-            pstmt.setInt(3, idDemandeur);
-            pstmt.setInt(4, idDemandeAccepter);
+            pstmt.setInt(3, idDemandeAccepter);
+            pstmt.setInt(4, idDemandeur);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             log.error("Erreur lors de l'acceptation de la demande d'amis", e);
@@ -302,8 +303,8 @@ public class AmisDAO extends DAO<Amis> {
             pstmt.setInt(1, idGroupeMessagesPrives);
             pstmt.setString(2, "AMI");
             pstmt.setDate(3, Date.valueOf(LocalDate.now()));
-            pstmt.setInt(4, idDemandeAccepter);
-            pstmt.setInt(5, idDemandeur);
+            pstmt.setInt(4, idDemandeur);
+            pstmt.setInt(5, idDemandeAccepter);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             log.error("Erreur lors de la duplication d'une ligne d'amis", e);

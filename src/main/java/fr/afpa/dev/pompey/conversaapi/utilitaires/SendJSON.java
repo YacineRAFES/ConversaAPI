@@ -5,9 +5,11 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
+@Slf4j
 public class SendJSON {
     private SendJSON() {
         throw new IllegalStateException("Utility class");
@@ -150,6 +152,7 @@ public class SendJSON {
 
             // J'écris la réponse JSON.
             response.getWriter().write(jsonResponse.toString());
+            log.info("jsonResponse : " + jsonResponse);
         } catch (Exception e) {
             throw new JsonException("Erreur dans la méthode SendJSON.Success : " + e.getMessage());
         }
