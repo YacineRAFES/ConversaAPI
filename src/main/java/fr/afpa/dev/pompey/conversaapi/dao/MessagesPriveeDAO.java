@@ -1,6 +1,8 @@
 package fr.afpa.dev.pompey.conversaapi.dao;
 
 import fr.afpa.dev.pompey.conversaapi.exception.DAOException;
+import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
+import fr.afpa.dev.pompey.conversaapi.modele.Amis;
 import fr.afpa.dev.pompey.conversaapi.modele.MessagesPrivee;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -19,7 +22,11 @@ public class MessagesPriveeDAO extends DAO<MessagesPrivee> {
     }
     @Override
     public int create(MessagesPrivee obj) {
-        int newid = 0;
+        return 0;
+    }
+
+    public int createMessagesPrives(MessagesPrivee obj){
+        int newId = 0;
         String insertSQL =
                 "INSERT INTO message_privee " +
                         "(MP_DATE, MP_MESSAGES, USER_ID, MG_ID)" +
@@ -32,17 +39,15 @@ public class MessagesPriveeDAO extends DAO<MessagesPrivee> {
             pstmt.setInt(3, obj.getIdUser());
             pstmt.setInt(4, obj.getIdGroupeMessagesPrives());
             pstmt.executeUpdate();
-
-            try(ResultSet rs = pstmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    newid = rs.getInt(1);
-                }
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                newId = rs.getInt(1);
             }
+            return newId;
         } catch (SQLException e) {
-            log.error("Erreur lors de la création Messages Privee", e);
+            log.error("Erreur lors de la création d'un message privé", e);
             throw new DAOException(e.getMessage());
         }
-        return newid;
     }
 
     @Override
@@ -62,15 +67,15 @@ public class MessagesPriveeDAO extends DAO<MessagesPrivee> {
 
     @Override
     public boolean update(MessagesPrivee obj) {
-        String updateSQL = "UPDATE message_privee SET MP_DATE = ?, MP_MESSAGES = ?, USER_ID = ?, MG_ID = ? WHERE MP_ID = ?";
+        if (obj.getId() == null) {
+            throw new DAOException("Impossible de mettre à jour un message privé sans ID !");
+        }
+        String updateSQL = "UPDATE message_privee SET MP_MESSAGES = ? WHERE MP_ID = ?";
 
         try {
             PreparedStatement pstmt = connect.prepareStatement(updateSQL);
-            pstmt.setTimestamp(1, obj.getDate());
-            pstmt.setString(2, obj.getMessage());
-            pstmt.setInt(3, obj.getIdUser());
-            pstmt.setInt(4, obj.getIdGroupeMessagesPrives());
-            pstmt.setInt(5, obj.getId());
+            pstmt.setString(1, obj.getMessage());
+            pstmt.setInt(2, obj.getId());
             pstmt.executeUpdate();
             return true;
         } catch (SQLException | DAOException e) {
@@ -81,12 +86,49 @@ public class MessagesPriveeDAO extends DAO<MessagesPrivee> {
 
     @Override
     public MessagesPrivee find(int id) {
+        String selectSQL = "SELECT * FROM message_privee WHERE MP_ID = ?";
+        try {
+            PreparedStatement pstmt = connect.prepareStatement(selectSQL);
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return new MessagesPrivee(
+                        rs.getInt("MP_ID"),
+                        rs.getTimestamp("MP_DATE"),
+                        rs.getString("MP_MESSAGES"),
+                        rs.getInt("USER_ID"),
+                        rs.getInt("MG_ID")
+                );
+            }
+        } catch (SQLException e) {
+            log.error("Erreur lors de la recherche d'un message privee", e);
+            throw new DAOException(e.getMessage());
+        }
 
         return null;
     }
 
     @Override
     public List<MessagesPrivee> findAll() {
-        return List.of();
+        List<MessagesPrivee> messagesPrivees = new ArrayList<>();
+        String selectAll = "SELECT * FROM message_privee";
+        try{
+            PreparedStatement pstmt = connect.prepareStatement(selectAll);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                MessagesPrivee mp = new MessagesPrivee();
+                mp.setId(rs.getInt("MP_ID"));
+                mp.setDate(rs.getTimestamp("MP_DATE"));
+                mp.setMessage(rs.getString("MP_MESSAGES"));
+                mp.setIdUser(rs.getInt("USER_ID"));
+                mp.setIdGroupeMessagesPrives(rs.getInt("MG_ID"));
+                messagesPrivees.add(mp);
+            }
+            return messagesPrivees;
+        }catch (SQLException | DAOException e) {
+            throw new DAOException(e.getMessage());
+        } catch (SaisieException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

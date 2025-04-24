@@ -43,6 +43,10 @@ public class Amis {
         this.statut = statut;
     }
 
+    /**
+     * Quand un utilisateur accepte une demande d'ami
+     * @return
+     */
     public Amis(Integer idGroupeMessagesPrives, Integer userIdDemandeur, Integer userIdAmiDe) {
         this.idGroupeMessagesPrives = idGroupeMessagesPrives;
         this.userIdDemandeur = userIdDemandeur;
@@ -125,5 +129,16 @@ public class Amis {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @Override
+    public String toString() {
+        return "Amis{" +
+                "userIdDemandeur=" + userIdDemandeur +
+                ", userIdAmiDe=" + userIdAmiDe +
+                ", statut=" + statut +
+                ", dateDemande=" + dateDemande +
+                ", idGroupeMessagesPrives=" + idGroupeMessagesPrives +
+                '}';
     }
 }

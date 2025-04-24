@@ -25,20 +25,22 @@ public class AmisDAO extends DAO<Amis> {
      */
     @Override
     public int create(Amis obj) {
-        return 0;
+        throw new UnsupportedOperationException("Use createDemandeAmis instead");
     }
 
     public boolean createDemandeAmis(Amis obj) {
+        int newId_MG = createGroupeMessagePrivee();
         String insertSQL =
                 "INSERT INTO amis " +
-                "(AMIS_STATUT, AMIS_DATE_DEMANDE, USER_ID_utilisateur, USER_ID_amiDe)" +
-                "VALUES (?, ?, ?, ?)";
+                "(AMIS_STATUT, AMIS_DATE_DEMANDE, USER_ID_utilisateur, USER_ID_amiDe, MG_ID)" +
+                "VALUES (?, ?, ?, ?, ?)";
         try {
             PreparedStatement pstmt = connect.prepareStatement(insertSQL);
             pstmt.setString(1, obj.getStatut().name());
             pstmt.setDate(2, obj.getDateDemande());
             pstmt.setInt(3, obj.getUserIdDemandeur());
             pstmt.setInt(4, obj.getUserIdAmiDe());
+            pstmt.setInt(5, newId_MG);
             pstmt.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -253,9 +255,10 @@ public class AmisDAO extends DAO<Amis> {
      */
     public void UtilisateurAccepteLaDemande(Amis obj) {
         try{
-            int newIdMessageGroupe = createGroupeMessagePrivee();
-            accepterDemandeAmis(obj.getUserIdDemandeur(), obj.getUserIdAmiDe(), newIdMessageGroupe);
-            dubliquerAmis(obj.getUserIdDemandeur(), obj.getUserIdAmiDe(), newIdMessageGroupe);
+            boolean confirmation = accepterDemandeAmis(obj.getUserIdDemandeur(), obj.getUserIdAmiDe(), obj.getIdGroupeMessagesPrives());
+            if(confirmation) {
+                dupliquerAmis(obj.getUserIdDemandeur(), obj.getUserIdAmiDe(), obj.getIdGroupeMessagesPrives());
+            }
         }catch (DAOException e){
             log.error("Erreur lors de la modification Amis", e);
             throw new DAOException(e.getMessage());
@@ -268,7 +271,7 @@ public class AmisDAO extends DAO<Amis> {
      * @param idDemandeAccepter
      * @param idGroupeMessagesPrives
      */
-    public void accepterDemandeAmis(int idDemandeur, int idDemandeAccepter, int idGroupeMessagesPrives) {
+    public boolean accepterDemandeAmis(int idDemandeur, int idDemandeAccepter, int idGroupeMessagesPrives) {
         String updateSQL =
                 "UPDATE amis " +
                 "SET AMIS_STATUT = ?, MG_ID = ? " +
@@ -278,9 +281,10 @@ public class AmisDAO extends DAO<Amis> {
             PreparedStatement pstmt = connect.prepareStatement(updateSQL);
             pstmt.setString(1, "AMI");
             pstmt.setInt(2, idGroupeMessagesPrives);
-            pstmt.setInt(3, idDemandeAccepter);
-            pstmt.setInt(4, idDemandeur);
+            pstmt.setInt(3, idDemandeur);
+            pstmt.setInt(4, idDemandeAccepter);
             pstmt.executeUpdate();
+            return true;
         } catch (SQLException e) {
             log.error("Erreur lors de l'acceptation de la demande d'amis", e);
             throw new DAOException(e.getMessage());
@@ -293,7 +297,7 @@ public class AmisDAO extends DAO<Amis> {
      * @param idDemandeAccepter
      * @param idGroupeMessagesPrives
      */
-    public void dubliquerAmis(int idDemandeur, int idDemandeAccepter, int idGroupeMessagesPrives) {
+    public void dupliquerAmis(int idDemandeur, int idDemandeAccepter, int idGroupeMessagesPrives) {
         String insertSQL =
                 "INSERT INTO amis " +
                 "(MG_ID, AMIS_STATUT, AMIS_DATE_DEMANDE, USER_ID_utilisateur, USER_ID_amiDe)" +
@@ -303,8 +307,8 @@ public class AmisDAO extends DAO<Amis> {
             pstmt.setInt(1, idGroupeMessagesPrives);
             pstmt.setString(2, "AMI");
             pstmt.setDate(3, Date.valueOf(LocalDate.now()));
-            pstmt.setInt(4, idDemandeur);
-            pstmt.setInt(5, idDemandeAccepter);
+            pstmt.setInt(4, idDemandeAccepter);
+            pstmt.setInt(5, idDemandeur);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             log.error("Erreur lors de la duplication d'une ligne d'amis", e);
@@ -421,5 +425,36 @@ public class AmisDAO extends DAO<Amis> {
         }
 
         return amis;
+    }
+
+    //Recupere les infos grâce un id de groupe messages privee
+    public Amis findByIdGroupeMessagesPrivee(int id) {
+        log.info("Fonction findByIdGroupeMessagesPrivee(id) appelée");
+        Amis amis = null;
+        String selectSQL =
+                "SELECT * " +
+                        "FROM amis a " +
+                        "WHERE a.MG_ID = ?";
+
+        try {
+            PreparedStatement pstmt = connect.prepareStatement(selectSQL);
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                amis = new Amis();
+                amis.setIdGroupeMessagesPrives(rs.getInt("MG_ID"));
+                amis.setUserIdDemandeur(rs.getInt("USER_ID_utilisateur"));
+                amis.setUserIdAmiDe(rs.getInt("USER_ID_amiDe"));
+                amis.setDateDemande(rs.getDate("AMIS_DATE_DEMANDE"));
+                amis.setStatut(StatutAmitie.valueOf(rs.getString("AMIS_STATUT")));
+            }
+            return amis;
+        } catch (SQLException e) {
+            log.error("Erreur lors de la récupération de la liste d'amis", e);
+            throw new DAOException(e.getMessage());
+        } catch (SaisieException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }

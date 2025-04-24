@@ -39,7 +39,7 @@ public class MessagesPriveeService {
      */
     public int add(MessagesPrivee messagesPrivee) throws IllegalStateException {
         try {
-            return messagesPriveeDAO.create(messagesPrivee);
+            return messagesPriveeDAO.createMessagesPrives(messagesPrivee);
         } catch (Exception e) {
             throw new IllegalStateException("Erreur lors de l'ajout d'un message privee : " + e.getMessage());
         }

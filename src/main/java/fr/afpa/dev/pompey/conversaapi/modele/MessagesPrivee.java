@@ -47,6 +47,16 @@ public class MessagesPrivee {
         this.idGroupeMessagesPrives = idGroupeMessagesPrives;
     }
 
+    /**
+     * Pour modifier un message
+     * @param message
+     * @param id
+     */
+    public MessagesPrivee(String message, Integer id) {
+        this.message = message;
+        this.id = id;
+    }
+
     // GETTERS ET SETTERS
 
     public Integer getId() {

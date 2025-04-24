@@ -106,5 +106,9 @@ public class AmisService {
         return amisDAO.TrouverUnAmis(nom, id);
     }
 
+    public Amis getIdGroupeMessagesPrivee(int idGroupeMessagesPrivee) {
+        return amisDAO.findByIdGroupeMessagesPrivee(idGroupeMessagesPrivee);
+    }
+
 
 }

@@ -64,12 +64,14 @@ public class UserDAO extends DAO<User>{
      */
     @Override
     public boolean delete(User obj) {
+        log.info("delete: Suppression de l'utilisateur avec ID: " + obj.getId());
         StringBuilder deleteSQL = new StringBuilder("DELETE FROM utilisateur WHERE USER_ID = ?");
 
         try {
             PreparedStatement pstmt = connect.prepareStatement(deleteSQL.toString());
             pstmt.setInt(1, obj.getId());
             pstmt.executeUpdate();
+            log.info("delete: Utilisateur supprimé avec succès"+ obj.getId());
         } catch (SQLException | DAOException e) {
             log.error("Erreur lors de la deletion User", e);
             throw new DAOException(e.getMessage());
