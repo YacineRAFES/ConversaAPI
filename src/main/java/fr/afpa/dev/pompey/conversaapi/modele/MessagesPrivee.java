@@ -96,7 +96,7 @@ public class MessagesPrivee {
         } else if (idUser <= 0) {
             throw new SaisieException("L'idUser ne doit pas être négatif");
         }
-        this.id = id;
+        this.id = idUser;
     }
 
     public Integer getIdGroupeMessagesPrives() {
