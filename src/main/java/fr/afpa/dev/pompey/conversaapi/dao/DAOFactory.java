@@ -30,5 +30,9 @@ public class DAOFactory {
         return new AmisDAO(connection);
     }
 
+    public MessagesPriveeDAO getMessagesPriveeDAO() {
+        return new MessagesPriveeDAO(connection);
+    }
+
     // Ajout d'autres DAO ici si nécessaire
 }
