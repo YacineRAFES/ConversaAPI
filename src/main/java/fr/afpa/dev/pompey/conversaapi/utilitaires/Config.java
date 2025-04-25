@@ -15,15 +15,15 @@ import java.util.Properties;
 public class Config {
     private static final Properties props = new Properties();
     static {
-        log.info("Clé privée chargée depuis le .env : " + props.getProperty("CLE_PRIVEE"));
-    }
-    static {
         String pathconf = "conf.properties";
         try(InputStream input = Config.class.getClassLoader().getResourceAsStream(pathconf)) {
             props.load(input);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    static {
+        log.info("Clé privée chargée depuis le .env : " + props.getProperty("CLE_PRIVEE"));
     }
     private static Properties chargerFichier(String nomFichier) {
         Properties prop = new Properties();
