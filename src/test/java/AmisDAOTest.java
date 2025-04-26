@@ -87,7 +87,8 @@ public class AmisDAOTest {
 
         Amis amisFind = amisService.find(id1, id2);
         // Met à jour la demande d'amis
-        boolean confirmation = amisService.update(amis);
+        Amis amisUpdate = new Amis(amisFind.getIdGroupeMessagesPrives(), id1, id2);
+        boolean confirmation = amisService.update(amisUpdate);
         assertTrue(confirmation, "Erreur lors de la mise à jour de la demande d'amis");
         log.info("Demande d'amis confirme");
         // Supprimez la demande d'amis et les utilisateurs
@@ -113,15 +114,19 @@ public class AmisDAOTest {
         Amis amis = new Amis(id1, id2);
         amisService.add(amis);
 
-        amisService.update(amis);
+        Amis amisFind1 = amisService.find(id1, id2);
+        // Met à jour la demande d'amis
+        Amis amisUpdate = new Amis(amisFind1.getIdGroupeMessagesPrives(), id1, id2);
+
+        amisService.update(amisUpdate);
 
         // Trouve l'amitié entre les deux utilisateurs
-        Amis amisFind = (Amis) amisService.get(id1);
+        Amis amisFind = amisService.find(id1, id2);
         assertTrue(amisFind != null, "Erreur lors de la recherche d'amis");
         log.info("Demande d'amis trouvée");
 
         log.info("Demande de retirer en amis...");
-        amisService.delete(amis);
+        amisService.delete(amisFind);
         log.info("Demande de retirer en amis : OK");
         log.info("Suppression des utilisateurs...");
         log.info("Suppression de l'utilisateur " + id1);
@@ -142,16 +147,22 @@ public class AmisDAOTest {
         // Crée une nouvelle amitié entre les deux utilisateurs
         Amis amis = new Amis(id1, id2);
         amisService.add(amis);
+        Amis amisFind1 = amisService.find(id1, id2);
+        Amis amisUpdate = new Amis(amisFind1.getIdGroupeMessagesPrives(), id1, id2);
 
-        amisService.update(amis);
+        amisService.update(amisUpdate);
 
         List<Amis> amisList = amisService.getAll();
         assertTrue(amisList != null, "Erreur lors de la recherche d'amis");
         log.info("Demande d'amis trouvée");
 
+        //Trouver les deux relations
+        Amis amisFind = amisService.find(id1, id2);
+
         log.info("Demande de retirer en amis...");
-        amisService.delete(amis);
+        amisService.delete(amisFind);
         log.info("Demande de retirer en amis : OK");
+
         log.info("Suppression des utilisateurs...");
 
         log.info("Suppression de l'utilisateur " + id1);
