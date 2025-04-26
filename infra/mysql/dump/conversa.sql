@@ -67,7 +67,7 @@ DROP TABLE IF EXISTS `groupe_messages_prives`;
 CREATE TABLE `groupe_messages_prives` (
   `MG_ID` int NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`MG_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -88,7 +88,7 @@ CREATE TABLE `message_privee` (
   KEY `MG_ID` (`MG_ID`),
   CONSTRAINT `message_privee_ibfk_1` FOREIGN KEY (`USER_ID`) REFERENCES `utilisateur` (`USER_ID`) ON DELETE CASCADE,
   CONSTRAINT `message_privee_ibfk_2` FOREIGN KEY (`MG_ID`) REFERENCES `groupe_messages_prives` (`MG_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -107,7 +107,7 @@ CREATE TABLE `utilisateur` (
   `USER_ROLE` varchar(11) NOT NULL,
   PRIMARY KEY (`USER_ID`),
   UNIQUE KEY `USER_EMAIL` (`USER_EMAIL`)
-) ENGINE=InnoDB AUTO_INCREMENT=270 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
