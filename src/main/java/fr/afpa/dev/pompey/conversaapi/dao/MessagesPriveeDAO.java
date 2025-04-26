@@ -1,6 +1,7 @@
 package fr.afpa.dev.pompey.conversaapi.dao;
 
 import fr.afpa.dev.pompey.conversaapi.exception.DAOException;
+import fr.afpa.dev.pompey.conversaapi.exception.RegexException;
 import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
 import fr.afpa.dev.pompey.conversaapi.modele.Amis;
 import fr.afpa.dev.pompey.conversaapi.modele.MessagesPrivee;
@@ -116,6 +117,38 @@ public class MessagesPriveeDAO extends DAO<MessagesPrivee> {
             PreparedStatement pstmt = connect.prepareStatement(selectAll);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
+                MessagesPrivee mp = new MessagesPrivee();
+                mp.setId(rs.getInt("MP_ID"));
+                mp.setDate(rs.getTimestamp("MP_DATE"));
+                mp.setMessage(rs.getString("MP_MESSAGES"));
+                mp.setIdUser(rs.getInt("USER_ID"));
+                mp.setIdGroupeMessagesPrives(rs.getInt("MG_ID"));
+                messagesPrivees.add(mp);
+            }
+            return messagesPrivees;
+        }catch (SQLException | DAOException e) {
+            throw new DAOException(e.getMessage());
+        } catch (SaisieException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<MessagesPrivee> findAllMessagesPriveesByIdUser(int idUser) {
+        List<MessagesPrivee> messagesPrivees = new ArrayList<>();
+        String selectAll = "" +
+                "SELECT * " +
+                "FROM message_privee mp " +
+                "JOIN utilisateur u ON mp.USER_ID = u.USER_ID " +
+                "JOIN groupe_messages_prives gmp ON mp.MG_ID = gmp.MG_ID " +
+                "JOIN amis a ON gmp.MG_ID = a.MG_ID " +
+                "WHERE u.USER_ID = ?";
+        try{
+            PreparedStatement pstmt = connect.prepareStatement(selectAll);
+            pstmt.setInt(1, idUser);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                //TODO: AVATAR DE L'UTILISATEUR
+
                 MessagesPrivee mp = new MessagesPrivee();
                 mp.setId(rs.getInt("MP_ID"));
                 mp.setDate(rs.getTimestamp("MP_DATE"));

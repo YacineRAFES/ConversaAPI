@@ -45,12 +45,18 @@ public class MessagesPriveeServlet extends HttpServlet {
             log.info("JSON RECU depuis: " + jsonObject + Utils.getNameClass());
             String jwt = jsonObject.getString("jwt");
             int idGroupeMessagesPrivee = Integer.parseInt(jsonObject.getString("idGroupeMessagesPrivee"));
-            String messages = jsonObject.getString("messages");
+            String type = jsonObject.getString("type");
             //Verification JWT
-            if (JWTutils.validateToken(jwt)) {
-                log.info("JWT valide");
+            if (jwt != null) {
+                if (JWTutils.validateToken(jwt)) {
+                    log.info("JWT valide");
+                } else {
+                    log.error("JWT invalide");
+                    SendJSON.Error(response, "jwtInvalide");
+                    return;
+                }
             } else {
-                log.error("JWT invalide");
+                log.error("JWT vide");
                 SendJSON.Error(response, "jwtInvalide");
                 return;
             }
@@ -77,6 +83,19 @@ public class MessagesPriveeServlet extends HttpServlet {
             if (user == null) {
                 log.error("Utilisateur non trouvé");
                 SendJSON.Error(response, "userNotFound");
+                return;
+            }
+
+            if(type.equals("getAllMessages")) {
+                //Recuperation de tous les messages privés
+                List<MessagesPrivee> messagesPrivee = messagesPriveeService.getAllMessagesPrivee(user.getId());
+                if (messagesPrivee == null) {
+                    log.error("Aucun message trouvé");
+                    SendJSON.Error(response, "noMessageFound");
+                    return;
+                }
+                //Envoi des messages privés en JSON
+                SendJSON.MessagesPrivee(response, messagesPrivee);
                 return;
             }
 

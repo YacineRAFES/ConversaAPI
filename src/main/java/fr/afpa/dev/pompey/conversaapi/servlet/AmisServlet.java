@@ -49,7 +49,7 @@ public class AmisServlet extends HttpServlet {
                 log.info("objects: " + objects);
                 String jwt = objects.getString("jwt");
 
-                if(jwt != null){
+                if (jwt != null) {
                     if (JWTutils.validateToken(jwt)) {
                         log.info("JWT valide");
                     } else {
@@ -57,12 +57,11 @@ public class AmisServlet extends HttpServlet {
                         SendJSON.Error(response, "jwtInvalide");
                         return;
                     }
-                }else{
+                } else {
                     log.error("JWT vide");
                     SendJSON.Error(response, "jwtInvalide");
                     return;
                 }
-
 
 
                 Claims claims = JWTutils.getUserInfoFromToken(jwt);
