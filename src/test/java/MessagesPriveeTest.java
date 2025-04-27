@@ -1,5 +1,6 @@
 import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
 import fr.afpa.dev.pompey.conversaapi.modele.MessagesPrivee;
+import fr.afpa.dev.pompey.conversaapi.modele.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -72,19 +73,11 @@ class MessagesPriveeTest {
 
     @ParameterizedTest
     @NullSource
-    void setIdUserNullSource(Integer id) {
+    void setUserNullSource(User user) {
         Exception exception = assertThrows(SaisieException.class, () -> {
-            messagesPriveeUnderTest.setIdUser(id);
+            messagesPriveeUnderTest.setUser(user);
         });
-        assertEquals("L'idUser ne doit pas être vide ou null", exception.getMessage());
-    }
-
-    @Test
-    void setIdUserNegative() {
-        Exception exception = assertThrows(SaisieException.class, () -> {
-            messagesPriveeUnderTest.setIdUser(-1);
-        });
-        assertEquals("L'idUser ne doit pas être négatif", exception.getMessage());
+        assertEquals("L'User ne doit pas être vide ou null", exception.getMessage());
     }
 
     @ParameterizedTest

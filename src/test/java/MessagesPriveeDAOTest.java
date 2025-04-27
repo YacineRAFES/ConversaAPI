@@ -40,13 +40,13 @@ class MessagesPriveeDAOTest {
         // Crée deux nouveaux utilisateurs
         User user1 = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()), true);
         User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", "aliiiice@example.com", "user", Date.valueOf(LocalDate.now()), true);
-        int id1 = userService.add(user1);
-        int id2 = userService.add(user2);
+        User userCreated1 = new User(userService.add(user1));
+        User userCreated2 = new User(userService.add(user2));
 
         // Crée une nouvelle amitié entre les deux utilisateurs
-        Amis amis = new Amis(id1, id2);
+        Amis amis = new Amis(userCreated1.getId(), userCreated2.getId());
         amisService.add(amis);
-        Amis amisFind = amisService.find(id1, id2);
+        Amis amisFind = amisService.find(userCreated1.getId(), userCreated2.getId());
         // Met à jour la demande d'amis
         amisService.update(amisFind);
         // Crée un message privé entre les deux utilisateurs
@@ -54,7 +54,7 @@ class MessagesPriveeDAOTest {
 
         MessagesPrivee messagesPrivee = new MessagesPrivee(
                 "Bonjour, comment ça va ?",
-                id1,
+                userCreated1,
                 amisFind.getIdGroupeMessagesPrives()
         );
 
@@ -64,8 +64,8 @@ class MessagesPriveeDAOTest {
 
         amisService.delete(amisFind);
 
-        userService.delete(new User(id1));
-        userService.delete(new User(id2));
+        userService.delete(new User(userCreated1.getId()));
+        userService.delete(new User(userCreated2.getId()));
     }
 
     @Test
@@ -74,13 +74,13 @@ class MessagesPriveeDAOTest {
         // Crée deux nouveaux utilisateurs
         User user1 = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()), true);
         User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", "aliiiice@example.com", "user", Date.valueOf(LocalDate.now()), true);
-        int id1 = userService.add(user1);
-        int id2 = userService.add(user2);
+        User userCreated1 = new User(userService.add(user1));
+        User userCreated2 = new User(userService.add(user2));
 
         // Crée une nouvelle amitié entre les deux utilisateurs
-        Amis amis = new Amis(id1, id2);
+        Amis amis = new Amis(userCreated1.getId(), userCreated2.getId());
         amisService.add(amis);
-        Amis amisFind = amisService.find(id1, id2);
+        Amis amisFind = amisService.find(userCreated1.getId(), userCreated2.getId());
         // Met à jour la demande d'amis
         amisService.update(amisFind);
         // Crée un message privé entre les deux utilisateurs
@@ -88,7 +88,7 @@ class MessagesPriveeDAOTest {
 
         MessagesPrivee messagesPrivee = new MessagesPrivee(
                 "Bonjour, comment ça va ?",
-                id1,
+                userCreated1,
                 amisFind.getIdGroupeMessagesPrives()
         );
 
@@ -103,8 +103,8 @@ class MessagesPriveeDAOTest {
 
         amisService.delete(amisFind);
 
-        userService.delete(new User(id1));
-        userService.delete(new User(id2));
+        userService.delete(new User(userCreated1.getId()));
+        userService.delete(new User(userCreated2.getId()));
 
     }
 
@@ -114,13 +114,13 @@ class MessagesPriveeDAOTest {
         // Crée deux nouveaux utilisateurs
         User user1 = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()), true);
         User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", "aliiiice@example.com", "user", Date.valueOf(LocalDate.now()), true);
-        int id1 = userService.add(user1);
-        int id2 = userService.add(user2);
+        User userCreated1 = new User(userService.add(user1));
+        User userCreated2 = new User(userService.add(user2));
 
         // Crée une nouvelle amitié entre les deux utilisateurs
-        Amis amis = new Amis(id1, id2);
+        Amis amis = new Amis(userCreated1.getId(), userCreated2.getId());
         amisService.add(amis);
-        Amis amisFind = amisService.find(id1, id2);
+        Amis amisFind = amisService.find(userCreated1.getId(), userCreated2.getId());
         // Met à jour la demande d'amis
         amisService.update(amisFind);
         // Crée un message privé entre les deux utilisateurs
@@ -129,7 +129,7 @@ class MessagesPriveeDAOTest {
 
         MessagesPrivee messagesPrivee = new MessagesPrivee(
                 "Bonjour, comment ça va ?",
-                id1,
+                userCreated1,
                 amisFind.getIdGroupeMessagesPrives()
         );
 
@@ -152,8 +152,8 @@ class MessagesPriveeDAOTest {
 
         amisService.delete(amisFind);
 
-        userService.delete(new User(id1));
-        userService.delete(new User(id2));
+        userService.delete(new User(userCreated1.getId()));
+        userService.delete(new User(userCreated2.getId()));
     }
 
     @Test
@@ -162,13 +162,13 @@ class MessagesPriveeDAOTest {
         // Crée deux nouveaux utilisateurs
         User user1 = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()), true);
         User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", "aliiiice@example.com", "user", Date.valueOf(LocalDate.now()), true);
-        int id1 = userService.add(user1);
-        int id2 = userService.add(user2);
+        User userCreated1 = new User(userService.add(user1));
+        User userCreated2 = new User(userService.add(user2));
 
         // Crée une nouvelle amitié entre les deux utilisateurs
-        Amis amis = new Amis(id1, id2);
+        Amis amis = new Amis(userCreated1.getId(), userCreated2.getId());
         amisService.add(amis);
-        Amis amisFind = amisService.find(id1, id2);
+        Amis amisFind = amisService.find(userCreated1.getId(), userCreated2.getId());
         // Met à jour la demande d'amis
         amisService.update(amisFind);
         // Crée un message privé entre les deux utilisateurs
@@ -177,7 +177,7 @@ class MessagesPriveeDAOTest {
 
         MessagesPrivee messagesPrivee = new MessagesPrivee(
                 "Bonjour, comment ça va ?",
-                id1,
+                userCreated1,
                 amisFind.getIdGroupeMessagesPrives()
         );
 
@@ -190,8 +190,8 @@ class MessagesPriveeDAOTest {
         log.info("Trouver un message privée réussi");
         amisService.delete(amisFind);
 
-        userService.delete(new User(id1));
-        userService.delete(new User(id2));
+        userService.delete(new User(userCreated1.getId()));
+        userService.delete(new User(userCreated2.getId()));
     }
 
     @Test
@@ -200,13 +200,13 @@ class MessagesPriveeDAOTest {
         // Crée deux nouveaux utilisateurs
         User user1 = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()), true);
         User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", "aliiiice@example.com", "user", Date.valueOf(LocalDate.now()), true);
-        int id1 = userService.add(user1);
-        int id2 = userService.add(user2);
+        User userCreated1 = new User(userService.add(user1));
+        User userCreated2 = new User(userService.add(user2));
 
         // Crée une nouvelle amitié entre les deux utilisateurs
-        Amis amis = new Amis(id1, id2);
+        Amis amis = new Amis(userCreated1.getId(), userCreated2.getId());
         amisService.add(amis);
-        Amis amisFind = amisService.find(id1, id2);
+        Amis amisFind = amisService.find(userCreated1.getId(), userCreated2.getId());
         // Met à jour la demande d'amis
         amisService.update(amisFind);
         // Crée un message privé entre les deux utilisateurs
@@ -215,7 +215,7 @@ class MessagesPriveeDAOTest {
 
         MessagesPrivee messagesPrivee1 = new MessagesPrivee(
                 "Bonjour, comment allez-vous ?",
-                id1,
+                userCreated1,
                 amisFind.getIdGroupeMessagesPrives()
         );
 
@@ -224,7 +224,7 @@ class MessagesPriveeDAOTest {
 
         MessagesPrivee messagesPrivee2 = new MessagesPrivee(
                 "Bonjour, ça va et vous?",
-                id2,
+                userCreated2,
                 amisFind.getIdGroupeMessagesPrives()
         );
 
@@ -237,7 +237,7 @@ class MessagesPriveeDAOTest {
         log.info("Trouver des messages privées réussi");
         amisService.delete(amisFind);
 
-        userService.delete(new User(id1));
-        userService.delete(new User(id2));
+        userService.delete(new User(userCreated1.getId()));
+        userService.delete(new User(userCreated2.getId()));
     }
 }

@@ -10,7 +10,7 @@ public class MessagesPrivee {
     private Integer id;
     private Timestamp date;
     private String message;
-    private Integer idUser;
+    private User user;
     private Integer idGroupeMessagesPrives;
 
     // CONSTRUCTEURS
@@ -23,27 +23,27 @@ public class MessagesPrivee {
      * @param id
      * @param date
      * @param message
-     * @param idUser
+     * @param user
      * @param idGroupeMessagesPrives
      */
-    public MessagesPrivee(Integer id, Timestamp date, String message, Integer idUser, Integer idGroupeMessagesPrives) {
+    public MessagesPrivee(Integer id, Timestamp date, String message, User user, Integer idGroupeMessagesPrives) {
         this.id = id;
         this.date = date;
         this.message = message;
-        this.idUser = idUser;
+        this.user = user;
         this.idGroupeMessagesPrives = idGroupeMessagesPrives;
     }
 
     /**
      * Quand un utilisateur envoie un message
      * @param message
-     * @param idUser
+     * @param user
      * @param idGroupeMessagesPrives
      */
-    public MessagesPrivee(String message, Integer idUser, Integer idGroupeMessagesPrives) {
+    public MessagesPrivee(String message, User user, Integer idGroupeMessagesPrives) {
         this.date = new Timestamp(System.currentTimeMillis());
         this.message = message;
-        this.idUser = idUser;
+        this.user = user;
         this.idGroupeMessagesPrives = idGroupeMessagesPrives;
     }
 
@@ -96,17 +96,15 @@ public class MessagesPrivee {
         this.message = message;
     }
 
-    public Integer getIdUser() {
-        return idUser;
+    public User getUser() {
+        return user;
     }
 
-    public void setIdUser(Integer idUser) throws SaisieException {
-        if (idUser == null) {
-            throw new SaisieException("L'idUser ne doit pas être vide ou null");
-        } else if (idUser <= 0) {
-            throw new SaisieException("L'idUser ne doit pas être négatif");
+    public void setUser(User user) throws SaisieException {
+        if (user == null) {
+            throw new SaisieException("L'User ne doit pas être vide ou null");
         }
-        this.id = idUser;
+        this.user = user;
     }
 
     public Integer getIdGroupeMessagesPrives() {

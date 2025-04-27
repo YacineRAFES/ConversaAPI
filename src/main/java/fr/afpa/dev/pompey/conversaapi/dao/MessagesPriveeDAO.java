@@ -37,7 +37,7 @@ public class MessagesPriveeDAO extends DAO<MessagesPrivee> {
                     PreparedStatement.RETURN_GENERATED_KEYS);
             pstmt.setTimestamp(1, obj.getDate());
             pstmt.setString(2, obj.getMessage());
-            pstmt.setInt(3, obj.getIdUser());
+            pstmt.setInt(3, obj.getUser().getId());
             pstmt.setInt(4, obj.getIdGroupeMessagesPrives());
             pstmt.executeUpdate();
             ResultSet rs = pstmt.getGeneratedKeys();
@@ -87,19 +87,24 @@ public class MessagesPriveeDAO extends DAO<MessagesPrivee> {
 
     @Override
     public MessagesPrivee find(int id) {
-        String selectSQL = "SELECT * FROM message_privee WHERE MP_ID = ?";
+        String selectSQL = "SELECT * FROM message_privee mp JOIN utilisateur u ON u.USER_ID = mp.USER_ID WHERE mp.MP_ID = ?";
         try {
             PreparedStatement pstmt = connect.prepareStatement(selectSQL);
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                return new MessagesPrivee(
+                User user = new User(
+                        rs.getInt("USER_ID"),
+                        rs.getString("USER_NAME")
+                );
+                MessagesPrivee messagesPrivee = new MessagesPrivee(
                         rs.getInt("MP_ID"),
                         rs.getTimestamp("MP_DATE"),
                         rs.getString("MP_MESSAGES"),
-                        rs.getInt("USER_ID"),
+                        user,
                         rs.getInt("MG_ID")
                 );
+                return messagesPrivee;
             }
         } catch (SQLException e) {
             log.error("Erreur lors de la recherche d'un message privee", e);
@@ -112,16 +117,20 @@ public class MessagesPriveeDAO extends DAO<MessagesPrivee> {
     @Override
     public List<MessagesPrivee> findAll() {
         List<MessagesPrivee> messagesPrivees = new ArrayList<>();
-        String selectAll = "SELECT * FROM message_privee";
+        String selectAll = "SELECT * FROM message_privee mp JOIN utilisateur u on u.USER_ID = mp.USER_ID";
         try{
             PreparedStatement pstmt = connect.prepareStatement(selectAll);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
+                User user = new User(
+                        rs.getInt("USER_ID"),
+                        rs.getString("USER_NAME")
+                );
                 MessagesPrivee mp = new MessagesPrivee();
                 mp.setId(rs.getInt("MP_ID"));
                 mp.setDate(rs.getTimestamp("MP_DATE"));
                 mp.setMessage(rs.getString("MP_MESSAGES"));
-                mp.setIdUser(rs.getInt("USER_ID"));
+                mp.setUser(user);
                 mp.setIdGroupeMessagesPrives(rs.getInt("MG_ID"));
                 messagesPrivees.add(mp);
             }
@@ -149,11 +158,15 @@ public class MessagesPriveeDAO extends DAO<MessagesPrivee> {
             while (rs.next()) {
                 //TODO: AVATAR DE L'UTILISATEUR
 
+                User user = new User(
+                        rs.getInt("USER_ID"),
+                        rs.getString("USER_NAME")
+                );
                 MessagesPrivee mp = new MessagesPrivee();
                 mp.setId(rs.getInt("MP_ID"));
                 mp.setDate(rs.getTimestamp("MP_DATE"));
                 mp.setMessage(rs.getString("MP_MESSAGES"));
-                mp.setIdUser(rs.getInt("USER_ID"));
+                mp.setUser(user);
                 mp.setIdGroupeMessagesPrives(rs.getInt("MG_ID"));
                 messagesPrivees.add(mp);
             }
