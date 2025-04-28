@@ -119,4 +119,15 @@ public class MessagesPrivee {
         }
         this.idGroupeMessagesPrives = idGroupeMessagesPrives;
     }
+
+    @Override
+    public String toString() {
+        return "MessagesPrivee{" +
+                "id=" + id +
+                ", date=" + date +
+                ", message='" + message + '\'' +
+                ", user=" + user.getId() +
+                ", idGroupeMessagesPrives=" + idGroupeMessagesPrives.toString() +
+                '}';
+    }
 }

@@ -24,6 +24,10 @@ public class User {
 
     }
 
+    /**
+     * Prend un nom d'utilisateur
+     * @param name
+     */
     public User(String name){
         this.name = name;
     }
@@ -45,6 +49,10 @@ public class User {
         this.role = role;
     }
 
+    /**
+     * @param id
+     * @param name
+     */
     public User(Integer id, String name) {
         this.id = id;
         this.name = name;
@@ -113,6 +121,7 @@ public class User {
 
 
     /**
+     * Prend un id d'utilisateur
      * @param id
      */
     public User(Integer id){

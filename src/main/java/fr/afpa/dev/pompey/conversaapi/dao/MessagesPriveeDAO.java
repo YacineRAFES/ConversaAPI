@@ -144,13 +144,14 @@ public class MessagesPriveeDAO extends DAO<MessagesPrivee> {
 
     public List<MessagesPrivee> findAllMessagesPriveesByIdUser(int idUser) {
         List<MessagesPrivee> messagesPrivees = new ArrayList<>();
-        String selectAll = "" +
-                "SELECT * " +
+        String selectAll =
+                "SELECT DISTINCT mp.MP_ID, mp.MP_DATE, mp.MP_MESSAGES, mp.USER_ID, mp.MG_ID, u.USER_NAME " +
                 "FROM message_privee mp " +
-                "JOIN utilisateur u ON mp.USER_ID = u.USER_ID " +
-                "JOIN groupe_messages_prives gmp ON mp.MG_ID = gmp.MG_ID " +
-                "JOIN amis a ON gmp.MG_ID = a.MG_ID " +
-                "WHERE u.USER_ID = ?";
+                "INNER JOIN utilisateur u ON mp.USER_ID = u.USER_ID " +
+                "INNER JOIN groupe_messages_prives gmp ON mp.MG_ID = gmp.MG_ID " +
+                "INNER JOIN amis a ON gmp.MG_ID = a.MG_ID " +
+                "INNER JOIN message_privee ON mp.MG_ID = gmp.MG_ID " +
+                "WHERE a.USER_ID_utilisateur = ?";
         try{
             PreparedStatement pstmt = connect.prepareStatement(selectAll);
             pstmt.setInt(1, idUser);

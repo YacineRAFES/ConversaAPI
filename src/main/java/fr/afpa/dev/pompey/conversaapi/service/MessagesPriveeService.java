@@ -7,6 +7,8 @@ import fr.afpa.dev.pompey.conversaapi.modele.MessagesPrivee;
 
 import java.util.List;
 
+import static fr.afpa.dev.pompey.conversaapi.utilitaires.Utils.getNameClass;
+
 public class MessagesPriveeService {
 
     private final MessagesPriveeDAO messagesPriveeDAO;
@@ -45,6 +47,8 @@ public class MessagesPriveeService {
         }
     }
 
+
+
     /**
      * Met à jour un message privé dans la base de données.
      *
@@ -75,4 +79,11 @@ public class MessagesPriveeService {
         return messagesPriveeDAO.find(id);
     }
 
+    public List<MessagesPrivee> getAllMessagesPriveeByIdUser(Integer id) {
+        List<MessagesPrivee> messagesPrivee = messagesPriveeDAO.findAllMessagesPriveesByIdUser(id);
+        if (messagesPrivee == null) {
+            throw new IllegalStateException(getNameClass() + " : Erreur lors de la récupération des messages privés");
+        }
+        return messagesPrivee;
+    }
 }
