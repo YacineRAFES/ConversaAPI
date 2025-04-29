@@ -457,4 +457,17 @@ public class AmisDAO extends DAO<Amis> {
         }
 
     }
+
+    public boolean siIdUserAppartientAUnGroupe(Amis obj) {
+        String query = "SELECT 1 FROM amis WHERE MG_ID = ? AND USER_ID_utilisateur = ? AND AMIS_STATUT = ? LIMIT 1";
+        try (PreparedStatement pstmt = connect.prepareStatement(query)) {
+            pstmt.setInt(1, obj.getIdGroupeMessagesPrives());
+            pstmt.setInt(2, obj.getUserIdDemandeur());
+            pstmt.setString(3, obj.getStatut().toString());
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next(); // Si une ligne existe, l'utilisateur appartient au groupe
+        } catch (SQLException e) {
+            throw new DAOException("Erreur lors de la vérification de l'appartenance d'un groupe : " + e.getMessage());
+        }
+    }
 }

@@ -107,7 +107,7 @@ public class SendJSON {
      * @param token    Le token JWT à envoyer.
      * @throws JsonException
      */
-    public static void LoginUser(HttpServletResponse response, String token) throws JsonException {
+    public static void LoginUser(HttpServletResponse response, String token, String iduser, String username) throws JsonException {
         try {
             // Je définis le type de contenu de la réponse HTTP.
             response.setContentType("application/json");
@@ -118,6 +118,10 @@ public class SendJSON {
             JsonObject jsonResponse = Json.createObjectBuilder()
                     .add("status", "success")
                     .add("message", "loginSuccess")
+                    .add("user", Json.createObjectBuilder()
+                            .add("iduser", iduser)
+                            .add("username", username)
+                            .build())
                     .build();
 
             // J'écris la réponse JSON.

@@ -20,6 +20,17 @@ public class Amis {
     public Amis() {
     }
 
+    /**
+     * Constructeur pour verifier si l'utilisateur appartient à un groupe message privé
+     * @param userId
+     * @param idGroupeMessagesPrives
+     */
+    public Amis(Integer userId, Integer idGroupeMessagesPrives, StatutAmitie statut) {
+        this.userIdDemandeur = userId;
+        this.idGroupeMessagesPrives = idGroupeMessagesPrives;
+        this.statut = statut;
+    }
+
     public Amis(List<Amis> amisList){
         this.amisList = amisList;
     }

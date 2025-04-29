@@ -85,7 +85,7 @@ public class LoginServlet extends HttpServlet {
             String jwtToken = JWTutils.generateToken(userFind.getId(), userFind.getName(), userFind.getEmail(), userFind.getRole());
             log.info("Token JWT généré: " + jwtToken);
             //Envoi du token JWT
-            SendJSON.LoginUser(response, jwtToken);
+            SendJSON.LoginUser(response, jwtToken, userFind.getId().toString(), userFind.getName());
 
         }catch(JsonException e){
             log.error("Erreur JSON détectée", e);

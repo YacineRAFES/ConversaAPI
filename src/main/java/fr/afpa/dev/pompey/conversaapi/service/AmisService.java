@@ -110,5 +110,9 @@ public class AmisService {
         return amisDAO.findByIdGroupeMessagesPrivee(idGroupeMessagesPrivee);
     }
 
+    public boolean siIdUserAppartientAUnGroupe(Amis amis) {
+        return amisDAO.siIdUserAppartientAUnGroupe(amis);
+    }
+
 
 }

@@ -3,6 +3,7 @@ package fr.afpa.dev.pompey.conversaapi.servlet;
 import fr.afpa.dev.pompey.conversaapi.emuns.Role;
 import fr.afpa.dev.pompey.conversaapi.modele.Amis;
 import fr.afpa.dev.pompey.conversaapi.modele.MessagesPrivee;
+import fr.afpa.dev.pompey.conversaapi.modele.StatutAmitie;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import fr.afpa.dev.pompey.conversaapi.securite.JWTutils;
 import fr.afpa.dev.pompey.conversaapi.service.AmisService;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @WebServlet("/MessagesPrivee")
@@ -31,6 +33,7 @@ public class MessagesPriveeServlet extends HttpServlet {
     private transient MessagesPriveeService messagesPriveeService;
     private transient UserService userService;
     private transient AmisService amisService;
+
     @Override
     public void init() {
         this.messagesPriveeService = new MessagesPriveeService(Role.UTILISATEUR);
@@ -46,20 +49,25 @@ public class MessagesPriveeServlet extends HttpServlet {
             log.info("JSON RECU depuis: " + jsonObject + Utils.getNameClass());
             String jwt = jsonObject.getString("jwt");
             String type = jsonObject.getString("type");
+            log.info(Utils.getNameClass() + " type : " + type);
+            log.info(Utils.getNameClass() + " jwt : " + jwt);
+
             //Verification JWT
             if (jwt != null) {
                 if (JWTutils.validateToken(jwt)) {
-                    log.info("JWT valide");
+                    log.info(Utils.getNameClass() + "JWT valide");
                 } else {
-                    log.error("JWT invalide");
+                    log.error(Utils.getNameClass() + "JWT invalide");
                     SendJSON.Error(response, "jwtInvalide");
                     return;
                 }
             } else {
-                log.error("JWT vide");
+                log.error(Utils.getNameClass() + "JWT vide");
                 SendJSON.Error(response, "jwtInvalide");
                 return;
             }
+
+
 
             //Recuperation de l'ID de l'utilisateur
             Claims claims = JWTutils.getUserInfoFromToken(jwt);
@@ -86,7 +94,7 @@ public class MessagesPriveeServlet extends HttpServlet {
                 return;
             }
 
-            if(type.equals("getAllMessages")) {
+            if (type.equals("getAllMessages")) {
                 //Recuperation de tous les messages privés
                 log.info("1. Recuperation de tous les messages privés");
                 List<MessagesPrivee> messagesPrivee = messagesPriveeService.getAllMessagesPriveeByIdUser(user.getId());
@@ -112,32 +120,56 @@ public class MessagesPriveeServlet extends HttpServlet {
 
                 SendJSON.GlobalJSON(response, globalJson);
                 return;
-            }else if(type.equals("sendMessages")){
-                //TODO: A FAIRE
+            } else if (type.equals("sendMessages")) {
+                log.info("2. Envoi d'un message privé");
+
+                Integer idGroupeMessagesPriveeRecup = jsonObject.getInt("idGroupeMessagesPrivee");
+                String messageRecup = jsonObject.getString("message");
+                Integer idUserRecup = Integer.valueOf(jsonObject.getString("iduser"));
+                String usernameRecup = jsonObject.getString("username");
+
+                //Verifie si username et iduser ne sont pas vide
+                if (idUserRecup == null ||
+                        usernameRecup == null || usernameRecup.isEmpty() ||
+                        idGroupeMessagesPriveeRecup == null ||
+                        messageRecup == null || messageRecup.isEmpty()) {
+                    log.error("Un des champs est vide");
+                    SendJSON.Error(response, "idUserVide");
+                    return;
+                }
+
+                if (!id.equals(idUserRecup) && !username.equals(usernameRecup)) {
+                    log.error("L'utilisateur ne peut pas s'envoyer un message");
+                    SendJSON.Error(response, "userCannotSendMessageToSelf");
+                    return;
+                }
+
+                //Si user appartient un groupe de message privées
+                Amis userAppartientUnGroupe = new Amis(user.getId(), idGroupeMessagesPriveeRecup, StatutAmitie.AMI);
+                if (!amisService.siIdUserAppartientAUnGroupe(userAppartientUnGroupe)) {
+                    log.error("L'utilisateur n'appartient pas à un groupe de messages privés");
+                    SendJSON.Error(response, "userNotInGroup");
+                    return;
+                }
+
+                //Création du message privé
+                MessagesPrivee messagesPrivee = new MessagesPrivee(
+                        messageRecup,
+                        user,
+                        idGroupeMessagesPriveeRecup
+                );
+
+                //Ajout du message privé
+                int idMessagePrivee = messagesPriveeService.add(messagesPrivee);
+                log.info("Message privé ajouté avec l'ID : " + idMessagePrivee);
+
+            } else {
+                log.error("Type de message non reconnu");
+                SendJSON.Error(response, "typeMessageInconnu");
+                return;
             }
 
-//            //Recupereration de l'ID du groupe de messages privés dans la bdd Amis
-//            Amis GroupeMessagesPrivee = amisService.getIdGroupeMessagesPrivee(idGroupeMessagesPrivee);
-//            if (GroupeMessagesPrivee == null) {
-//                log.error("Groupe de messages privés non trouvé");
-//                SendJSON.Error(response, "groupeMessagesPriveeNotFound");
-//                return;
-//            }
-
-
-            //Recupere le message et add le message dans la bdd
-            MessagesPrivee messagesPrivee = new MessagesPrivee(
-
-            );
-
-
-
-
-
-
-
-
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Erreur dans MessagesPriveeServlet : ", e);
             SendJSON.Error(response, "internalError");
         }
