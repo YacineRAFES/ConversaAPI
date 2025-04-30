@@ -83,6 +83,8 @@ CREATE TABLE `message_privee` (
   `MP_MESSAGES` text NOT NULL,
   `USER_ID` int NOT NULL,
   `MG_ID` int NOT NULL,
+  `MP_ISDELETE` tinyint(1) DEFAULT '0',
+  `MP_SIGNALER` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`MP_ID`),
   KEY `USER_ID` (`USER_ID`),
   KEY `MG_ID` (`MG_ID`),
@@ -105,6 +107,7 @@ CREATE TABLE `utilisateur` (
   `USER_NAME` varchar(50) NOT NULL,
   `USER_DATE` date NOT NULL,
   `USER_ROLE` varchar(11) NOT NULL,
+  `USER_ISVALID` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`USER_ID`),
   UNIQUE KEY `USER_EMAIL` (`USER_EMAIL`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -119,4 +122,4 @@ CREATE TABLE `utilisateur` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-24  9:56:51
+-- Dump completed on 2025-04-30 16:32:14

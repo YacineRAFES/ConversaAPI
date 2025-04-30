@@ -115,10 +115,10 @@ public class UserDAO extends DAO<User>{
     public User find(int id) {
         User user = new User(id);
 
-        StringBuilder selectById = new StringBuilder("SELECT * FROM utilisateur WHERE USER_ID = ?");
+        String selectById = "SELECT * FROM utilisateur WHERE USER_ID = ? AND USER_ISVALID=1";
 
         try{
-            PreparedStatement pstmt = connect.prepareStatement(selectById.toString());
+            PreparedStatement pstmt = connect.prepareStatement(selectById);
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
 
@@ -145,7 +145,7 @@ public class UserDAO extends DAO<User>{
     @Override
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT * FROM utilisateur";
+        String sql = "SELECT * FROM utilisateur WHERE USER_ISVALID=1";
 
         try(PreparedStatement ps = connect.prepareStatement(sql)){
 

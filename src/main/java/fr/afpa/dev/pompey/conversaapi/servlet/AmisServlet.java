@@ -63,6 +63,7 @@ public class AmisServlet extends HttpServlet {
                     return;
                 }
 
+                //TODO : FAIRE UNE FONCTION QUI RECUPERE LE JWT ET LE DECODE
 
                 Claims claims = JWTutils.getUserInfoFromToken(jwt);
                 User user;
