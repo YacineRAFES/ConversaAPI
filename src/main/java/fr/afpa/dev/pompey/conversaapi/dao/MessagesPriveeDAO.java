@@ -150,8 +150,7 @@ public class MessagesPriveeDAO extends DAO<MessagesPrivee> {
                 "INNER JOIN utilisateur u ON mp.USER_ID = u.USER_ID " +
                 "INNER JOIN groupe_messages_prives gmp ON mp.MG_ID = gmp.MG_ID " +
                 "INNER JOIN amis a ON gmp.MG_ID = a.MG_ID " +
-                "INNER JOIN message_privee ON mp.MG_ID = gmp.MG_ID " +
-                "WHERE a.USER_ID_utilisateur = ?" +
+                "WHERE a.USER_ID_utilisateur = ? " +
                 "AND mp.MP_ISDELETE = 0";
         try{
             PreparedStatement pstmt = connect.prepareStatement(selectAll);

@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+import static fr.afpa.dev.pompey.conversaapi.securite.JWTutils.VerificationJWT;
+
 @Slf4j
 @WebServlet("/MessagesPrivee")
 public class MessagesPriveeServlet extends HttpServlet {
@@ -52,43 +54,9 @@ public class MessagesPriveeServlet extends HttpServlet {
             log.info(Utils.getNameClass() + " type : " + type);
             log.info(Utils.getNameClass() + " jwt : " + jwt);
 
-            //Verification JWT
-            if (jwt != null) {
-                if (JWTutils.validateToken(jwt)) {
-                    log.info(Utils.getNameClass() + "JWT valide");
-                } else {
-                    log.error(Utils.getNameClass() + "JWT invalide");
-                    SendJSON.Error(response, "jwtInvalide");
-                    return;
-                }
-            } else {
-                log.error(Utils.getNameClass() + "JWT vide");
-                SendJSON.Error(response, "jwtInvalide");
-                return;
-            }
+            User user = userService.get(VerificationJWT(response, jsonObject.getString("jwt")).getId());
 
-
-
-            //Recuperation de l'ID de l'utilisateur
-            Claims claims = JWTutils.getUserInfoFromToken(jwt);
-            User user;
-            if (claims == null) {
-                log.error("Token claims null");
-                SendJSON.Error(response, "invalidToken");
-                return;
-            }
-
-            Integer id = claims.get("id", Integer.class);
-            String email = claims.get("email", String.class);
-            String username = claims.get("name", String.class);
-            String role = claims.get("roles", String.class);
-            if (id == null || email == null || username == null || role == null) {
-                log.error("Données manquantes dans le token");
-                SendJSON.Error(response, "missingDataInToken");
-                return;
-            }
-            user = userService.get(id);
-            if (user == null) {
+            if(user == null) {
                 log.error("Utilisateur non trouvé");
                 SendJSON.Error(response, "userNotFound");
                 return;
@@ -96,32 +64,39 @@ public class MessagesPriveeServlet extends HttpServlet {
 
             if (type.equals("getAllMessages")) {
                 //Recuperation de tous les messages privés
-                log.info("1. Recuperation de tous les messages privés");
+                log.info("Appel : getAllMessages");
                 List<MessagesPrivee> messagesPrivee = messagesPriveeService.getAllMessagesPriveeByIdUser(user.getId());
-                //Envoi des messages privés en JSON
-                JsonArrayBuilder messagesPriveeBuilder = Json.createArrayBuilder();
 
-                for (MessagesPrivee messagesPrivee1 : messagesPrivee) {
-                    messagesPriveeBuilder.add(Json.createObjectBuilder()
-                            .add("id", messagesPrivee1.getId())
-                            .add("message", messagesPrivee1.getMessage())
-                            .add("idGroupeMessagesPrives", messagesPrivee1.getIdGroupeMessagesPrives())
-                            .add("date", messagesPrivee1.getDate().toString())
-                            .add("user", Json.createObjectBuilder()
-                                    .add("id", messagesPrivee1.getUser().getId())
-                                    .add("username", messagesPrivee1.getUser().getName())
-                            )
-                    );
+                if(!messagesPrivee.isEmpty()) {
+                    log.info("Messages privés trouvés : " + messagesPrivee.size());
+                    //Envoi des messages privés en JSON
+                    JsonArrayBuilder messagesPriveeBuilder = Json.createArrayBuilder();
+
+                    for (MessagesPrivee messagesPrivee1 : messagesPrivee) {
+                        messagesPriveeBuilder.add(Json.createObjectBuilder()
+                                .add("id", messagesPrivee1.getId())
+                                .add("message", messagesPrivee1.getMessage())
+                                .add("idGroupeMessagesPrives", messagesPrivee1.getIdGroupeMessagesPrives())
+                                .add("date", messagesPrivee1.getDate().toString())
+                                .add("user", Json.createObjectBuilder()
+                                        .add("id", messagesPrivee1.getUser().getId())
+                                        .add("username", messagesPrivee1.getUser().getName())
+                                )
+                        );
+                    }
+
+                    JsonObject globalJson = Json.createObjectBuilder()
+                            .add("getAllMessages", messagesPriveeBuilder)
+                            .build();
+
+                    SendJSON.GlobalJSON(response, globalJson);
+                }else{
+                    log.error("Aucun message trouvé");
+                    SendJSON.Success(response, "aucunMessageTrouve");
                 }
 
-                JsonObject globalJson = Json.createObjectBuilder()
-                        .add("getAllMessages", messagesPriveeBuilder)
-                        .build();
-
-                SendJSON.GlobalJSON(response, globalJson);
-                return;
             } else if (type.equals("sendMessages")) {
-                log.info("2. Envoi d'un message privé");
+                log.info("Appel : sendMessages");
 
                 Integer idGroupeMessagesPriveeRecup = jsonObject.getInt("idGroupeMessagesPrivee");
                 String messageRecup = jsonObject.getString("message");
@@ -138,7 +113,7 @@ public class MessagesPriveeServlet extends HttpServlet {
                     return;
                 }
 
-                if (!id.equals(idUserRecup) && !username.equals(usernameRecup)) {
+                if (!user.getId().equals(idUserRecup) && !user.getName().equals(usernameRecup)) {
                     log.error("L'utilisateur ne peut pas s'envoyer un message");
                     SendJSON.Error(response, "userCannotSendMessageToSelf");
                     return;
