@@ -56,7 +56,9 @@ public class MessagesPriveeServlet extends HttpServlet {
 
             User user = userService.get(VerificationJWT(response, jsonObject.getString("jwt")).getId());
 
-            if(user == null) {
+            //Verifie si l'utilisateur appartient à un groupe de message privées
+
+            if (user == null) {
                 log.error("Utilisateur non trouvé");
                 SendJSON.Error(response, "userNotFound");
                 return;
@@ -67,7 +69,7 @@ public class MessagesPriveeServlet extends HttpServlet {
                 log.info("Appel : getAllMessages");
                 List<MessagesPrivee> messagesPrivee = messagesPriveeService.getAllMessagesPriveeByIdUser(user.getId());
 
-                if(!messagesPrivee.isEmpty()) {
+                if (!messagesPrivee.isEmpty()) {
                     log.info("Messages privés trouvés : " + messagesPrivee.size());
                     //Envoi des messages privés en JSON
                     JsonArrayBuilder messagesPriveeBuilder = Json.createArrayBuilder();
@@ -90,7 +92,7 @@ public class MessagesPriveeServlet extends HttpServlet {
                             .build();
 
                     SendJSON.GlobalJSON(response, globalJson);
-                }else{
+                } else {
                     log.error("Aucun message trouvé");
                     SendJSON.Success(response, "aucunMessageTrouve");
                 }
@@ -138,7 +140,98 @@ public class MessagesPriveeServlet extends HttpServlet {
                 int idMessagePrivee = messagesPriveeService.add(messagesPrivee);
                 log.info("Message privé ajouté avec l'ID : " + idMessagePrivee);
 
-            } else {
+                //Recuperation de tous les messages privés
+                log.info("Appel : getAllMessages");
+                List<MessagesPrivee> getAllMessagesPrivee = messagesPriveeService.getAllMessagesPriveeByIdUser(user.getId());
+
+                if (!getAllMessagesPrivee.isEmpty()) {
+                    log.info("Messages privés trouvés : " + getAllMessagesPrivee.size());
+                    //Envoi des messages privés en JSON
+                    JsonArrayBuilder messagesPriveeBuilder = Json.createArrayBuilder();
+
+                    for (MessagesPrivee messagesPrivee1 : getAllMessagesPrivee) {
+                        messagesPriveeBuilder.add(Json.createObjectBuilder()
+                                .add("id", messagesPrivee1.getId())
+                                .add("message", messagesPrivee1.getMessage())
+                                .add("idGroupeMessagesPrives", messagesPrivee1.getIdGroupeMessagesPrives())
+                                .add("date", messagesPrivee1.getDate().toString())
+                                .add("user", Json.createObjectBuilder()
+                                        .add("id", messagesPrivee1.getUser().getId())
+                                        .add("username", messagesPrivee1.getUser().getName())
+                                )
+                        );
+                    }
+
+                    JsonObject globalJson = Json.createObjectBuilder()
+                            .add("getAllMessages", messagesPriveeBuilder)
+                            .build();
+
+                    SendJSON.GlobalJSON(response, globalJson);
+
+                }else {
+                    log.error("Aucun message trouvé");
+                    SendJSON.Success(response, "aucunMessageTrouve");
+                }
+            }else if(type.equals("signaler")){
+
+                log.info("Appel : signaler");
+                Integer idMessagePriveeRecup = jsonObject.getInt("idMessage");
+
+                //Verifie si idMessagePriveeRecup et messageRecup ne sont pas vide
+                if (idMessagePriveeRecup == null) {
+                    log.error("Un des champs est vide");
+                    SendJSON.Error(response, "idUserVide");
+                    return;
+                }
+
+                //Verifie si idMessagePriveeRecup existe
+                MessagesPrivee mpExist = messagesPriveeService.findById(idMessagePriveeRecup);
+
+                if(mpExist != null){
+                    log.info("Message privé trouvé avec l'ID : " + mpExist.getId());
+
+                    //Création d'une instanciation de l'objet message privé
+                    MessagesPrivee messagesPrivee = new MessagesPrivee(
+                            mpExist.getId()
+                    );
+
+                    //Ajout du message privé au signalement
+                    MessagesPrivee mp = messagesPriveeService.signaler(messagesPrivee);
+                    log.info("Message privé signalé avec l'ID : " + mp.getId());
+
+                    SendJSON.Success(response, "messageSignaler");
+                }
+
+
+            }else if(type.equals("supprimer")){
+                log.info("Appel : supprimer");
+                Integer idMessagePriveeRecup = jsonObject.getInt("idMessage");
+
+                //Verifie si idMessagePriveeRecup ne sont pas vide
+                if (idMessagePriveeRecup == null) {
+                    log.error("Un des champs est vide");
+                    SendJSON.Error(response, "idUserVide");
+                    return;
+                }
+
+                //Verifie si idMessagePriveeRecup existe
+                MessagesPrivee mpExist = messagesPriveeService.findById(idMessagePriveeRecup);
+
+                if(mpExist != null){
+                    log.info("Message privé trouvé avec l'ID : " + mpExist.getId());
+
+                    //Création d'une instanciation de l'objet message privé
+                    MessagesPrivee messagesPrivee = new MessagesPrivee(
+                            mpExist.getId()
+                    );
+
+                    //Ajout du message privé au signalement
+                    MessagesPrivee mp = messagesPriveeService.supprimer(messagesPrivee);
+                    log.info("Message privé supprimé avec l'ID : " + mp.getId());
+
+                    SendJSON.Success(response, "messageSupprimer");
+                }
+            }else {
                 log.error("Type de message non reconnu");
                 SendJSON.Error(response, "typeMessageInconnu");
                 return;

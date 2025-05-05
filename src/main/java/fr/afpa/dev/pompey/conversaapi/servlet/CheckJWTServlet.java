@@ -30,6 +30,7 @@ public class CheckJWTServlet extends HttpServlet {
             JsonObject jsonObject = jsonReader.readObject();
             log.info("JSON RECU depuis: " + jsonObject + Utils.getNameClass());
             String jwt = jsonObject.getString("jwt");
+            log.info(Utils.getNameClass() + " jwt : " + jwt);
             if (jwt != null) {
                 if (JWTutils.validateToken(jwt)) {
                     log.info("JWT valide");

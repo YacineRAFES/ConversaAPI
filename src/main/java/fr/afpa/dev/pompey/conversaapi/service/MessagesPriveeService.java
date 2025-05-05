@@ -86,4 +86,12 @@ public class MessagesPriveeService {
         }
         return messagesPrivee;
     }
+
+    public MessagesPrivee signaler(MessagesPrivee messagesPrivee) {
+        return messagesPriveeDAO.signalerUnMessage(messagesPrivee);
+    }
+
+    public MessagesPrivee supprimer(MessagesPrivee messagesPrivee) {
+        return messagesPriveeDAO.supprimerUnMessage(messagesPrivee);
+    }
 }

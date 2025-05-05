@@ -1,9 +1,7 @@
 package fr.afpa.dev.pompey.conversaapi.dao;
 
 import fr.afpa.dev.pompey.conversaapi.exception.DAOException;
-import fr.afpa.dev.pompey.conversaapi.exception.RegexException;
 import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
-import fr.afpa.dev.pompey.conversaapi.modele.Amis;
 import fr.afpa.dev.pompey.conversaapi.modele.MessagesPrivee;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import lombok.extern.slf4j.Slf4j;
@@ -176,6 +174,32 @@ public class MessagesPriveeDAO extends DAO<MessagesPrivee> {
             throw new DAOException(e.getMessage());
         } catch (SaisieException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public MessagesPrivee signalerUnMessage(MessagesPrivee obj) {
+        String updateSQL = "UPDATE message_privee SET MP_SIGNALER = 1 WHERE MP_ID = ?";
+        try {
+            PreparedStatement pstmt = connect.prepareStatement(updateSQL);
+            pstmt.setInt(1, obj.getId());
+            pstmt.executeUpdate();
+            return obj;
+        } catch (SQLException e) {
+            log.error("Erreur lors de la signalisation d'un message privee", e);
+            throw new DAOException(e.getMessage());
+        }
+    }
+
+    public MessagesPrivee supprimerUnMessage(MessagesPrivee obj) {
+        String updateSQL = "UPDATE message_privee SET MP_ISDELETE = 1 WHERE MP_ID = ?";
+        try {
+            PreparedStatement pstmt = connect.prepareStatement(updateSQL);
+            pstmt.setInt(1, obj.getId());
+            pstmt.executeUpdate();
+            return obj;
+        } catch (SQLException e) {
+            log.error("Erreur lors de la suppression d'un message privee", e);
+            throw new DAOException(e.getMessage());
         }
     }
 }

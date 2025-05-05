@@ -22,6 +22,7 @@ import jakarta.json.JsonObject;
 import java.io.IOException;
 import java.util.List;
 
+import static fr.afpa.dev.pompey.conversaapi.securite.JWTutils.VerificationJWT;
 import static fr.afpa.dev.pompey.conversaapi.utilitaires.AlertMsg.ERRORSERVER;
 
 @Slf4j
@@ -43,47 +44,22 @@ public class AmisServlet extends HttpServlet {
             JsonObject jsonObject = jsonReader.readObject();
             log.info("JSON RECU depuis: " + jsonObject + Utils.getNameClass());
 
+            User user = userService.get(VerificationJWT(response, jsonObject.getString("jwt")).getId());
+
+            //Verifie si l'utilisateur appartient à un groupe de message privées
+
+            if (user == null) {
+                log.error("Utilisateur non trouvé");
+                SendJSON.Error(response, "userNotFound");
+                return;
+            }
+
             if (jsonObject.containsKey("method")) {
                 String method = jsonObject.getString("method");
                 JsonObject objects = jsonObject.getJsonObject("objects");
-                log.info("objects: " + objects);
-                String jwt = objects.getString("jwt");
 
-                if (jwt != null) {
-                    if (JWTutils.validateToken(jwt)) {
-                        log.info("JWT valide");
-                    } else {
-                        log.error("JWT invalide");
-                        SendJSON.Error(response, "jwtInvalide");
-                        return;
-                    }
-                } else {
-                    log.error("JWT vide");
-                    SendJSON.Error(response, "jwtInvalide");
-                    return;
-                }
-
-                //TODO : FAIRE UNE FONCTION QUI RECUPERE LE JWT ET LE DECODE
-
-                Claims claims = JWTutils.getUserInfoFromToken(jwt);
-                User user;
-                if (claims == null) {
-                    log.error("Token claims null");
-                    SendJSON.Error(response, "invalidToken");
-                    return;
-                }
-
-                Integer id = claims.get("id", Integer.class);
-                String email = claims.get("email", String.class);
-                String username = claims.get("name", String.class);
-                String role = claims.get("roles", String.class);
+                //TODO : FAIRE UNE FONCTION QUI RECUPERE LE JWT
                 if (method.equals("GetListFriends")) {
-                    if (id == null || email == null || username == null || role == null) {
-                        log.error("Données manquantes dans le token");
-                        SendJSON.Error(response, "missingDataInToken");
-                        return;
-                    }
-                    user = userService.get(id);
                     if (user == null) {
                         log.error("L'utilisateur n'existe pas");
                         SendJSON.Error(response, "userNotFound");
@@ -91,8 +67,8 @@ public class AmisServlet extends HttpServlet {
                     } else {
                         //Récupere la liste des amis et les mettre en jsonarray
                         log.info("L'utilisateur existe");
-                        List<Amis> amisList = amisService.findById(id);
-                        List<Amis> amiRequest = amisService.findAllFriendsRequestById(id);
+                        List<Amis> amisList = amisService.findById(user.getId());
+                        List<Amis> amiRequest = amisService.findAllFriendsRequestById(user.getId());
 
                         JsonArrayBuilder amisBuilder = Json.createArrayBuilder();
 
@@ -136,7 +112,7 @@ public class AmisServlet extends HttpServlet {
                                 //Recherche d'amis dans la liste de l'utilisateur
                                 //Je récupère l'id de l'utilisateur puis je cherche le nom dans sa liste des amis qui correspond à la demande de l'utilisateur
                                 String nomRechercher = objects.getString("username", "");
-                                List<Amis> amisRechercher = amisService.TrouverUnAmis(nomRechercher, id);
+                                List<Amis> amisRechercher = amisService.TrouverUnAmis(nomRechercher, user.getId());
                                 //Puis j'envoye à l'utilisateur la liste des amis qui correspondent à la recherche
 
                                 JsonArrayBuilder amisRechercherBuilder = Json.createArrayBuilder();
@@ -173,7 +149,7 @@ public class AmisServlet extends HttpServlet {
                                     return;
                                 }
 
-                                Amis demanderEnAmis = new Amis(id, userRechercherID.getId());
+                                Amis demanderEnAmis = new Amis(user.getId(), userRechercherID.getId());
                                 boolean isAdd = false;
                                 isAdd = amisService.add(demanderEnAmis);
                                 log.info("Demande d'amis envoyée: " + isAdd);
@@ -198,7 +174,7 @@ public class AmisServlet extends HttpServlet {
 
                             if (action.equals("yes")) {
                                 log.info("friendRequestResponse.yes: " + objects);
-                                Amis amis = new Amis(amisFindGroupeMP.getIdGroupeMessagesPrives(), amisFindGroupeMP.getUserIdDemandeur(), id);
+                                Amis amis = new Amis(amisFindGroupeMP.getIdGroupeMessagesPrives(), amisFindGroupeMP.getUserIdDemandeur(), user.getId());
                                 boolean isAccept = false;
                                 isAccept = amisService.update(amis);
 
@@ -210,7 +186,7 @@ public class AmisServlet extends HttpServlet {
                                 }
                             } else if (action.equals("no")) {
                                 log.info("friendRequestResponse.no: " + objects);
-                                Amis amis = new Amis(amisFindGroupeMP.getIdGroupeMessagesPrives(), amisFindGroupeMP.getUserIdDemandeur(), id);
+                                Amis amis = new Amis(amisFindGroupeMP.getIdGroupeMessagesPrives(), amisFindGroupeMP.getUserIdDemandeur(), user.getId());
                                 boolean isRefus = false;
                                 isRefus = amisService.delete(amis);
 

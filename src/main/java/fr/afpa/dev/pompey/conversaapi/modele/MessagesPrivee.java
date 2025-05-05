@@ -18,6 +18,10 @@ public class MessagesPrivee {
 
     }
 
+    public MessagesPrivee(Integer id) {
+        this.id = id;
+    }
+
     /**
      * On l'utilise find
      * @param id
