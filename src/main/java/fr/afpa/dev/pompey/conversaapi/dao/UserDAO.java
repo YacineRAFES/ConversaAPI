@@ -71,7 +71,7 @@ public class UserDAO extends DAO<User>{
             PreparedStatement pstmt = connect.prepareStatement(deleteSQL.toString());
             pstmt.setInt(1, obj.getId());
             pstmt.executeUpdate();
-            log.info("delete: Utilisateur supprimé avec succès"+ obj.getId());
+            log.info("delete: Utilisateur supprimé avec succès "+ obj.getId());
         } catch (SQLException | DAOException e) {
             log.error("Erreur lors de la deletion User", e);
             throw new DAOException(e.getMessage());
@@ -87,10 +87,17 @@ public class UserDAO extends DAO<User>{
      */
     @Override
     public boolean update(User obj) {
-        StringBuilder updateSQL = new StringBuilder("UPDATE utilisateur SET USER_EMAIL = ?, USER_PASSWORD = ?, USER_NAME = ?, USER_DATE = ?, USER_ROLE = ? WHERE USER_ID = ?");
+        String updateSQL =
+                        "UPDATE utilisateur " +
+                        "SET USER_EMAIL = ?, " +
+                        "USER_PASSWORD = ?, " +
+                        "USER_NAME = ?, " +
+                        "USER_DATE = ?, " +
+                        "USER_ROLE = ? " +
+                        "WHERE USER_ID = ? ";
 
         try {
-            PreparedStatement pstmt = connect.prepareStatement(updateSQL.toString());
+            PreparedStatement pstmt = connect.prepareStatement(updateSQL);
             pstmt.setString(1, obj.getEmail());
             pstmt.setString(2, obj.getPassword());
             pstmt.setString(3, obj.getName());
@@ -171,7 +178,7 @@ public class UserDAO extends DAO<User>{
     public User findByUsername(String username) {
         log.info("findByUsername: Recherche de l'utilisateur par nom: " + username);
         User user = new User();
-        String sql = "SELECT * FROM utilisateur WHERE USER_NAME = ?";
+        String sql = "SELECT * FROM utilisateur WHERE USER_NAME = ? AND USER_ISVALID=1";
 
         try(PreparedStatement ps = connect.prepareStatement(sql)){
             ps.setString(1, username);

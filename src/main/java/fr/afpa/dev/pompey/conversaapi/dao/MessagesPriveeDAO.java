@@ -177,18 +177,18 @@ public class MessagesPriveeDAO extends DAO<MessagesPrivee> {
         }
     }
 
-    public MessagesPrivee signalerUnMessage(MessagesPrivee obj) {
-        String updateSQL = "UPDATE message_privee SET MP_SIGNALER = 1 WHERE MP_ID = ?";
-        try {
-            PreparedStatement pstmt = connect.prepareStatement(updateSQL);
-            pstmt.setInt(1, obj.getId());
-            pstmt.executeUpdate();
-            return obj;
-        } catch (SQLException e) {
-            log.error("Erreur lors de la signalisation d'un message privee", e);
-            throw new DAOException(e.getMessage());
-        }
-    }
+//    public MessagesPrivee signalerUnMessage(MessagesPrivee obj) {
+//        String updateSQL = "UPDATE message_privee SET MP_SIGNALER = 1 WHERE MP_ID = ?";
+//        try {
+//            PreparedStatement pstmt = connect.prepareStatement(updateSQL);
+//            pstmt.setInt(1, obj.getId());
+//            pstmt.executeUpdate();
+//            return obj;
+//        } catch (SQLException e) {
+//            log.error("Erreur lors de la signalisation d'un message privee", e);
+//            throw new DAOException(e.getMessage());
+//        }
+//    }
 
     public MessagesPrivee supprimerUnMessage(MessagesPrivee obj) {
         String updateSQL = "UPDATE message_privee SET MP_ISDELETE = 1 WHERE MP_ID = ?";

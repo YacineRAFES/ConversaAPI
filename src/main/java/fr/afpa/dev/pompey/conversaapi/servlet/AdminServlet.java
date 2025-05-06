@@ -18,7 +18,7 @@ public class AdminServlet extends HttpServlet {
 
     @Override
     public void init() {
-        this.messagesPriveeService = new MessagesPriveeService(Role.ADMIN);
+        this.messagesPriveeService = new MessagesPriveeService(Role.SUPERADMIN);
     }
 
     @Override

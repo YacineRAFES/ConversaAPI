@@ -1,13 +1,11 @@
 package fr.afpa.dev.pompey.conversaapi.servlet;
 
 import fr.afpa.dev.pompey.conversaapi.emuns.Role;
-import fr.afpa.dev.pompey.conversaapi.modele.Amis;
-import fr.afpa.dev.pompey.conversaapi.modele.MessagesPrivee;
-import fr.afpa.dev.pompey.conversaapi.modele.StatutAmitie;
-import fr.afpa.dev.pompey.conversaapi.modele.User;
+import fr.afpa.dev.pompey.conversaapi.modele.*;
 import fr.afpa.dev.pompey.conversaapi.securite.JWTutils;
 import fr.afpa.dev.pompey.conversaapi.service.AmisService;
 import fr.afpa.dev.pompey.conversaapi.service.MessagesPriveeService;
+import fr.afpa.dev.pompey.conversaapi.service.SignalementsService;
 import fr.afpa.dev.pompey.conversaapi.service.UserService;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.SendJSON;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.Utils;
@@ -35,12 +33,14 @@ public class MessagesPriveeServlet extends HttpServlet {
     private transient MessagesPriveeService messagesPriveeService;
     private transient UserService userService;
     private transient AmisService amisService;
+    private transient SignalementsService signalementsService;
 
     @Override
     public void init() {
         this.messagesPriveeService = new MessagesPriveeService(Role.UTILISATEUR);
         this.userService = new UserService(Role.UTILISATEUR);
         this.amisService = new AmisService(Role.UTILISATEUR);
+        this.signalementsService = new SignalementsService(Role.UTILISATEUR);
     }
 
     @Override
@@ -191,15 +191,22 @@ public class MessagesPriveeServlet extends HttpServlet {
                     log.info("Message privé trouvé avec l'ID : " + mpExist.getId());
 
                     //Création d'une instanciation de l'objet message privé
-                    MessagesPrivee messagesPrivee = new MessagesPrivee(
-                            mpExist.getId()
+
+                    Signalements signalements = new Signalements(
+                            mpExist,
+                            user
                     );
 
                     //Ajout du message privé au signalement
-                    MessagesPrivee mp = messagesPriveeService.signaler(messagesPrivee);
-                    log.info("Message privé signalé avec l'ID : " + mp.getId());
+                    boolean confirmation = signalementsService.add(signalements);
 
-                    SendJSON.Success(response, "messageSignaler");
+                    if(confirmation){
+                        SendJSON.Success(response, "messageSignaler");
+                    }else{
+                        log.error("Erreur lors de l'ajout du signalement");
+                        SendJSON.Error(response, "erreurAjoutSignalement");
+                    }
+
                 }
 
 

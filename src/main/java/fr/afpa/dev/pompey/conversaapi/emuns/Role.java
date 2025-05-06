@@ -1,7 +1,7 @@
 package fr.afpa.dev.pompey.conversaapi.emuns;
 
 public enum Role {
-    ADMIN,
+    SUPERADMIN,
     UTILISATEUR,
     MODERATEUR;
 
