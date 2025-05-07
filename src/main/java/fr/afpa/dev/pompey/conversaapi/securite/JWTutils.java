@@ -70,29 +70,24 @@ public class JWTutils {
         }
     }
 
-    public static User VerificationJWT(HttpServletResponse response, String jwt) throws SaisieException, RegexException {
+    public static User VerificationJWT(String jwt) throws SaisieException, RegexException {
         //Verification JWT
         if (jwt != null) {
             if (JWTutils.validateToken(jwt)) {
                 log.info(Utils.getNameClass() + "JWT valide");
             } else {
                 log.error(Utils.getNameClass() + "JWT invalide");
-                SendJSON.Error(response, "jwtInvalide");
                 return null;
             }
         } else {
             log.error(Utils.getNameClass() + "JWT vide");
-            SendJSON.Error(response, "jwtInvalide");
             return null;
         }
-
-
 
         //Recuperation de l'ID de l'utilisateur
         Claims claims = JWTutils.getUserInfoFromToken(jwt);
         if (claims == null) {
             log.error("Token claims null");
-            SendJSON.Error(response, "invalidToken");
             return null;
         }
 
@@ -102,13 +97,15 @@ public class JWTutils {
         String role = claims.get("roles", String.class);
         if (id == null || email == null || username == null || role == null) {
             log.error("Données manquantes dans le token");
-            SendJSON.Error(response, "missingDataInToken");
             return null;
         }
 
-        return new User(
-                id
-        );
+        User user = new User();
+        user.setId(id);
+        user.setEmail(email);
+        user.setName(username);
+        user.setRole(role);
+        return user;
 
     }
 }

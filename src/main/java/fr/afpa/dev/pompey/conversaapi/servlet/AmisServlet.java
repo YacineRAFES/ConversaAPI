@@ -44,7 +44,7 @@ public class AmisServlet extends HttpServlet {
             JsonObject jsonObject = jsonReader.readObject();
             log.info("JSON RECU depuis: " + jsonObject + Utils.getNameClass());
 
-            User user = userService.get(VerificationJWT(response, jsonObject.getString("jwt")).getId());
+            User user = userService.get(VerificationJWT(jsonObject.getString("jwt")).getId());
 
             //Verifie si l'utilisateur appartient à un groupe de message privées
 

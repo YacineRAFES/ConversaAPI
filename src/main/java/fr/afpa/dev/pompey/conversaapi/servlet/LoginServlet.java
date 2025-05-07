@@ -82,7 +82,7 @@ public class LoginServlet extends HttpServlet {
             log.info("Mot de passe correct");
 
             //Generation du token JWT
-            String jwtToken = JWTutils.generateToken(userFind.getId(), userFind.getName(), userFind.getEmail(), userFind.getRole());
+            String jwtToken = JWTutils.generateToken(userFind.getId(), userFind.getEmail(), userFind.getName(), userFind.getRole());
             log.info("Token JWT généré: " + jwtToken);
             //Envoi du token JWT
             SendJSON.LoginUser(response, jwtToken, userFind.getId().toString(), userFind.getName());

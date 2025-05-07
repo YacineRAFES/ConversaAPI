@@ -44,7 +44,7 @@ public class HomeServlet extends HttpServlet {
             String jwt = jsonObject.getString("jwt");
             log.info(Utils.getNameClass() + " jwt : " + jwt);
 
-            User user = userService.get(VerificationJWT(response, jsonObject.getString("jwt")).getId());
+            User user = userService.get(VerificationJWT(jsonObject.getString("jwt")).getId());
 
             if(user == null) {
                 log.error("Utilisateur non trouvé");

@@ -24,6 +24,14 @@ public class User {
 
     }
 
+    public User(Integer id, String name, Date date, String email, String role){
+        this.id = id;
+        this.name = name;
+        this.date = date;
+        this.email = email;
+        this.role = role;
+    }
+
     /**
      * Prend un nom d'utilisateur
      * @param name

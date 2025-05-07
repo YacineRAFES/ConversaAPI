@@ -3,7 +3,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON `conversa`.`utilisateur` TO `utilisateur
 GRANT SELECT, INSERT, UPDATE, DELETE ON `conversa`.`amis` TO `utilisateur`@`localhost`;
 GRANT SELECT, INSERT, UPDATE, DELETE ON `conversa`.`groupe_messages_prives` TO 'utilisateur'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON `conversa`.`message_privee` TO 'utilisateur'@'localhost';
-GRANT INSERT ON `conversa`.`signalement` TO 'utilisateur'@'localhost';
+GRANT SELECT, INSERT ON `conversa`.`signalement` TO 'utilisateur'@'localhost';
 
 CREATE USER 'superadmin'@'localhost' IDENTIFIED BY 'superadmin123';
 GRANT SELECT, INSERT, UPDATE, DELETE ON `conversa`.`utilisateur` TO 'superadmin'@'localhost';

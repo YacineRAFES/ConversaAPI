@@ -8,10 +8,7 @@ import fr.afpa.dev.pompey.conversaapi.modele.Signalements;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,9 +101,13 @@ public class SignalementsDAO extends DAO<Signalements> {
                         rs.getString("u1.USER_NAME")
                 );
 
+
                 User emetteurMessage = new User(
                         rs.getInt("u2.USER_ID"),
-                        rs.getString("u2.USER_NAME")
+                        rs.getString("u2.USER_NAME"),
+                        rs.getDate("u2.USER_DATE"),
+                        rs.getString("u2.USER_EMAIL"),
+                        rs.getString("u2.USER_ROLE")
                 );
 
                 MessagesPrivee messagesPrivee = new MessagesPrivee(

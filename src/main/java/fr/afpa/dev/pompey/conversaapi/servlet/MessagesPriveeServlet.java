@@ -54,7 +54,7 @@ public class MessagesPriveeServlet extends HttpServlet {
             log.info(Utils.getNameClass() + " type : " + type);
             log.info(Utils.getNameClass() + " jwt : " + jwt);
 
-            User user = userService.get(VerificationJWT(response, jsonObject.getString("jwt")).getId());
+            User user = userService.get(VerificationJWT(jsonObject.getString("jwt")).getId());
 
             //Verifie si l'utilisateur appartient à un groupe de message privées
 

@@ -73,6 +73,34 @@ public class SendJSON {
     }
 
     /**
+     * Envoye un message success en JSON et l'envoie à la réponse HTTP.
+     * {"status": "success", "objects" : "Votre Message"}
+     *
+     * @param response La réponse HTTP.
+     * @param jsonObject  L'objet a envoyer.
+     * @throws JsonException
+     */
+    public static void SuccessWithObject(HttpServletResponse response, String message, String key, JsonObject jsonObject) throws JsonException {
+        try {
+            // Je définis le type de contenu de la réponse HTTP.
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            // Je construis un objet JSON avec le message de succès.
+            JsonObject jsonResponse = Json.createObjectBuilder()
+                    .add("status", "success")
+                    .add("message", message)
+                    .add(key, jsonObject)
+                    .build();
+
+            // J'écris la réponse JSON.
+            response.getWriter().write(jsonResponse.toString());
+        } catch (Exception e) {
+            throw new JsonException("Erreur dans la méthode SendJSON.SuccessWithObject : " + e.getMessage());
+        }
+    }
+
+    /**
      * Envoye un token en JSON et l'envoie à la réponse HTTP.
      * {"status": "typeToken", "message": "votreToken"}
      *

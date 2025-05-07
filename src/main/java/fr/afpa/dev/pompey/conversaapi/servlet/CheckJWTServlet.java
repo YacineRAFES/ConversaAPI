@@ -1,8 +1,12 @@
 package fr.afpa.dev.pompey.conversaapi.servlet;
+import fr.afpa.dev.pompey.conversaapi.emuns.Role;
+import fr.afpa.dev.pompey.conversaapi.modele.User;
 import fr.afpa.dev.pompey.conversaapi.securite.JWTutils;
+import fr.afpa.dev.pompey.conversaapi.service.UserService;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.SendJSON;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.Utils;
 import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
 import jakarta.servlet.ServletException;
@@ -13,13 +17,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Slf4j
 @WebServlet(name = "CheckJWTServlet", value = "/CheckJWT")
 public class CheckJWTServlet extends HttpServlet {
+    private transient UserService userService;
 
     @Override
     public void init() {
+        this.userService = new UserService(Role.UTILISATEUR);
     
     }
 
@@ -32,9 +39,17 @@ public class CheckJWTServlet extends HttpServlet {
             String jwt = jsonObject.getString("jwt");
             log.info(Utils.getNameClass() + " jwt : " + jwt);
             if (jwt != null) {
-                if (JWTutils.validateToken(jwt)) {
+                User user = userService.get(JWTutils.VerificationJWT(jwt).getId());
+                if (user != null) {
                     log.info("JWT valide");
-                    SendJSON.Success(response, "jwtValide");
+                    JsonObject userJson = Json.createObjectBuilder()
+                            .add("userId", user.getId())
+                            .add("userName", user.getName())
+                            .add("userEmail", user.getEmail())
+                            .add("userRole", user.getRole())
+                            .build();
+
+                    SendJSON.SuccessWithObject(response, "jwtValide", "user", userJson);
                 } else {
                     log.error("JWT invalide");
                     SendJSON.Error(response, "jwtInvalide");
@@ -51,7 +66,5 @@ public class CheckJWTServlet extends HttpServlet {
             SendJSON.Error(response, "ErrorServer");
             throw new ServletException("ErrorServer");
         }
-        //Verifier le JWT
-
     }
 }
