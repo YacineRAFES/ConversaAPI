@@ -84,13 +84,31 @@ CREATE TABLE `message_privee` (
   `USER_ID` int NOT NULL,
   `MG_ID` int NOT NULL,
   `MP_ISDELETE` tinyint(1) DEFAULT '0',
-  `MP_SIGNALER` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`MP_ID`),
   KEY `USER_ID` (`USER_ID`),
   KEY `MG_ID` (`MG_ID`),
   CONSTRAINT `message_privee_ibfk_1` FOREIGN KEY (`USER_ID`) REFERENCES `utilisateur` (`USER_ID`) ON DELETE CASCADE,
   CONSTRAINT `message_privee_ibfk_2` FOREIGN KEY (`MG_ID`) REFERENCES `groupe_messages_prives` (`MG_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `signalement`
+--
+
+DROP TABLE IF EXISTS `signalement`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `signalement` (
+  `MP_ID_Signaler` int NOT NULL,
+  `SGL_DATE` datetime NOT NULL,
+  `SGL_RAISON` varchar(50) DEFAULT NULL,
+  `USER_ID_Signale` int NOT NULL,
+  PRIMARY KEY (`MP_ID_Signaler`),
+  KEY `signalement_ibfk_2` (`USER_ID_Signale`),
+  CONSTRAINT `signalement_ibfk_1` FOREIGN KEY (`MP_ID_Signaler`) REFERENCES `message_privee` (`MP_ID`) ON DELETE CASCADE,
+  CONSTRAINT `signalement_ibfk_2` FOREIGN KEY (`USER_ID_Signale`) REFERENCES `utilisateur` (`USER_ID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -122,4 +140,4 @@ CREATE TABLE `utilisateur` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-30 16:32:14
+-- Dump completed on 2025-05-07  8:02:27
