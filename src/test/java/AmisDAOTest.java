@@ -69,6 +69,7 @@ public class AmisDAOTest {
         assertTrue(confirmation, "Erreur lors de la suppression Amis");
         log.info("Demande d'amis confirmée");
 
+
         //Supprimez les utilisateurs
         userService.delete(new User(id1));
         userService.delete(new User(id2));

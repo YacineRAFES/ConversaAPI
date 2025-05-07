@@ -14,7 +14,7 @@ public class SignalementsService {
     private final SignalementsDAO signalementsDAO;
 
     public SignalementsService(Role role){
-        DAOFactory daoFactory = DAOFactory.getInstance(role);
+        DAOFactory daoFactory = new DAOFactory(role);
         this.signalementsDAO = daoFactory.getSignalementsDAO();
     }
 

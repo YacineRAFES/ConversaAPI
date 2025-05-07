@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,8 +39,8 @@ class MessagesPriveeDAOTest {
     void create() {
         log.info("createTest");
         // Crée deux nouveaux utilisateurs
-        User user1 = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()), true);
-        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", "aliiiice@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user1 = new User("JohnDoe", "ValidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
         User userCreated1 = new User(userService.add(user1));
         User userCreated2 = new User(userService.add(user2));
 
@@ -72,8 +73,8 @@ class MessagesPriveeDAOTest {
     void delete() {
         log.info("deleteTest");
         // Crée deux nouveaux utilisateurs
-        User user1 = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()), true);
-        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", "aliiiice@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user1 = new User("JohnDoe", "ValidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
         User userCreated1 = new User(userService.add(user1));
         User userCreated2 = new User(userService.add(user2));
 
@@ -112,8 +113,8 @@ class MessagesPriveeDAOTest {
     void update() {
         log.info("updateTest");
         // Crée deux nouveaux utilisateurs
-        User user1 = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()), true);
-        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", "aliiiice@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user1 = new User("JohnDoe", "ValidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
         User userCreated1 = new User(userService.add(user1));
         User userCreated2 = new User(userService.add(user2));
 

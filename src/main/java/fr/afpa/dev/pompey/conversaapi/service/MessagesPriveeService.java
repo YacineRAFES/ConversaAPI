@@ -19,7 +19,7 @@ public class MessagesPriveeService {
      * @param role Le rôle de l'utilisateur (UTILISATEUR, MODERATEUR OU SUPERADMIN).
      */
     public MessagesPriveeService(Role role) {
-        DAOFactory daoFactory = DAOFactory.getInstance(role);
+        DAOFactory daoFactory = new DAOFactory(role);
         this.messagesPriveeDAO = daoFactory.getMessagesPriveeDAO();
     }
 

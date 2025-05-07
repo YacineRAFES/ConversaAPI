@@ -13,7 +13,7 @@ public class UserService {
     private final UserDAO userDAO;
 
     public UserService(Role role){
-        DAOFactory daoFactory = DAOFactory.getInstance(role);
+        DAOFactory daoFactory = new DAOFactory(role);
         this.userDAO = daoFactory.getUserDAO();
     }
 

@@ -13,7 +13,7 @@ public class AmisService {
     private final AmisDAO amisDAO;
 
     public AmisService(Role role){
-        DAOFactory daoFactory = DAOFactory.getInstance(role);
+        DAOFactory daoFactory = new DAOFactory(role);
         this.amisDAO = daoFactory.getAmisDAO();
     }
 

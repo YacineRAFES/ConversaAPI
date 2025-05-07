@@ -12,8 +12,8 @@ public class DAOFactory {
     private final Connection connection;
 
     // Constructeur privé qui reçoit la connexion
-    private DAOFactory(Role role) {
-        log.info(role.toString());
+    public DAOFactory(Role role) {
+        log.info("Role : " + role);
         this.connection = Singleton.getInstanceDB(role.name().toLowerCase());
     }
 
