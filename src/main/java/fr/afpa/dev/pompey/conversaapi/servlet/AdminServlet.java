@@ -4,6 +4,7 @@ import fr.afpa.dev.pompey.conversaapi.emuns.Role;
 import fr.afpa.dev.pompey.conversaapi.modele.Amis;
 import fr.afpa.dev.pompey.conversaapi.modele.Signalements;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
+import fr.afpa.dev.pompey.conversaapi.securite.JWTutils;
 import fr.afpa.dev.pompey.conversaapi.service.AmisService;
 import fr.afpa.dev.pompey.conversaapi.service.MessagesPriveeService;
 import fr.afpa.dev.pompey.conversaapi.service.SignalementsService;
@@ -41,9 +42,27 @@ public class AdminServlet extends HttpServlet {
             JsonReader jsonReader = Json.createReader(request.getInputStream());
             JsonObject jsonObject = jsonReader.readObject();
             log.info("JSON RECU depuis: " + jsonObject + Utils.getNameClass());
+
+            String jwt = jsonObject.getString("jwt");
+
             this.userService = new UserService(Role.UTILISATEUR);
-            User user = userService.get(VerificationJWT(jsonObject.getString("jwt")).getId());
-            String action = jsonObject.getString("action");
+
+            User user;
+
+            if (jwt != null) {
+                user = userService.get(JWTutils.VerificationJWT(jwt).getId());
+                if (user != null) {
+                    log.info("JWT valide");
+                } else {
+                    log.error("JWT invalide");
+                    SendJSON.Error(response, "jwtInvalide");
+                    return;
+                }
+            } else {
+                log.error("JWT vide");
+                SendJSON.Error(response, "jwtInvalide");
+                return;
+            }
 
             if(user.getRole().equals("admin")) {
                 log.info("Admin logged in");
@@ -54,6 +73,8 @@ public class AdminServlet extends HttpServlet {
             }
 
             this.signalementsService = new SignalementsService(Role.SUPERADMIN);
+
+            String action = jsonObject.getString("action");
             if (action.equals("getAllSignalements")) {
                 log.info("Récupération de tous les signalements");
 
@@ -62,27 +83,45 @@ public class AdminServlet extends HttpServlet {
 
                 for (Signalements signalement : signalementsList) {
                     JsonObjectBuilder signalementJson = Json.createObjectBuilder()
-                            .add("messageId", signalement.getMessagesPrivee().getId())
-                            .add("messageTexte", signalement.getMessagesPrivee().getMessage())
-                            .add("messageDate", signalement.getMessagesPrivee().getDate().toString())
-                            .add("messageGroupeId", signalement.getMessagesPrivee().getIdGroupeMessagesPrives())
-                            .add("emetteurId", signalement.getMessagesPrivee().getUser().getId())
-                            .add("emetteurNom", signalement.getMessagesPrivee().getUser().getName())
-                            .add("emetteurDateInscription", signalement.getMessagesPrivee().getUser().getDate().toString())
-                            .add("emetteurEmail", signalement.getMessagesPrivee().getUser().getEmail())
-                            .add("emetteurRole", signalement.getMessagesPrivee().getUser().getRole())
-                            .add("utilisateurSignaleId", signalement.getUser().getId())
-                            .add("dateSignalement", signalement.getDate().toString())
-                            .add("raison", signalement.getRaison());
-
+                            .add("messageId", signalement.getMessagesPrivee().getId());
                     signalementsBuilder.add(signalementJson);
                 }
 
+                JsonObject userJson = Json.createObjectBuilder()
+                        .add("userId", user.getId())
+                        .add("userName", user.getName())
+                        .add("userEmail", user.getEmail())
+                        .add("userRole", user.getRole())
+                        .build();
+
+
                 JsonObject globalJson = Json.createObjectBuilder()
                         .add("signalements", signalementsBuilder)
+                        .add("user", userJson)
                         .build();
 
                 SendJSON.GlobalJSON(response, globalJson);
+
+            }else if(action.equals("getSignalement")) {
+                Integer messageId = Integer.valueOf(jsonObject.getString("messageId"));
+                Signalements signalements = signalementsService.getByIdMP(messageId);
+
+                JsonObject signalementsBuilder = Json.createObjectBuilder()
+                        .add("messageId", signalements.getMessagesPrivee().getId())
+                        .add("messageTexte", signalements.getMessagesPrivee().getMessage())
+                        .add("messageDate", signalements.getMessagesPrivee().getDate().toString())
+                        .add("messageGroupeId", signalements.getMessagesPrivee().getIdGroupeMessagesPrives())
+                        .add("emetteurId", signalements.getMessagesPrivee().getUser().getId())
+                        .add("emetteurNom", signalements.getMessagesPrivee().getUser().getName())
+                        .add("emetteurDateInscription", signalements.getMessagesPrivee().getUser().getDate().toString())
+                        .add("emetteurEmail", signalements.getMessagesPrivee().getUser().getEmail())
+                        .add("emetteurRole", signalements.getMessagesPrivee().getUser().getRole())
+                        .add("utilisateurSignaleId", signalements.getUser().getId())
+                        .add("dateSignalement", signalements.getDate().toString())
+                        .add("raison", signalements.getRaison())
+                        .build();
+
+                SendJSON.SuccessWithObject(response, "signalementOK", "signalement", signalementsBuilder);
             }
 
         }catch (Exception e) {
@@ -90,11 +129,6 @@ public class AdminServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
-
-    }
-
-    @Override
-    public void destroy() {
 
     }
 }

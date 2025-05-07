@@ -201,9 +201,10 @@ public class MessagesPriveeServlet extends HttpServlet {
                     boolean confirmation = signalementsService.add(signalements);
 
                     if(confirmation){
+                        log.info("Signalement d'un message confirmé " + mpExist.getId());
                         SendJSON.Success(response, "messageSignaler");
                     }else{
-                        log.error("Erreur lors de l'ajout du signalement");
+                        log.error("Erreur lors de l'ajout du signalement " + mpExist.getId());
                         SendJSON.Error(response, "erreurAjoutSignalement");
                     }
 

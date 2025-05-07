@@ -171,6 +171,7 @@ public class SendJSON {
     }
 
     public static void GlobalJSON(HttpServletResponse response, JsonObject jsonObject) throws JsonException {
+        //TODO:  A REVOIR
         try {
             // Je définis le type de contenu de la réponse HTTP.
             response.setContentType("application/json");
