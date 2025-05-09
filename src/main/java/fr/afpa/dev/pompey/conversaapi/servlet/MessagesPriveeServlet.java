@@ -49,11 +49,7 @@ public class MessagesPriveeServlet extends HttpServlet {
             JsonReader jsonReader = Json.createReader(request.getInputStream());
             JsonObject jsonObject = jsonReader.readObject();
             log.info("JSON RECU depuis: " + jsonObject + Utils.getNameClass());
-            String jwt = jsonObject.getString("jwt");
             String type = jsonObject.getString("type");
-            log.info(Utils.getNameClass() + " type : " + type);
-            log.info(Utils.getNameClass() + " jwt : " + jwt);
-
             User user = userService.get(VerificationJWT(jsonObject.getString("jwt")).getId());
 
             //Verifie si l'utilisateur appartient à un groupe de message privées
