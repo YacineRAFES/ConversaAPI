@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.util.Objects;
 
+import static fr.afpa.dev.pompey.conversaapi.utilitaires.Utils.getNameClass;
+
 @Slf4j
 @WebServlet(name = "CheckJWTServlet", value = "/CheckJWT")
 public class CheckJWTServlet extends HttpServlet {
@@ -35,9 +37,9 @@ public class CheckJWTServlet extends HttpServlet {
         try {
             JsonReader jsonReader = Json.createReader(request.getInputStream());
             JsonObject jsonObject = jsonReader.readObject();
-            log.info("JSON RECU depuis: " + jsonObject + Utils.getNameClass());
+            log.info("JSON RECU depuis: " + jsonObject + getNameClass());
             String jwt = jsonObject.getString("jwt");
-            log.info(Utils.getNameClass() + " jwt : " + jwt);
+            log.info(getNameClass() + " jwt : " + jwt);
             if (jwt != null) {
                 User user = userService.get(JWTutils.VerificationJWT(jwt).getId());
                 if (user != null) {
@@ -51,7 +53,7 @@ public class CheckJWTServlet extends HttpServlet {
 
                     SendJSON.SuccessWithObject(response, "jwtValide", "user", userJson);
                 } else {
-                    log.error("JWT invalide");
+                    log.error("{}JWT invalide", getNameClass());
                     SendJSON.Error(response, "jwtInvalide");
                     throw new ServletException("JWT invalide");
                 }

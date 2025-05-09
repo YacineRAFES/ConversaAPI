@@ -93,6 +93,7 @@ public class SendJSON {
                     .add(key, jsonObject)
                     .build();
 
+            log.info(jsonResponse.toString());
             // J'écris la réponse JSON.
             response.getWriter().write(jsonResponse.toString());
         } catch (Exception e) {

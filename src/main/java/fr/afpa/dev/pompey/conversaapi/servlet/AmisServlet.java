@@ -58,7 +58,6 @@ public class AmisServlet extends HttpServlet {
                 String method = jsonObject.getString("method");
                 JsonObject objects = jsonObject.getJsonObject("objects");
 
-                //TODO : FAIRE UNE FONCTION QUI RECUPERE LE JWT
                 if (method.equals("GetListFriends")) {
                     if (user == null) {
                         log.error("L'utilisateur n'existe pas");
@@ -205,6 +204,24 @@ public class AmisServlet extends HttpServlet {
                     } else {
                         SendJSON.Error(response, ERRORSERVER);
                     }
+                }else if(method.equals("getAllAmis")){
+                    List<Amis> amisList = amisService.findById(user.getId());
+
+                    JsonArrayBuilder amisBuilder = Json.createArrayBuilder();
+
+                    for (Amis ami : amisList) {
+                        amisBuilder.add(Json.createObjectBuilder()
+                                .add("idGroupeMessagesPrives", ami.getIdGroupeMessagesPrives())
+                                .add("statut", ami.getStatut().toString())
+                                .add("username", ami.getUser().getName())
+                                .add("userId", ami.getUser().getId()));
+                    }
+
+                    JsonObject globalJson = Json.createObjectBuilder()
+                            .add("getAllAmis", amisBuilder)
+                            .build();
+
+                    SendJSON.GlobalJSON(response, globalJson);
                 }
             }
         } catch (Exception e) {

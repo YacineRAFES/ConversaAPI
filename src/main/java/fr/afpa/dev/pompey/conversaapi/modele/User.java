@@ -66,6 +66,12 @@ public class User {
         this.name = name;
     }
 
+    public User(Integer id, String name, Date date) {
+        this.id = id;
+        this.name = name;
+        this.date = date;
+    }
+
     /**
      * @param id
      * @param name

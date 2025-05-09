@@ -116,12 +116,13 @@ public class AdminServlet extends HttpServlet {
                         .add("emetteurDateInscription", signalements.getMessagesPrivee().getUser().getDate().toString())
                         .add("emetteurEmail", signalements.getMessagesPrivee().getUser().getEmail())
                         .add("emetteurRole", signalements.getMessagesPrivee().getUser().getRole())
-                        .add("utilisateurSignaleId", signalements.getUser().getId())
+                        .add("utilisateurIdSignale", signalements.getUser().getId())
+                        .add("utilisateurNomSignale", signalements.getUser().getName())
                         .add("dateSignalement", signalements.getDate().toString())
                         .add("raison", signalements.getRaison())
                         .build();
 
-                SendJSON.SuccessWithObject(response, "signalementOK", "signalement", signalementsBuilder);
+                SendJSON.SuccessWithObject(response, "signalementOK", "signalements", signalementsBuilder);
             }
 
         }catch (Exception e) {

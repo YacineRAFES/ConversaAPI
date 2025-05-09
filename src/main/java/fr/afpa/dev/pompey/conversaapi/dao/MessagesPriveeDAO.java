@@ -156,24 +156,24 @@ public class MessagesPriveeDAO extends DAO<MessagesPrivee> {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 //TODO: AVATAR DE L'UTILISATEUR
-
                 User user = new User(
                         rs.getInt("USER_ID"),
-                        rs.getString("USER_NAME")
+                        rs.getString("USER_NAME"),
+                        rs.getDate("USER_DATE")
                 );
-                MessagesPrivee mp = new MessagesPrivee();
-                mp.setId(rs.getInt("MP_ID"));
-                mp.setDate(rs.getTimestamp("MP_DATE"));
-                mp.setMessage(rs.getString("MP_MESSAGES"));
-                mp.setUser(user);
-                mp.setIdGroupeMessagesPrives(rs.getInt("MG_ID"));
+
+                MessagesPrivee mp = new MessagesPrivee(
+                        rs.getInt("MP_ID"),
+                        rs.getTimestamp("MP_DATE"),
+                        rs.getString("MP_MESSAGES"),
+                        user,
+                        rs.getInt("MG_ID")
+                );
                 messagesPrivees.add(mp);
             }
             return messagesPrivees;
         }catch (SQLException | DAOException e) {
             throw new DAOException(e.getMessage());
-        } catch (SaisieException e) {
-            throw new RuntimeException(e);
         }
     }
 
