@@ -123,6 +123,8 @@ public class AdminServlet extends HttpServlet {
                         .build();
 
                 SendJSON.SuccessWithObject(response, "signalementOK", "signalements", signalementsBuilder);
+            }else if(action.equals("deleteSignalement")) {
+
             }
 
         }catch (Exception e) {

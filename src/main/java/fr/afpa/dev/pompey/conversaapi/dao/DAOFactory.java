@@ -4,6 +4,8 @@ import fr.afpa.dev.pompey.conversaapi.emuns.Role;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 public class DAOFactory {
@@ -17,12 +19,10 @@ public class DAOFactory {
         this.connection = Singleton.getInstanceDB(role.name().toLowerCase());
     }
 
-    // Méthode getInstance avec paramètre "role"
-    public static DAOFactory getInstance(Role role) {
-        if (instance == null) {
-            instance = new DAOFactory(role);
-        }
-        return instance;
+    private static final Map<Role, DAOFactory> instances = new HashMap<>();
+
+    public static synchronized DAOFactory getInstance(Role role) {
+        return instances.computeIfAbsent(role, DAOFactory::new);
     }
 
     public UserDAO getUserDAO() {
