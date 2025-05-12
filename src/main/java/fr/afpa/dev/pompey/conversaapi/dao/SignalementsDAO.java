@@ -38,10 +38,10 @@ public class SignalementsDAO extends DAO<Signalements> {
     public Signalements find(int id) {
         log.info("find: Recherche du signalement avec ID: " + id);
         String findSQL =
-                "SELECT * FROM SIGNALEMENT sgl " +
-                "JOIN MESSAGE_PRIVEE mp ON sgl.MP_ID_SIGNALER = mp.MP_ID " +
-                "JOIN UTILISATEUR u1 ON sgl.USER_ID_SIGNALE = u1.USER_ID " +
-                "JOIN UTILISATEUR u2 ON mp.USER_ID = u2.USER_ID " +
+                "SELECT * FROM signalement sgl " +
+                "JOIN message_privee mp ON sgl.MP_ID_SIGNALER = mp.MP_ID " +
+                "JOIN utilisateur u1 ON sgl.USER_ID_SIGNALE = u1.USER_ID " +
+                "JOIN utilisateur u2 ON mp.USER_ID = u2.USER_ID " +
                 "WHERE MP_ID_SIGNALER = ?";
         try {
             PreparedStatement pstmt = connect.prepareStatement(findSQL);
@@ -75,7 +75,7 @@ public class SignalementsDAO extends DAO<Signalements> {
                 );
             }
         } catch (SQLException e) {
-            throw new DAOException(e.getMessage() + " " + id + "Erreur lors de la récupération du signalement");
+            throw new DAOException("Erreur lors de la récupération du signalement (MP_ID: " + id + ") : " + e.getMessage());
         }
         return null;
     }
@@ -86,10 +86,10 @@ public class SignalementsDAO extends DAO<Signalements> {
 
         List<Signalements> signalements = new ArrayList<>();
         String selectAllSQL =
-                "SELECT * FROM SIGNALEMENT sgl " +
-                "JOIN MESSAGE_PRIVEE mp ON sgl.MP_ID_SIGNALER = mp.MP_ID " +
-                "JOIN UTILISATEUR u1 ON sgl.USER_ID_SIGNALE = u1.USER_ID " +
-                "JOIN UTILISATEUR u2 ON mp.USER_ID = u2.USER_ID";
+                "SELECT * FROM signalement sgl " +
+                "JOIN message_privee mp ON sgl.MP_ID_SIGNALER = mp.MP_ID " +
+                "JOIN utilisateur u1 ON sgl.USER_ID_SIGNALE = u1.USER_ID " +
+                "JOIN utilisateur u2 ON mp.USER_ID = u2.USER_ID";
 
         try(PreparedStatement ps = connect.prepareStatement(selectAllSQL)){
 
@@ -128,8 +128,8 @@ public class SignalementsDAO extends DAO<Signalements> {
             }
 
         }catch (SQLException e){
-            log.error("Erreur lors de la recherche de tous les utilisateurs", e);
-            throw new DAOException(e.getMessage());
+            log.error("Erreur lors de la recherche de tous les signalements", e);
+            throw new DAOException("Erreur lors de la recherche de tous les signalement : " + e.getMessage());
         }
         return signalements;
     }
@@ -137,7 +137,7 @@ public class SignalementsDAO extends DAO<Signalements> {
     public boolean creerUnSignalement(Signalements obj) {
         log.info("create: Création d'un signalement pour l'utilisateur avec ID: " + obj.getMessagesPrivee().getId());
         String insertSQL =
-                "INSERT INTO SIGNALEMENT (MP_ID_SIGNALER, SGL_DATE, SGL_RAISON, USER_ID_SIGNALE)\n" +
+                "INSERT INTO signalement (MP_ID_SIGNALER, SGL_DATE, SGL_RAISON, USER_ID_SIGNALE)\n" +
                         "VALUES (?, ?, ?, ?)";
         try {
             PreparedStatement pstmt = connect.prepareStatement(insertSQL,
@@ -149,33 +149,33 @@ public class SignalementsDAO extends DAO<Signalements> {
             pstmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            throw new DAOException(e.getMessage() + " " + obj.getMessagesPrivee().getId() + "Erreur lors de la création d'un signalement");
+            throw new DAOException("Erreur lors de la création du signalement (MP_ID: " + obj.getMessagesPrivee().getId() + ") : " + e.getMessage());
         }
     }
 
     public boolean supprimerUnSignalement(Signalements obj) {
         log.info("delete: Suppression du signalement avec ID: " + obj.getMessagesPrivee().getId());
-        String deleteSQL = "DELETE FROM SIGNALEMENT WHERE MP_ID_SIGNALER = ?";
+        String deleteSQL = "DELETE FROM signalement WHERE MP_ID_SIGNALER = ?";
         try {
             PreparedStatement pstmt = connect.prepareStatement(deleteSQL);
             pstmt.setInt(1, obj.getMessagesPrivee().getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DAOException(e.getMessage() + " " + obj.getMessagesPrivee().getId() + "Erreur lors de la suppression d'un signalement");
+            throw new DAOException("Erreur lors de la suppression du signalement (MP_ID: " + obj.getMessagesPrivee().getId() + ") : " + e.getMessage());
         }
         return true;
     }
 
     public boolean updateUnSignalement(Signalements obj) {
         log.info("update: Modification du signalement avec ID: " + obj.getMessagesPrivee().getId() + " et raison: " + obj.getRaison());
-        String updateSQL = "UPDATE SIGNALEMENT SET SGL_RAISON = ? WHERE MP_ID_SIGNALER = ?";
+        String updateSQL = "UPDATE signalement SET SGL_RAISON = ? WHERE MP_ID_SIGNALER = ?";
         try {
             PreparedStatement pstmt = connect.prepareStatement(updateSQL);
             pstmt.setString(1, obj.getRaison());
             pstmt.setInt(2, obj.getMessagesPrivee().getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DAOException(e.getMessage() + " " + obj.getMessagesPrivee().getId() + "Erreur lors de la modification d'un signalement");
+            throw new DAOException("Erreur lors de la modification du signalement (MP_ID: " + obj.getMessagesPrivee().getId() + ") : " + e.getMessage());
         }
         return true;
     }
