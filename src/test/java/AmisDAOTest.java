@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -36,8 +37,8 @@ public class AmisDAOTest {
     @Test
     void create() {
         // Crée deux nouveaux utilisateurs
-        User user1 = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()), true);
-        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", "aliiiice@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user1 = new User("JohnDoe", "ValidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
         int id1 = userService.add(user1);
         int id2 = userService.add(user2);
 
@@ -58,8 +59,8 @@ public class AmisDAOTest {
     @Test
     void delete() {
         // Crée deux nouveaux utilisateurs
-        User user1 = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()), true);
-        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", "aliiiice@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user1 = new User("JohnDoe", "ValidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
         int id1 = userService.add(user1);
         int id2 = userService.add(user2);
         // Crée une nouvelle amitié entre les deux utilisateurs
@@ -78,8 +79,8 @@ public class AmisDAOTest {
     @Test
     void update() {
         // Crée deux nouveaux utilisateurs
-        User user1 = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()), true);
-        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", "aliiiice@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user1 = new User("JohnDoe", "ValidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
         int id1 = userService.add(user1);
         int id2 = userService.add(user2);
         // Crée une nouvelle amitié entre les deux utilisateurs
@@ -107,8 +108,8 @@ public class AmisDAOTest {
     @Test
     void find() {
         // Crée deux nouveaux utilisateurs
-        User user1 = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()), true);
-        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", "aliiiice@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user1 = new User("JohnDoe", "ValidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
         int id1 = userService.add(user1);
         int id2 = userService.add(user2);
         // Crée une nouvelle amitié entre les deux utilisateurs
@@ -141,8 +142,8 @@ public class AmisDAOTest {
     @Test
     void findAll() {
         // Crée deux nouveaux utilisateurs
-        User user1 = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()), true);
-        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", "aliiiice@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user1 = new User("JohnDoe", "ValidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
+        User user2 = new User("Aliiiice", "VdfdalidPassword1%$!", UUID.randomUUID() + "@example.com", "user", Date.valueOf(LocalDate.now()), true);
         int id1 = userService.add(user1);
         int id2 = userService.add(user2);
         // Crée une nouvelle amitié entre les deux utilisateurs
