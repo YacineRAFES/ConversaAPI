@@ -74,8 +74,6 @@ class SignalementsDAOTest {
                 userCreated2
         );
 
-        signalementsService = new SignalementsService(Role.UTILISATEUR);
-
         boolean confirmation = signalementsService.add(signalement);
 
         assertTrue(confirmation, "Erreur lors de la création d'un signalement");
@@ -122,11 +120,7 @@ class SignalementsDAOTest {
                 userCreated2
         );
 
-        signalementsService = new SignalementsService(Role.UTILISATEUR);
-
         signalementsService.add(signalement);
-
-        signalementsService = new SignalementsService(Role.SUPERADMIN);
 
         // Supprime le signalement
         boolean confirmation = signalementsService.delete(signalement);
@@ -175,7 +169,7 @@ class SignalementsDAOTest {
                 userCreated2
         );
 
-        signalementsService = new SignalementsService(Role.UTILISATEUR);
+
 
         signalementsService.add(signalement1);
 
@@ -185,7 +179,7 @@ class SignalementsDAOTest {
                 "Insulte"
         );
 
-        signalementsService = new SignalementsService(Role.SUPERADMIN);
+
 
         boolean confirmation = signalementsService.update(signalementUpdate);
 
@@ -233,11 +227,7 @@ class SignalementsDAOTest {
                 userCreated2
         );
 
-        signalementsService = new SignalementsService(Role.UTILISATEUR);
-
         signalementsService.add(signalement1);
-
-        signalementsService = new SignalementsService(Role.SUPERADMIN);
 
         //Trouver le signalement
 
@@ -287,11 +277,7 @@ class SignalementsDAOTest {
                 userCreated2
         );
 
-        signalementsService = new SignalementsService(Role.UTILISATEUR);
-
         signalementsService.add(signalement1);
-
-        signalementsService = new SignalementsService(Role.SUPERADMIN);
 
         //Trouver le signalement
 
@@ -305,7 +291,5 @@ class SignalementsDAOTest {
 
         userService.delete(new User(userCreated1.getId()));
         userService.delete(new User(userCreated2.getId()));
-
-
     }
 }
