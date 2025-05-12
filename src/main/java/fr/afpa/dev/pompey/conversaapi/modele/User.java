@@ -32,6 +32,12 @@ public class User {
         this.role = role;
     }
 
+    public User(Integer id, String name, Date date){
+        this.id = id;
+        this.name = name;
+        this.date = date;
+    }
+
     /**
      * Prend un nom d'utilisateur
      * @param name
@@ -66,10 +72,13 @@ public class User {
         this.name = name;
     }
 
-    public User(Integer id, String name, Date date) {
+    public User(Integer id, String name, Date date, String email, String role, boolean valide) {
         this.id = id;
         this.name = name;
         this.date = date;
+        this.email = email;
+        this.role = role;
+        this.valide = valide;
     }
 
     /**

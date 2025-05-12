@@ -178,7 +178,11 @@ public class UserDAO extends DAO<User>{
     public User findByUsername(String username) {
         log.info("findByUsername: Recherche de l'utilisateur par nom: " + username);
         User user = new User();
-        String sql = "SELECT * FROM utilisateur WHERE USER_NAME = ? AND USER_ISVALID=1";
+        String sql =
+                "SELECT * " +
+                "FROM utilisateur " +
+                "WHERE USER_NAME = ? " +
+                "AND USER_ISVALID=1";
 
         try(PreparedStatement ps = connect.prepareStatement(sql)){
             ps.setString(1, username);
@@ -199,5 +203,21 @@ public class UserDAO extends DAO<User>{
         }
     }
 
+    public boolean disableAccount(User obj){
+        log.info("Desactiver le compte : " + obj.getName());
+        String disableAccountSQL =
+                "UPDATE utilisateur " +
+                "SET USER_ISVALID = 0 " +
+                "WHERE USER_ID = ?";
+        try {
+            PreparedStatement pstmt = connect.prepareStatement(disableAccountSQL);
+            pstmt.setInt(1, obj.getId());
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException | DAOException e) {
+            log.error("Erreur lors de la modification User pour desactiver le compte",e);
+            throw new DAOException(e.getMessage());
+        }
+    }
 
 }

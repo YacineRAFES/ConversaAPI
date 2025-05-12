@@ -2,6 +2,7 @@ package fr.afpa.dev.pompey.conversaapi.servlet;
 
 import fr.afpa.dev.pompey.conversaapi.emuns.Role;
 import fr.afpa.dev.pompey.conversaapi.modele.Amis;
+import fr.afpa.dev.pompey.conversaapi.modele.MessagesPrivee;
 import fr.afpa.dev.pompey.conversaapi.modele.Signalements;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import fr.afpa.dev.pompey.conversaapi.securite.JWTutils;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static fr.afpa.dev.pompey.conversaapi.securite.JWTutils.VerificationJWT;
+import static fr.afpa.dev.pompey.conversaapi.utilitaires.AlertMsg.INTERNALSERVERERROR;
 
 @Slf4j
 @WebServlet(name = "AdminServlet", value = "/admin")
@@ -73,11 +75,13 @@ public class AdminServlet extends HttpServlet {
             }
 
             this.signalementsService = new SignalementsService(Role.SUPERADMIN);
+            this.messagesPriveeService = new MessagesPriveeService(Role.SUPERADMIN);
+            this.userService = new UserService(Role.SUPERADMIN);
 
+            log.info("Clés disponibles dans le JSON : " + jsonObject.keySet());
             String action = jsonObject.getString("action");
             if (action.equals("getAllSignalements")) {
                 log.info("Récupération de tous les signalements");
-
                 List<Signalements> signalementsList = signalementsService.getAll();
                 JsonArrayBuilder signalementsBuilder = Json.createArrayBuilder();
 
@@ -103,10 +107,27 @@ public class AdminServlet extends HttpServlet {
                 SendJSON.GlobalJSON(response, globalJson);
 
             }else if(action.equals("getSignalement")) {
-                Integer messageId = Integer.valueOf(jsonObject.getString("messageId"));
+                log.info("getSignalement enclenchée.");
+
+                int messageId = Integer.parseInt(jsonObject.getString("IdMessage"));
                 Signalements signalements = signalementsService.getByIdMP(messageId);
 
-                JsonObject signalementsBuilder = Json.createObjectBuilder()
+                if(signalements == null){
+                    SendJSON.Error(response, "signalementsIsNull");
+                    return;
+                }
+
+                log.info("Récupération de tous les signalements");
+                List<Signalements> signalementsList = signalementsService.getAll();
+                JsonArrayBuilder signalementsBuilder = Json.createArrayBuilder();
+
+                for (Signalements signalement : signalementsList) {
+                    JsonObjectBuilder signalementJson = Json.createObjectBuilder()
+                            .add("messageId", signalement.getMessagesPrivee().getId());
+                    signalementsBuilder.add(signalementJson);
+                }
+
+                JsonObject getsignalementsBuilder = Json.createObjectBuilder()
                         .add("messageId", signalements.getMessagesPrivee().getId())
                         .add("messageTexte", signalements.getMessagesPrivee().getMessage())
                         .add("messageDate", signalements.getMessagesPrivee().getDate().toString())
@@ -122,15 +143,79 @@ public class AdminServlet extends HttpServlet {
                         .add("raison", signalements.getRaison())
                         .build();
 
-                SendJSON.SuccessWithObject(response, "signalementOK", "signalements", signalementsBuilder);
+                JsonObject globalJson = Json.createObjectBuilder()
+                        .add("signalements", getsignalementsBuilder)
+                        .add("getAllSignalement", signalementsBuilder)
+                        .build();
+
+                SendJSON.SuccessWithObject(response, "getSignalement", "sgl", globalJson);
             }else if(action.equals("deleteSignalement")) {
+                log.info("deleteSignalement enclenchée");
 
+                int messageId = Integer.parseInt(jsonObject.getString("IdMessage"));
+                MessagesPrivee messagesPrivee = new MessagesPrivee(
+                        messageId
+                );
+
+                Signalements signalementsAdelete = new Signalements(
+                        messagesPrivee
+                );
+                boolean signalements = signalementsService.delete(signalementsAdelete);
+
+                if (signalements) {
+                    SendJSON.Success(response, "deleteSignalement");
+                }else{
+                    SendJSON.Error(response, INTERNALSERVERERROR);
+                }
+
+            }else if(action.equals("banSignalement")) {
+                log.info("banSignalement enclenchée");
+
+                int idUser = Integer.parseInt(jsonObject.getString("idUser"));
+                int messageId = Integer.parseInt(jsonObject.getString("IdMessage"));
+                //Supprime le message
+                MessagesPrivee msgAsupprimer = new MessagesPrivee(
+                        messageId
+                );
+
+
+                boolean msgSupprConfirmation = messagesPriveeService.delete(msgAsupprimer);
+
+                //Desactiver le compte
+                User userBan = new User(
+                        idUser
+                );
+                boolean compteDesactive = userService.disableAccount(userBan);
+
+                if (compteDesactive && msgSupprConfirmation) {
+                    SendJSON.Success(response, "banSignalement");
+                } else {
+                    SendJSON.Error(response, INTERNALSERVERERROR);
+                }
+
+            }else if(action.equals("warningSignalement")){
+                log.info("warningSignalement enclenchée");
+
+                int messageId = Integer.parseInt(jsonObject.getString("IdMessage"));
+                //TODO: faire un truc pour envoyer un mail
+                MessagesPrivee msgAsupprimer = new MessagesPrivee(
+                        messageId
+                );
+                boolean msgSupprConfirmation = messagesPriveeService.delete(msgAsupprimer);
+
+                if(msgSupprConfirmation){
+                    SendJSON.Success(response, "warningSignalement");
+                } else {
+                    SendJSON.Error(response, INTERNALSERVERERROR);
+                }
+
+
+            }else{
+                SendJSON.Error(response, "actionNotFound");
             }
-
         }catch (Exception e) {
-            log.error("Erreur dans la récupération de l'utilisateur: " + e.getMessage());
+            log.error("Erreur : " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
         }
 
     }

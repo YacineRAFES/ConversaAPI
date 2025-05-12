@@ -51,12 +51,20 @@ public class SignalementsDAO extends DAO<Signalements> {
             if (rs.next()) {
                 User utilisateurSignale = new User(
                         rs.getInt("u1.USER_ID"),
-                        rs.getString("u1.USER_NAME")
+                        rs.getString("u1.USER_NAME"),
+                        rs.getDate("u1.USER_DATE"),
+                        rs.getString("u1.USER_EMAIL"),
+                        rs.getString("u1.USER_ROLE"),
+                        rs.getBoolean("u1.USER_ISVALID")
                 );
 
                 User emetteurMessage = new User(
                         rs.getInt("u2.USER_ID"),
-                        rs.getString("u2.USER_NAME")
+                        rs.getString("u2.USER_NAME"),
+                        rs.getDate("u2.USER_DATE"),
+                        rs.getString("u2.USER_EMAIL"),
+                        rs.getString("u2.USER_ROLE"),
+                        rs.getBoolean("u2.USER_ISVALID")
                 );
 
                 MessagesPrivee messagesPrivee = new MessagesPrivee(

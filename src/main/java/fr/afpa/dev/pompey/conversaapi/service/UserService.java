@@ -74,4 +74,8 @@ public class UserService {
     public User findByName(String name) {
         return userDAO.findByUsername(name);
     }
+
+    public boolean disableAccount(User user){
+        return userDAO.disableAccount(user);
+    }
 }

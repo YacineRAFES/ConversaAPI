@@ -51,7 +51,7 @@ public class MessagesPriveeDAO extends DAO<MessagesPrivee> {
 
     @Override
     public boolean delete(MessagesPrivee obj) {
-        String deleteSQL = "DELETE FROM message_privee WHERE MP_ID = ?";
+        String deleteSQL = "DELETE FROM message_privee WHERE MP_ID_Signaler = ?";
 
         try {
             PreparedStatement pstmt = connect.prepareStatement(deleteSQL);

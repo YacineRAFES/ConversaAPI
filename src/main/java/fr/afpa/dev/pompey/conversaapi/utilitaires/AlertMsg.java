@@ -8,6 +8,7 @@ public class AlertMsg {
     public static final String INVALIDUSERNAME = "InvalidUsername";
     public static final String USEREXISTS = "userAlreadyExists";
     public static final String ERRORSERVER = "errorServer";
+    public static final String INTERNALSERVERERROR = "internalServerError";
 
     //TODO: A FAIRE LES ALERTES DE MESSAGES
 }
