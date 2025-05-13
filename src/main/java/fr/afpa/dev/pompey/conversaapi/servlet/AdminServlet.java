@@ -34,11 +34,6 @@ public class AdminServlet extends HttpServlet {
     private transient SignalementsService signalementsService;
 
     @Override
-    public void init() {
-
-    }
-
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             JsonReader jsonReader = Json.createReader(request.getInputStream());
@@ -74,9 +69,9 @@ public class AdminServlet extends HttpServlet {
                 return;
             }
 
+            this.userService = new UserService(Role.SUPERADMIN);
             this.signalementsService = new SignalementsService(Role.SUPERADMIN);
             this.messagesPriveeService = new MessagesPriveeService(Role.SUPERADMIN);
-            this.userService = new UserService(Role.SUPERADMIN);
 
             log.info("Clés disponibles dans le JSON : " + jsonObject.keySet());
             String action = jsonObject.getString("action");
@@ -97,7 +92,6 @@ public class AdminServlet extends HttpServlet {
                         .add("userEmail", user.getEmail())
                         .add("userRole", user.getRole())
                         .build();
-
 
                 JsonObject globalJson = Json.createObjectBuilder()
                         .add("signalements", signalementsBuilder)
@@ -173,13 +167,19 @@ public class AdminServlet extends HttpServlet {
 
                 int idUser = Integer.parseInt(jsonObject.getString("idUser"));
                 int messageId = Integer.parseInt(jsonObject.getString("IdMessage"));
+                String raison = jsonObject.getString("raison");
                 //Supprime le message
-                MessagesPrivee msgAsupprimer = new MessagesPrivee(
+                MessagesPrivee msg = new MessagesPrivee(
                         messageId
                 );
+                boolean msgSupprConfirmation = messagesPriveeService.delete(msg);
 
-
-                boolean msgSupprConfirmation = messagesPriveeService.delete(msgAsupprimer);
+                //Mettre à jour le signalement
+                Signalements signalementsBan = new Signalements(
+                        msg,
+                        raison
+                );
+                boolean signalementMaj = signalementsService.update(signalementsBan);
 
                 //Desactiver le compte
                 User userBan = new User(
@@ -187,7 +187,8 @@ public class AdminServlet extends HttpServlet {
                 );
                 boolean compteDesactive = userService.disableAccount(userBan);
 
-                if (compteDesactive && msgSupprConfirmation) {
+                //Verifie si tout est ok donc on envoye le confirmation de bannisement de l'utilisateur
+                if (compteDesactive && msgSupprConfirmation && signalementMaj) {
                     SendJSON.Success(response, "banSignalement");
                 } else {
                     SendJSON.Error(response, INTERNALSERVERERROR);
@@ -196,14 +197,25 @@ public class AdminServlet extends HttpServlet {
             }else if(action.equals("warningSignalement")){
                 log.info("warningSignalement enclenchée");
 
+                int idUser = Integer.parseInt(jsonObject.getString("idUser"));
                 int messageId = Integer.parseInt(jsonObject.getString("IdMessage"));
-                //TODO: faire un truc pour envoyer un mail
-                MessagesPrivee msgAsupprimer = new MessagesPrivee(
+                String raison = jsonObject.getString("raison");
+                //Supprime le message
+                MessagesPrivee mp = new MessagesPrivee(
                         messageId
                 );
-                boolean msgSupprConfirmation = messagesPriveeService.delete(msgAsupprimer);
+                boolean msgSupprConfirmation = messagesPriveeService.delete(mp);
 
-                if(msgSupprConfirmation){
+                //Mettre à jour le signalement
+                Signalements signalementsBan = new Signalements(
+                        mp,
+                        raison
+                );
+                boolean signalementMaj = signalementsService.update(signalementsBan);
+
+                //TODO: faire un truc pour envoyer un mail
+
+                if(msgSupprConfirmation && signalementMaj){
                     SendJSON.Success(response, "warningSignalement");
                 } else {
                     SendJSON.Error(response, INTERNALSERVERERROR);

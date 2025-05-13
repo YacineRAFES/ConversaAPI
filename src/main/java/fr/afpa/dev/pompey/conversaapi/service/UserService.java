@@ -78,4 +78,12 @@ public class UserService {
     public boolean disableAccount(User user){
         return userDAO.disableAccount(user);
     }
+
+    public List<User> getAllOnlyUserAndModo(){
+        return userDAO.findAllOnlyUsersAndModo();
+    }
+
+    public User getIdUser(User user){
+        return userDAO.findByIdUserForAdmin(user);
+    }
 }

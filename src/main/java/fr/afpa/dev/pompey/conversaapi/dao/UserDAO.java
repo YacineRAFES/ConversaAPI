@@ -113,7 +113,7 @@ public class UserDAO extends DAO<User>{
     }
 
     /**
-     * Trouve un utilisateur par son ID.
+     * Trouve un utilisateur par son ID avec un compte valide.
      *
      * @param id L'ID de l'utilisateur à trouver.
      * @return L'utilisateur trouvé, ou null si aucun utilisateur n'a été trouvé.
@@ -216,6 +216,67 @@ public class UserDAO extends DAO<User>{
             return true;
         } catch (SQLException | DAOException e) {
             log.error("Erreur lors de la modification User pour desactiver le compte",e);
+            throw new DAOException(e.getMessage());
+        }
+    }
+
+    /**
+     * Trouve tous les utilisateurs dans la base de données.
+     *
+     * @return Une liste de tous les utilisateurs.
+     */
+    public List<User> findAllOnlyUsersAndModo() {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT USER_ID, USER_NAME, USER_EMAIL, USER_DATE, USER_ROLE, USER_ISVALID FROM utilisateur WHERE USER_ROLE IN ('user', 'moderator')";
+
+        try(PreparedStatement ps = connect.prepareStatement(sql)){
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                User user = new User();
+                user.setId(rs.getInt("USER_ID"));
+                user.setEmail(rs.getString("USER_EMAIL"));
+                user.setName(rs.getString("USER_NAME"));
+                user.setDate(rs.getDate("USER_DATE"));
+                user.setRole(rs.getString("USER_ROLE"));
+                user.setValide(rs.getBoolean("USER_ISVALID"));
+                users.add(user);
+            }
+            return users;
+        }catch (SQLException | SaisieException | RegexException e){
+            log.error("Erreur lors de la recherche de tous les utilisateurs", e);
+            throw new DAOException(e.getMessage());
+        }
+    }
+
+    /**
+     * Trouve un utilisateur par son ID.
+     *
+     * @param obj L'ID de l'utilisateur à trouver.
+     * @return L'utilisateur trouvé, ou null si aucun utilisateur n'a été trouvé.
+     */
+    public User findByIdUserForAdmin(User obj) {
+        log.info("findByIdUserForAdmin" + obj.getId());
+        User user = new User();
+        String selectById = "SELECT USER_ID, USER_EMAIL, USER_NAME, USER_DATE, USER_ROLE, USER_ISVALID FROM utilisateur WHERE USER_ID = ?";
+
+        try{
+            PreparedStatement pstmt = connect.prepareStatement(selectById);
+            pstmt.setInt(1, obj.getId());
+            ResultSet rs = pstmt.executeQuery();
+
+            if(rs.next()){
+                user.setId(rs.getInt("USER_ID"));
+                user.setEmail(rs.getString("USER_EMAIL"));
+                user.setName(rs.getString("USER_NAME"));
+                user.setDate(rs.getDate("USER_DATE"));
+                user.setRole(rs.getString("USER_ROLE"));
+                user.setValide(rs.getBoolean("USER_ISVALID"));
+            }
+            return user;
+        }catch (SQLException | SaisieException | RegexException e){
+            log.error("Erreur lors de la recherche User",e);
             throw new DAOException(e.getMessage());
         }
     }

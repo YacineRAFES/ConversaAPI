@@ -142,6 +142,21 @@ public class User {
         this.role = role;
     }
 
+    /**
+     * Utiliser pour modifier un compte d'utilisateur par un SuperAdmin
+     * @param id
+     * @param name
+     * @param email
+     * @param role
+     * @param valide
+     */
+    public User(Integer id, String name, String email, String role, boolean valide) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.role = role;
+        this.valide = valide;
+    }
 
     /**
      * Prend un id d'utilisateur

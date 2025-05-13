@@ -187,6 +187,4 @@ public class SignalementsDAO extends DAO<Signalements> {
         }
         return true;
     }
-
-
 }
