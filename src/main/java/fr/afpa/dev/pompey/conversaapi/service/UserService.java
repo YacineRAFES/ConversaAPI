@@ -86,4 +86,13 @@ public class UserService {
     public User getIdUser(User user){
         return userDAO.findByIdUserForAdmin(user);
     }
+
+    /**
+     * Mise à jour par un Admin
+     * @param user
+     * @return
+     */
+    public boolean modifyByAdmin(User user) {
+        return userDAO.updateByAdmin(user);
+    }
 }

@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.util.List;
 
+import static fr.afpa.dev.pompey.conversaapi.utilitaires.AlertMsg.ERRORUSERNOTEXIST;
 import static fr.afpa.dev.pompey.conversaapi.utilitaires.AlertMsg.INTERNALSERVERERROR;
 
 @Slf4j
@@ -107,14 +108,15 @@ public class AccManagementServlet extends HttpServlet {
                 //Récupère les informations grâce un IdUser
                 log.info("getUser enclenchée.");
 
-                int idUser = Integer.parseInt(jsonObject.getString("IdUser"));
+                int idUser = Integer.parseInt(jsonObject.getString("userId"));
                 User getuser = new User(
                         idUser
                 );
                 User getUser = userService.getIdUser(getuser);
 
-                if(getUser == null){
-                    SendJSON.Error(response, "userIsNull");
+                //Je vérifie si l'utilisateur existe dans la BDD
+                if(!verifyIfUserExist(response, idUser)){
+                    SendJSON.Error(response, ERRORUSERNOTEXIST);
                     return;
                 }
 
@@ -151,55 +153,127 @@ public class AccManagementServlet extends HttpServlet {
                 //Modification de l'utilisateur
                 log.info("modifUser enclenchée");
 
-                int IdUser = Integer.parseInt(jsonObject.getString("IdUser"));
+                int IdUser = Integer.parseInt(jsonObject.getString("userId"));
 
                 //Je vérifie si l'utilisateur existe dans la BDD
                 if(!verifyIfUserExist(response, IdUser)){
+                    SendJSON.Error(response, ERRORUSERNOTEXIST);
                     return;
                 }
 
-                String email = jsonObject.getString("email");
-                String roles = jsonObject.getString("roles");
-                String nom = jsonObject.getString("nom");
-                boolean valid = jsonObject.getBoolean("valide");
-                if(email != null && nom != null && roles != null) {
-
+                String email = jsonObject.getString("userEmail");
+                String roles = jsonObject.getString("userRole");
+                String nom = jsonObject.getString("userName");
+                if(email == null && nom == null && roles == null) {
+                    SendJSON.Error(response, "Champs vide");
+                    return;
                 }
 
                 User userUpdate = new User(
                         IdUser,
-                        jsonObject.getString("UserName"),
-                        jsonObject.getString("UserEmail"),
-                        jsonObject.getString("UserRole"),
-                        jsonObject.getBoolean("UserIsValide")
+                        nom,
+                        email,
+                        roles,
+                        jsonObject.getBoolean("userIsValid")
                 );
 
-                boolean confirmation = userService.update(userUpdate);
+                boolean confirmation = userService.modifyByAdmin(userUpdate);
 
                 if (confirmation) {
-                    SendJSON.Success(response, "userModified");
+                    User getUser = userService.getIdUser(userUpdate);
+                    //Récupère tous les utilisateurs
+                    log.info("Récupération de tous les utilisateurs");
+                    List<User> utilisateursList = userService.getAllOnlyUserAndModo();
+                    JsonArrayBuilder utilisateursBuilder = Json.createArrayBuilder();
+                    for (User utilisateur : utilisateursList) {
+                        JsonObjectBuilder utilisateurJson = Json.createObjectBuilder()
+                                .add("userId", utilisateur.getId())
+                                .add("userName", utilisateur.getName());
+                        utilisateursBuilder.add(utilisateurJson);
+                    }
+
+                    //Récupère l'utilisateur grâce à IdUser
+                    log.info("Récupération de l'utilisateur grâce à IdUser");
+                    JsonObject getUserBuilder = Json.createObjectBuilder()
+                            .add("userId", getUser.getId())
+                            .add("userName", getUser.getName())
+                            .add("userDate", getUser.getDate().toString())
+                            .add("userEmail", getUser.getEmail())
+                            .add("userRole", getUser.getRole())
+                            .add("userIsValid", getUser.isValide())
+                            .build();
+
+                    JsonObject globalJson = Json.createObjectBuilder()
+                            .add("getAllUser", utilisateursBuilder)
+                            .add("getUser", getUserBuilder)
+                            .build();
+
+                    SendJSON.SuccessWithObject(response, "userModified", "usr", globalJson);
                 }else{
                     SendJSON.Error(response, INTERNALSERVERERROR);
                 }
             }else if(action.equals("sendAskResetPassword")) {
+                //TODO: A faire pour envoyer un mail de réinialisation de mdp
+
                 //Modification de l'utilisateur
                 log.info("sendAskResetPassword enclenchée");
 
-                int IdUser = Integer.parseInt(jsonObject.getString("IdUser"));
+                int IdUser = Integer.parseInt(jsonObject.getString("userId"));
 
                 //Je vérifie si l'utilisateur existe dans la BDD
                 if(!verifyIfUserExist(response, IdUser)){
                     return;
                 }
 
-                //TODO: Faire une fonction qui envoye les emails
+                User userFind = userService.get(IdUser);
+
+//                boolean confirmation = sendEmail();
 
 //                if (confirmation) {
-//                    SendJSON.Success(response, "userModified");
+//                    SendJSON.Success(response, "userDeleted");
 //                }else{
 //                    SendJSON.Error(response, INTERNALSERVERERROR);
 //                }
-            }else{
+            } else if (action.equals("deleteAccount")) {
+                //Supprimer un compte utilisateur
+                log.info("deleteAccount enclenchée");
+
+                int IdUser = Integer.parseInt(jsonObject.getString("userId"));
+
+                //Je vérifie si l'utilisateur existe dans la BDD
+                if(!verifyIfUserExist(response, IdUser)){
+                    SendJSON.Error(response, ERRORUSERNOTEXIST);
+                    return;
+                }
+
+                log.info("deleteaccount : " + IdUser);
+
+                User userDelete = new User(
+                        IdUser
+                );
+
+                boolean confirmation = userService.delete(userDelete);
+
+                if (confirmation) {
+                    //Récupère tous les utilisateurs
+                    log.info("Récupération de tous les utilisateurs");
+                    List<User> utilisateursList = userService.getAllOnlyUserAndModo();
+                    JsonArrayBuilder utilisateursBuilder = Json.createArrayBuilder();
+                    for (User utilisateur : utilisateursList) {
+                        JsonObjectBuilder utilisateurJson = Json.createObjectBuilder()
+                                .add("userId", utilisateur.getId())
+                                .add("userName", utilisateur.getName());
+                        utilisateursBuilder.add(utilisateurJson);
+                    }
+
+                    JsonObject globalJson = Json.createObjectBuilder()
+                            .add("getAllUser", utilisateursBuilder)
+                            .build();
+
+                    SendJSON.SuccessWithObject(response, "userDeleted", "usr", globalJson);
+                }
+
+            } else{
                 SendJSON.Error(response, "actionNotFound");
             }
         }catch (Exception e) {

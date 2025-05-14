@@ -9,6 +9,7 @@ public class AlertMsg {
     public static final String USEREXISTS = "userAlreadyExists";
     public static final String ERRORSERVER = "errorServer";
     public static final String INTERNALSERVERERROR = "internalServerError";
+    public static final String ERRORUSERNOTEXIST = "ErrorUserNotExist";
 
     //TODO: A FAIRE LES ALERTES DE MESSAGES
 }

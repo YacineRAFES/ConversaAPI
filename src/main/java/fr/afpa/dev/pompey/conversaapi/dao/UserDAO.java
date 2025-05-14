@@ -64,7 +64,7 @@ public class UserDAO extends DAO<User>{
      */
     @Override
     public boolean delete(User obj) {
-        log.info("delete: Suppression de l'utilisateur avec ID: " + obj.getId());
+        log.info("delete: Suppression de l'utilisateur avec ID : " + obj.getId());
         StringBuilder deleteSQL = new StringBuilder("DELETE FROM utilisateur WHERE USER_ID = ?");
 
         try {
@@ -176,7 +176,7 @@ public class UserDAO extends DAO<User>{
     }
 
     public User findByUsername(String username) {
-        log.info("findByUsername: Recherche de l'utilisateur par nom: " + username);
+        log.info("findByUsername: Recherche de l'utilisateur par nom : " + username);
         User user = new User();
         String sql =
                 "SELECT * " +
@@ -257,7 +257,7 @@ public class UserDAO extends DAO<User>{
      * @return L'utilisateur trouvé, ou null si aucun utilisateur n'a été trouvé.
      */
     public User findByIdUserForAdmin(User obj) {
-        log.info("findByIdUserForAdmin" + obj.getId());
+        log.info("findByIdUserForAdmin : " + obj.getId());
         User user = new User();
         String selectById = "SELECT USER_ID, USER_EMAIL, USER_NAME, USER_DATE, USER_ROLE, USER_ISVALID FROM utilisateur WHERE USER_ID = ?";
 
@@ -277,6 +277,30 @@ public class UserDAO extends DAO<User>{
             return user;
         }catch (SQLException | SaisieException | RegexException e){
             log.error("Erreur lors de la recherche User",e);
+            throw new DAOException(e.getMessage());
+        }
+    }
+
+    public boolean updateByAdmin(User obj) {
+        String updateSQL =
+                "UPDATE utilisateur " +
+                        "SET USER_EMAIL = ?, " +
+                        "USER_NAME = ?, " +
+                        "USER_ROLE = ?, " +
+                        "USER_ISVALID = ? " +
+                        "WHERE USER_ID = ? ";
+
+        try {
+            PreparedStatement pstmt = connect.prepareStatement(updateSQL);
+            pstmt.setString(1, obj.getEmail());
+            pstmt.setString(2, obj.getName());
+            pstmt.setString(3, obj.getRole());
+            pstmt.setBoolean(4, obj.isValide());
+            pstmt.setInt(5, obj.getId());
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException | DAOException e) {
+            log.error("Erreur lors de la modification User",e);
             throw new DAOException(e.getMessage());
         }
     }
