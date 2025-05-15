@@ -72,41 +72,45 @@ public class JWTutils {
 
     public static User VerificationJWT(String jwt) throws SaisieException, RegexException {
         //Verification JWT
-        if (jwt != null) {
-            if (JWTutils.validateToken(jwt)) {
-                log.info(Utils.getNameClass() + "JWT valide");
+        try{
+            if (jwt != null) {
+                if (JWTutils.validateToken(jwt)) {
+                    log.info(Utils.getNameClass() + "JWT valide");
+                } else {
+                    log.error(Utils.getNameClass() + "JWT invalide");
+                    return null;
+                }
             } else {
-                log.error(Utils.getNameClass() + "JWT invalide");
+                log.error(Utils.getNameClass() + "JWT vide");
+
                 return null;
             }
-        } else {
-            log.error(Utils.getNameClass() + "JWT vide");
-            return null;
+
+            //Recuperation de l'ID de l'utilisateur
+            Claims claims = JWTutils.getUserInfoFromToken(jwt);
+            if (claims == null) {
+                log.error("Token claims null");
+                return null;
+            }
+
+            Integer id = claims.get("id", Integer.class);
+            String email = claims.get("email", String.class);
+            String username = claims.get("name", String.class);
+            String role = claims.get("roles", String.class);
+            if (id != null || email != null || username != null || role != null) {
+                User user = new User();
+                user.setId(id);
+                user.setEmail(email);
+                user.setName(username);
+                user.setRole(role);
+                return user;
+            }else{
+                log.error("Données manquantes dans le token");
+                return null;
+            }
+        }catch (Exception e){
+            throw new NullPointerException(e.getMessage());
         }
-
-        //Recuperation de l'ID de l'utilisateur
-        Claims claims = JWTutils.getUserInfoFromToken(jwt);
-        if (claims == null) {
-            log.error("Token claims null");
-            return null;
-        }
-
-        Integer id = claims.get("id", Integer.class);
-        String email = claims.get("email", String.class);
-        String username = claims.get("name", String.class);
-        String role = claims.get("roles", String.class);
-        if (id == null || email == null || username == null || role == null) {
-            log.error("Données manquantes dans le token");
-            return null;
-        }
-
-        User user = new User();
-        user.setId(id);
-        user.setEmail(email);
-        user.setName(username);
-        user.setRole(role);
-        return user;
-
     }
 }
 

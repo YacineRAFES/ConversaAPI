@@ -94,4 +94,8 @@ public class MessagesPriveeService {
     public MessagesPrivee supprimer(MessagesPrivee messagesPrivee) {
         return messagesPriveeDAO.supprimerUnMessage(messagesPrivee);
     }
+
+    public List<MessagesPrivee> findAllMessagesPriveesByIdMG(int idMG){
+        return messagesPriveeDAO.findAllMessagesPriveesByIdMG(idMG);
+    }
 }

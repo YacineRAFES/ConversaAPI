@@ -72,22 +72,22 @@ public class MessagesPriveeServlet extends HttpServlet {
 
                     for (MessagesPrivee messagesPrivee1 : messagesPrivee) {
                         messagesPriveeBuilder.add(Json.createObjectBuilder()
-                                .add("id", messagesPrivee1.getId())
-                                .add("message", messagesPrivee1.getMessage())
-                                .add("idGroupeMessagesPrives", messagesPrivee1.getIdGroupeMessagesPrives())
-                                .add("date", messagesPrivee1.getDate().toString())
-                                .add("user", Json.createObjectBuilder()
-                                        .add("id", messagesPrivee1.getUser().getId())
-                                        .add("username", messagesPrivee1.getUser().getName())
+                                .add("groupe_messages_prives", Json.createObjectBuilder()
+                                        .add("id_groupe_messages_prives", messagesPrivee1.getIdGroupeMessagesPrives())
+                                        .add("message_prive", Json.createObjectBuilder()
+                                                .add("message", messagesPrivee1.getMessage())
+                                                .add("id_message_prive", messagesPrivee1.getId())
+                                                .add("date", messagesPrivee1.getDate().toString())
+                                                .add("user", Json.createObjectBuilder()
+                                                        .add("id_user", user.getId())
+                                                        .add("username", messagesPrivee1.getUser().getName())
+                                                )
+                                        )
                                 )
                         );
                     }
 
-                    JsonObject globalJson = Json.createObjectBuilder()
-                            .add("getAllMessages", messagesPriveeBuilder)
-                            .build();
-
-                    SendJSON.GlobalJSON(response, globalJson);
+                    SendJSON.SuccessWithJsonArrayBuilder(response, "getAllMessages", "getAllMsg", messagesPriveeBuilder);
                 } else {
                     log.error("Aucun message trouvé");
                     SendJSON.Success(response, "aucunMessageTrouve");
