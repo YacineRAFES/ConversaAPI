@@ -79,7 +79,7 @@ public class MessagesPriveeServlet extends HttpServlet {
                                                 .add("id_message_prive", messagesPrivee1.getId())
                                                 .add("date", messagesPrivee1.getDate().toString())
                                                 .add("user", Json.createObjectBuilder()
-                                                        .add("id_user", user.getId())
+                                                        .add("id_user", messagesPrivee1.getUser().getId())
                                                         .add("username", messagesPrivee1.getUser().getName())
                                                 )
                                         )
