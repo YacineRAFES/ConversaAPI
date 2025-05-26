@@ -111,7 +111,7 @@ jobs :
             - name: Download a single artifact
               uses: actions/download-artifact@v4
               with:
-                  name: package.jar
+                  name: package.war
 
             # juste pour le contrôler
             - name: List files in the repository
