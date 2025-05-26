@@ -1,139 +1,140 @@
 name: CI build
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    types: [opened, synchronize, reopened]
+    push:
+        branches:
+            - main
+    pull_request:
+        types: [opened, synchronize, reopened]
 jobs :
-  build :
-    name : Build and analyze
-    runs-on : ubuntu-latest
-    steps :
-      - uses : actions/checkout@v4
-        with :
-          fetch-depth : 0  # Shallow clones should be disabled for a better relevancy of analysis
-        # MYSQL
-      - name: Start MYSQL
-        run: sudo service mysql start
-        # Création de la base de données et des grants
-      - name: Create Database from script
-        run: mysql -u${{ secrets.DB_USER }} -p${{ secrets.DB_PASSWORD }} -e "source infra/mysql/dump/conversa.sql"
+    build :
+        name : Build and analyze
+        runs-on : ubuntu-latest
+        steps :
+            - uses : actions/checkout@v4
+              with :
+                  fetch-depth : 0  # Shallow clones should be disabled for a better relevancy of analysis
+                # MYSQL
+            - name: Start MYSQL
+              run: sudo service mysql start
+                # Création de la base de données et des grants
+            - name: Create Database from script
+              run: mysql -u${{ secrets.DB_USER }} -p${{ secrets.DB_PASSWORD }} -e "source infra/mysql/dump/conversa.sql"
 
-      - name: Create Grant from script
-        run: mysql -u${{ secrets.DB_USER }} -p${{ secrets.DB_PASSWORD }} -e "source infra/mysql/dump/conversa-grants.sql"
+            - name: Create Grant from script
+              run: mysql -u${{ secrets.DB_USER }} -p${{ secrets.DB_PASSWORD }} -e "source infra/mysql/dump/conversa-grants.sql"
 
-        # Configuration de JDK 21
-      - name : Set up JDK 21
-        uses : actions/setup-java@v4
-        with :
-          java-version : 21
-          distribution : 'zulu'
+                # Configuration de JDK 21
+            - name : Set up JDK 21
+              uses : actions/setup-java@v4
+              with :
+                  java-version : 21
+                  distribution : 'zulu'
 
-        # Mise en cache des paquets SonarQube
-      - name : Cache SonarQube packages
-        uses : actions/cache@v4
-        with :
-          path : ~/.sonar/cache
-          key : ${{ runner.os }}-sonar${{ hashFiles('**/*.java') }}
-          restore-keys : ${{ runner.os }}-sonar
-        # Mise en cache des paquets Maven
-      - name : Cache Maven packages
-        uses : actions/cache@v4
-        with :
-          path : ~/.m2
-          key : ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys : ${{ runner.os }}-m2
+                # Mise en cache des paquets SonarQube
+            - name : Cache SonarQube packages
+              uses : actions/cache@v4
+              with :
+                  path : ~/.sonar/cache
+                  key : ${{ runner.os }}-sonar${{ hashFiles('**/*.java') }}
+                  restore-keys : ${{ runner.os }}-sonar
+                # Mise en cache des paquets Maven
+            - name : Cache Maven packages
+              uses : actions/cache@v4
+              with :
+                  path : ~/.m2
+                  key : ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+                  restore-keys : ${{ runner.os }}-m2
 
-      # Build et analyse du projet
-      - name : Build and analyze
-        env :
-          SONAR_TOKEN : ${{ secrets.SONAR_TOKEN }}
-        run : mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=YacineRAFES_ConversaAPI
+            - name: List files in the repository
+              run: ls ${{ github.workspace }}
 
-      - name : Charging artefact #permet de charger un artefact
-        uses : actions/upload-artifact@v4
-        with :
-          name : package.jar
-          path : target/*.jar
-          retention-days : 1
+            # Build et analyse du projet
+            - name : Build and analyze
+              env :
+                  SONAR_TOKEN : ${{ secrets.SONAR_TOKEN }}
+              run : mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=YacineRAFES_ConversaAPI
 
-  Discord :
-    name : Discord
-    runs-on : ubuntu-latest
-    needs : build
+            - name : Charging artefact #permet de charger un artefact
+              uses : actions/upload-artifact@v4
+              with :
+                  name : package.jar
+                  path : target/*.jar
+                  retention-days : 1
+    Discord :
+        name : Discord
+        runs-on : ubuntu-latest
+        needs : build
+        steps :
+            - name : Discord notification (succès)
+              if : success()
+              env :
+                  DISCORD_WEBHOOK : ${{ secrets.DISCORD_WEBHOOK }}
+              uses : sarisia/actions-status-discord@v1
+              with :
+                  description : 'Le projet ConversaAPI a été build avec succès'
 
-    steps :
-      - name : Discord notification (succès)
-        if : success()
-        env :
-          DISCORD_WEBHOOK : ${{ secrets.DISCORD_WEBHOOK }}
-        uses : sarisia/actions-status-discord@v1
-        with :
-          description : 'Le projet ConversaAPI a été build avec succès'
+            - name : Discord notification (échec)
+              if : failure()
+              env :
+                  DISCORD_WEBHOOK : ${{ secrets.DISCORD_WEBHOOK }}
+              uses : sarisia/actions-status-discord@v1
+              with :
+                  description : 'Le projet ConversaAPI a échoué'
 
-      - name : Discord notification (échec)
-        if : failure()
-        env :
-          DISCORD_WEBHOOK : ${{ secrets.DISCORD_WEBHOOK }}
-        uses : sarisia/actions-status-discord@v1
-        with :
-          description : 'Le projet ConversaAPI a échoué'
+    docker-build-image-api:
+        if: ${{ github.ref == 'refs/heads/main' }}
+        runs-on: ubuntu-latest
+        needs:
+            - build
+        steps:
+            - uses: actions/checkout@v4
 
-  docker-build-image-api:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
-    needs:
-      - build
-    steps:
-      - uses: actions/checkout@v4
+            - name: Set Up QEMU
+              uses: docker/setup-qemu-action@v3
 
-      - name: Set Up QEMU
-        uses: docker/setup-qemu-action@v3
+            - name: Set Up Docker Build
+              uses: docker/setup-buildx-action@v3
 
-      - name: Set Up Docker Build
-        uses: docker/setup-buildx-action@v3
+            - name: Connect to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                  username: ${{ secrets.DOCKER_USERNAME }}
+                  password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Connect to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+            # juste pour le contrôler
+            -   name: List files in the repository
+                run: ls ${{ github.workspace }}
 
-      # juste pour le contrôler
-      -   name: List files in the repository
-          run: ls ${{ github.workspace }}
+            - name: Download a single artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: package.jar
 
-      - name: Download a single artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: package.jar
+            # juste pour le contrôler
+            - name: List files in the repository
+              run: ls ${{ github.workspace }}
 
-      # juste pour le contrôler
-      - name: List files in the repository
-        run: ls ${{ github.workspace }}
+            # construction de l'image docker et push sur dockerhub
+            - name: Build and push
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  file: Dockerfile
+                  push: true
+                  tags: ${{ secrets.DOCKER_USERNAME }}/conversaapi:latest
+            - run: echo "This job's status is ${{ job.status }}."
 
-      # construction de l'image docker et push sur dockerhub
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/conversaapi:latest
-      - run: echo "This job's status is ${{ job.status }}."
+    #Notification for docker
+    Discord_for_docker:
+        name: Discord
+        runs-on: ubuntu-latest
+        needs: docker-build-image-api
 
-  #Notification for docker
-  Discord_for_docker:
-    name: Discord
-    runs-on: ubuntu-latest
-    needs: docker-build-image-api
-
-    steps:
-      -   name: Discord notification
-          env:
-            DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          uses: sarisia/actions-status-discord@v1
-          if: always()
-          with:
-            description: 'Le projet ConversaAPI a été build avec DockerHub avec succès.'
+        steps:
+            -   name: Discord notification
+                env:
+                    DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+                uses: sarisia/actions-status-discord@v1
+                if: always()
+                with:
+                    description: 'Le projet ConversaAPI a été build avec DockerHub avec succès.'
