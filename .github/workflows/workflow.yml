@@ -56,12 +56,12 @@ jobs :
 
             - name: List files in target directory
               run: ls -l target/
-              
+
             - name : Charging artefact #permet de charger un artefact
               uses : actions/upload-artifact@v4
               with :
-                  name : package.jar
-                  path : target/*.jar
+                  name : package.war
+                  path : target/*.war
                   retention-days : 1
     Discord :
         name : Discord
