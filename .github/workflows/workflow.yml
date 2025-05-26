@@ -23,14 +23,6 @@ jobs :
       - name: Create Grant from script
         run: mysql -u${{ secrets.DB_USER }} -p${{ secrets.DB_PASSWORD }} -e "source infra/mysql/dump/conversa-grants.sql"
 
-        # Installation de Chrome pour Selenium
-      - name: Install Chrome Browser for Selenium
-        uses: browser-actions/setup-chrome@late
-
-        # Démarre le navigateur Chrome
-      - name: run Chrome Browser for version control
-        run: chrome --version
-
         # Configuration de JDK 21
       - name : Set up JDK 21
         uses : actions/setup-java@v4
