@@ -54,6 +54,9 @@ jobs :
                   SONAR_TOKEN : ${{ secrets.SONAR_TOKEN }}
               run : mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=YacineRAFES_ConversaAPI
 
+            - name: List files in target directory
+              run: ls -l target/
+              
             - name : Charging artefact #permet de charger un artefact
               uses : actions/upload-artifact@v4
               with :
