@@ -2,7 +2,7 @@ version: "3.9"
 services:
     app-maven:
         container_name: app-maven
-        image: maven:3.8.3-jdk-11
+        image: maven:latest
         volumes:
             - ./app:/app
             - maven_repo:/root/.m2/repository
