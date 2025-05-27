@@ -16,7 +16,7 @@ jobs :
                 # MYSQL
             - name: Start MYSQL
               run: sudo service mysql start
-                # Création de la base de données et des grants
+                # Creation de la base de données et des grants
             - name: Create Database from script
               run: mysql -u${{ secrets.DB_USER }} -p${{ secrets.DB_PASSWORD }} -e "source infra/mysql/dump/conversa.sql"
 
