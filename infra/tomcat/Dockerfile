@@ -1,4 +1,4 @@
-FROM tomcat:10
+FROM tomcat:10.1.34-jdk21-temurin
 
 # Copy the WAR file into the container
 # à ne pas faire car target est supprimé dans le cadre d'un clean maven
