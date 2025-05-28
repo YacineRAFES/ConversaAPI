@@ -168,11 +168,17 @@ public class User {
 
 //    GETTER ET SETTER
 
+    /**
+     * Récupère ID de l'utilisateur.
+     *
+     * @return id
+     */
     public Integer getId() {
         return id;
     }
 
     /**
+     * Saisie l'ID user
      * @param id
      */
     public void setId(Integer id) throws SaisieException {
@@ -185,13 +191,15 @@ public class User {
     }
 
     /**
-     * @return
+     * Récupère le nom de l'utilisateur
+     * @return name
      */
     public String getName() {
         return name;
     }
 
     /**
+     * Saisie le nom de l'utilisateur
      * @param name
      */
     public void setName(String name) throws RegexException, SaisieException {
@@ -205,13 +213,15 @@ public class User {
     }
 
     /**
-     * @return
+     * Récupère le mot de passe de l'utilisateur
+     * @return password
      */
     public String getPassword() {
         return password;
     }
 
     /**
+     * Saisie le mot de passe
      * @param password
      */
     public void setPassword(String password) throws SaisieException {
@@ -221,10 +231,19 @@ public class User {
         this.password = password;
     }
 
+    /**
+     * Récupère l'adresse email de l'utilisateur
+     * @return email
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     * Saisie l'adresse email de l'utilisateur
+     * @param email
+     * @throws SaisieException
+     */
     public void setEmail(String email) throws SaisieException {
         if (email == null || email.isEmpty()) {
             throw new SaisieException("L'email ne doit pas être vide ou null");
@@ -234,10 +253,19 @@ public class User {
         this.email = email;
     }
 
+    /**
+     * Récupère le rôle de l'utilisateur
+     * @return
+     */
     public String getRole() {
         return role;
     }
 
+    /**
+     * Saisie le rôle de l'utilisateur
+     * @param role
+     * @throws SaisieException
+     */
     public void setRole(String role) throws SaisieException {
         if (role == null || role.isEmpty()) {
             throw new SaisieException("Le role ne doit pas être vide ou null");
@@ -245,10 +273,19 @@ public class User {
         this.role = role;
     }
 
+    /**
+     * Récupère la date d'inscription de l'utilisateur
+     * @return
+     */
     public Date getDate() {
         return date;
     }
 
+    /**
+     * Saisie la date de l'utilisateur
+     * @param date
+     * @throws SaisieException
+     */
     public void setDate(Date date) throws SaisieException {
         if (date == null) {
             throw new SaisieException("La date ne doit pas être vide ou null");
@@ -258,10 +295,19 @@ public class User {
         this.date = date;
     }
 
+    /**
+     * Récupère la valeur en booléenne
+     * @return
+     */
     public boolean isValide() {
         return valide;
     }
 
+    /**
+     * Saisie la valeur en booléenne
+     * @param valide
+     * @throws SaisieException
+     */
     public void setValide(boolean valide) throws SaisieException {
         this.valide = valide;
     }
