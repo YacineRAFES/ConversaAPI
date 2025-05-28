@@ -11,9 +11,9 @@ import java.util.Date;
 
 
 public class Securite {
-//    Pour plus d'info : https://github.com/Password4j/password4j
-//    hashPassword("password", hash)
-// le sel n'est pas nécessaire car il est généré par Bcrypt
+    // Pour plus d'info : https://github.com/Password4j/password4j
+    // hashPassword("password", hash)
+    // le sel n'est pas nécessaire car il est généré par Bcrypt
     /**
      * Hash le mot de passe
      * @param password le mot de passe à hasher
@@ -23,14 +23,14 @@ public class Securite {
         try {
             Hash hash = Password.hash(password)
                         .addPepper(PoivreToken.POIVRE)
-                        .withBcrypt();
+                        .withArgon2();
 
             return hash.getResult();
         }catch (Exception e){
             throw new RuntimeException("Erreur lors du hashage du mot de passe", e);
         }
     }
-//    checkPassword("password", hash)
+
     /**
      * Vérifie si le mot de passe correspond au hash
      * @param password le mot de passe à vérifier
@@ -41,7 +41,7 @@ public class Securite {
         try {
             return Password.check(password, hash)
                     .addPepper(PoivreToken.POIVRE)
-                    .withBcrypt();
+                    .withArgon2();
         }catch (Exception e){
             throw new RuntimeException("Erreur lors de la vérification du mot de passe");
         }
