@@ -32,10 +32,10 @@ public class Securite {
     }
 
     /**
-     * Vérifie si le mot de passe correspond au hash
-     * @param password le mot de passe à vérifier
-     * @param hash le hash à vérifier
-     * @return true si le mot de passe correspond au hash, false sinon
+     * Vérifie si le mot de passe correspond au hashage
+     * @param password le mot de passe saisie à vérifier
+     * @param hash le hash de la BDD à vérifier
+     * @return true si le mot de passe correspond au hash, sinon false
      */
     public static boolean checkPassword(String password, String hash) {
         try {

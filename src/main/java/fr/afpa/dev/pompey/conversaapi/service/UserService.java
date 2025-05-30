@@ -104,7 +104,7 @@ public class UserService {
      * @param email
      * @return
      */
-    public User trouveParEmail(String email) throws SaisieException {
+    public User trouveParEmail(String email){
         if(email == null || email.isEmpty()){
             throw new IllegalArgumentException("Email invalide");
         }

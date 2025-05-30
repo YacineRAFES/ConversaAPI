@@ -320,14 +320,19 @@ public class UserDAO extends DAO<User>{
         }
     }
 
+    /**
+     * Trouve l'email existant dans la BDD
+     * @param email
+     * @return user
+     */
     public User findByEmail(String email){
         log.info("findByEmail: Recherche de l'utilisateur par email : " + email);
         User user = new User();
         String sql =
                 "SELECT * " +
-                        "FROM utilisateur " +
-                        "WHERE USER_EMAIL = ? " +
-                        "AND USER_ISVALID=1";
+                "FROM utilisateur " +
+                "WHERE USER_EMAIL = ? " +
+                "AND USER_ISVALID=1";
 
         try(PreparedStatement ps = connect.prepareStatement(sql)){
             ps.setString(1, email);

@@ -149,7 +149,7 @@ public class UserServlet extends HttpServlet {
             log.error("Erreur JSON détectée", e);
         }catch (Exception e){
             log.error("Erreur inattendue", e);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Une erreur interne est survenue");
+            SendJSON.Error(response, "errorServer");
         }
     }
 }
