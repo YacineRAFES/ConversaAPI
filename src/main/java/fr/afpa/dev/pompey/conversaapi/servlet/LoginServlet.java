@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static fr.afpa.dev.pompey.conversaapi.securite.Securite.checkPassword;
-
 @Slf4j
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -41,60 +40,58 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try{
+        try {
             JsonReader jsonReader = Json.createReader(request.getInputStream());
             JsonObject jsonObject = jsonReader.readObject();
-            log.info("JSON RECU depuis: "+jsonObject + Utils.getNameClass());
+            log.info("JSON REÇU depuis: {}{}", jsonObject, Utils.getNameClass());
 
-            String email = jsonObject.getString("email", "");
-            String password = jsonObject.getString("password", "");
+            String email = jsonObject.getString("email", "").trim();
+            String password = jsonObject.getString("password", "").trim();
 
-            if(email.trim().isEmpty() && password.trim().isEmpty()) {
-                log.error("Les champs sont vides");
+            if (email.isEmpty() || password.isEmpty()) {
+                log.error("Champs email ou mot de passe vides");
                 SendJSON.Error(response, "emptyField");
                 return;
             }
+
             log.info("Champs valides");
 
-            List<User> users = userService.getAll();
-            User userFind = null;
-            for (User user : users) {
-                if (user.getEmail().equals(email)) {
-                    log.info("Utilisateur trouvé: " + user);
-                    userFind = user;
-                    break; // on sort de la boucle dès qu'on trouve
-                }
-            }
-            log.info("Utilisateur trouvé: " + userFind);
+            User userFind = userService.trouveParEmail(email);
 
             if (userFind == null) {
                 log.error("Utilisateur non trouvé");
-                SendJSON.Error(response, AlertMsg.INVALIDCREDENTIALS);
+                SendJSON.Error(response, "userNotFound");
                 return;
             }
-            log.info("Utilisateur valide");
 
-            if(!checkPassword(password, userFind.getPassword())) {
+            log.info("Utilisateur trouvé: {}", userFind);
+
+            // Verifie si le mdp saisie et le mdp hashé est correct
+            if (!checkPassword(password, userFind.getPassword())) {
                 log.error("Mot de passe incorrect");
                 SendJSON.Error(response, AlertMsg.INVALIDCREDENTIALS);
                 return;
             }
-            log.info("Mot de passe correct");
 
-            //Generation du token JWT
-            String jwtToken = JWTutils.generateToken(userFind.getId(),
+            // Generation JWT
+            String jwtToken = JWTutils.generateToken(
+                    userFind.getId(),
                     userFind.getEmail(),
                     userFind.getName(),
                     userFind.getRole()
             );
-            log.info("Token JWT généré: " + jwtToken);
-            //Envoi du token JWT
+
+            log.info("Token JWT généré: {}", jwtToken);
+
             SendJSON.LoginUser(response, jwtToken, userFind.getId().toString(), userFind.getName());
 
-        }catch(JsonException e){
+        } catch (JsonException e) {
             log.error("Erreur JSON détectée", e);
-        }catch (Exception e){
+            SendJSON.Error(response, "jsonError");
+        } catch (Exception e) {
             log.error("Erreur inattendue", e);
+            SendJSON.Error(response, "serverError");
         }
     }
+
 }

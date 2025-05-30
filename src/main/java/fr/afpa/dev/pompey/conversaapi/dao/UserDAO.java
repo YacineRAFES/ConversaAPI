@@ -175,6 +175,11 @@ public class UserDAO extends DAO<User>{
         }
     }
 
+    /**
+     * Trouve un utilisateur par le nom
+     * @param username
+     * @return
+     */
     public User findByUsername(String username) {
         log.info("findByUsername: Recherche de l'utilisateur par nom : " + username);
         User user = new User();
@@ -203,6 +208,11 @@ public class UserDAO extends DAO<User>{
         }
     }
 
+    /**
+     * Désactive un compte d'utilisateur
+     * @param obj
+     * @return
+     */
     public boolean disableAccount(User obj){
         log.info("Desactiver le compte : " + obj.getName());
         String disableAccountSQL =
@@ -221,7 +231,7 @@ public class UserDAO extends DAO<User>{
     }
 
     /**
-     * Trouve tous les utilisateurs dans la base de données.
+     * Trouve tous les utilisateurs seulement par le rôle utilisateur et modérateur dans la base de données.
      *
      * @return Une liste de tous les utilisateurs.
      */
@@ -281,6 +291,11 @@ public class UserDAO extends DAO<User>{
         }
     }
 
+    /**
+     * Mise à jour un compte d'utilisateur par un Admin
+     * @param obj
+     * @return
+     */
     public boolean updateByAdmin(User obj) {
         String updateSQL =
                 "UPDATE utilisateur " +
@@ -301,6 +316,34 @@ public class UserDAO extends DAO<User>{
             return true;
         } catch (SQLException | DAOException e) {
             log.error("Erreur lors de la modification User",e);
+            throw new DAOException(e.getMessage());
+        }
+    }
+
+    public User findByEmail(String email){
+        log.info("findByEmail: Recherche de l'utilisateur par email : " + email);
+        User user = new User();
+        String sql =
+                "SELECT * " +
+                        "FROM utilisateur " +
+                        "WHERE USER_EMAIL = ? " +
+                        "AND USER_ISVALID=1";
+
+        try(PreparedStatement ps = connect.prepareStatement(sql)){
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()){
+                user.setId(rs.getInt("USER_ID"));
+                user.setName(rs.getString("USER_NAME"));
+                user.setEmail(rs.getString("USER_EMAIL"));
+                user.setPassword(rs.getString("USER_PASSWORD"));
+                user.setDate(rs.getDate("USER_DATE"));
+                user.setRole(rs.getString("USER_ROLE"));
+            }
+            return user;
+        }catch (SQLException | SaisieException | RegexException e){
+            log.error("Erreur lors de la recherche de l'utilisateur par nom", e);
             throw new DAOException(e.getMessage());
         }
     }

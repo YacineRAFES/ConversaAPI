@@ -3,11 +3,14 @@ package fr.afpa.dev.pompey.conversaapi.service;
 import fr.afpa.dev.pompey.conversaapi.dao.DAOFactory;
 import fr.afpa.dev.pompey.conversaapi.dao.UserDAO;
 import fr.afpa.dev.pompey.conversaapi.emuns.Role;
+import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
 import fr.afpa.dev.pompey.conversaapi.modele.User;
 import fr.afpa.dev.pompey.conversaapi.utilitaires.Utils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+@Slf4j
 public class UserService {
 
     private final UserDAO userDAO;
@@ -94,5 +97,21 @@ public class UserService {
      */
     public boolean modifyByAdmin(User user) {
         return userDAO.updateByAdmin(user);
+    }
+
+    /**
+     * Trouve un utilisateur par email
+     * @param email
+     * @return
+     */
+    public User trouveParEmail(String email) throws SaisieException {
+        if(email == null || email.isEmpty()){
+            throw new IllegalArgumentException("Email invalide");
+        }
+        User user = userDAO.findByEmail(email);
+        if(user == null){
+            log.warn("Aucun utilisateur a été trouvé");
+        }
+        return user;
     }
 }
