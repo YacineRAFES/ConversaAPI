@@ -11,6 +11,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 
 import static fr.afpa.dev.pompey.conversaapi.utilitaires.Config.getCLE_PRIVEE;
@@ -47,9 +48,9 @@ public class JWTutils {
     public static boolean validateToken(String token) {
         try {
             Jwts.parser()
-                    .setSigningKey(getSecretKey())
+                    .verifyWith((SecretKey) getSecretKey())
                     .build()
-                    .parseClaimsJws(token);
+                    .parse(token);
             return true;
         } catch (Exception e) {
             log.error("Erreur de validation du token : " + e.getMessage());

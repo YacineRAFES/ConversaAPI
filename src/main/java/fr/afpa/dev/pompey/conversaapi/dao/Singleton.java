@@ -33,7 +33,7 @@ public class Singleton {
     }
 
     // Méthode qui permet de retourner une instance de connexion à la base de données
-    public static synchronized Connection getInstanceDB(String role) {
+    public static Connection getInstanceDB(String role) {
         return connections.computeIfAbsent(role.toLowerCase(), r -> {
             Properties propsRole = switch (r) {
                 case "utilisateur" -> utilisateur();

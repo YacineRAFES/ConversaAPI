@@ -30,7 +30,7 @@ public class LoginServlet extends HttpServlet {
     private transient UserService userService;
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         this.userService = new UserService(Role.UTILISATEUR);
     }
 

@@ -9,20 +9,12 @@ import java.util.Map;
 
 @Slf4j
 public class DAOFactory {
-    private static DAOFactory instance;
-
     private final Connection connection;
 
     // Constructeur privé qui reçoit la connexion
     public DAOFactory(Role role) {
-        log.info("Role : " + role);
+        log.info("Role : {}", role);
         this.connection = Singleton.getInstanceDB(role.name().toLowerCase());
-    }
-
-    private static final Map<Role, DAOFactory> instances = new HashMap<>();
-
-    public static synchronized DAOFactory getInstance(Role role) {
-        return instances.computeIfAbsent(role, DAOFactory::new);
     }
 
     public UserDAO getUserDAO() {
@@ -41,5 +33,4 @@ public class DAOFactory {
         return new SignalementsDAO(connection);
     }
 
-    // Ajout d'autres DAO ici si nécessaire
 }
