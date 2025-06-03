@@ -28,9 +28,11 @@ services:
         environment:
             - DB_HOST=mysql
             - DB_PORT=3306
-            - DB_NAME=conversa
+            - DB_NAME=${MY_DATABASE}
             - DB_USER=${DB_USER}
             - DB_PASSWORD=${DB_PASSWORD}
+        networks:
+            - conversa-network
     conversa-web:
         image: yacinerafes/conversaweb:latest
         container_name: conversa-web
