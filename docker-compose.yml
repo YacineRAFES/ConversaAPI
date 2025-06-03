@@ -1,45 +1,9 @@
 version: "3.9"
 services:
-    app-maven:
-        container_name: app-maven
-        image: maven:latest
-        volumes:
-            - ./app:/app
-            - maven_repo:/root/.m2/repository
-            - ./infra/maven/settings.xml:/root/.m2/settings.xml
-            - ./infra/logs/maven:/logs
-        working_dir: /app
-        depends_on:
-            - app-tomcat
-        command: [ "sh", "-c", "mvn clean package && cp /app/target/*.war /app/deploy/" ]
-        # La commande Maven et la copie du .war sont maintenant combinées en une seule commande shell
-        networks:
-            - app
-
-    app-tomcat:
-        container_name: app-tomcat
-        restart: 'always'
-        build:
-            context: ./infra/tomcat
-        #image: tomcat:10
-        env_file:
-            - "./.env"
-        depends_on:
-            - app-mysql
-        ports:
-            - "8080:8080"
-        volumes:
-            - ./app/deploy:/usr/local/tomcat/webapps
-            - ./infra/tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
-            - ./infra/tomcat/server.xml:/usr/local/tomcat/conf/server.xml
-            - ./infra/logs/tomcat:/usr/local/tomcat/logs
-        # command: ["catalina.sh", "run"]
-        networks:
-            - app
-
-    app-mysql:
-        container_name: app-mysql
-        restart: 'always'
+    mysql:
+        image: mysql:latest
+        container_name: mysql
+        restart: always
         build:
             context: ./infra/mysql
         volumes:
@@ -51,13 +15,34 @@ services:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ${MY_DATABASE}
         ports:
-            - "8036:3306"
+            - "3307:3306"
         networks:
-            - app
+            - conversa-network
+    conversa-api:
+        depends_on:
+            -   mysql
+        image: yacinerafes/conversaapi:latest
+        container_name: conversa-api
+        ports:
+            - "8080:8080"
+        environment:
+            - DB_HOST=mysql
+            - DB_PORT=3306
+            - DB_NAME=conversa
+            - DB_USER=${DB_USER}
+            - DB_PASSWORD=${DB_PASSWORD}
+    conversa-web:
+        image: yacinerafes/conversaweb:latest
+        container_name: conversa-web
+        ports:
+            - "8090:8090"
+        depends_on:
+            - conversa-api
+        networks:
+            - conversa-network
 
-#Docker Networks
 networks:
-    app:
+    conversa-network:
         driver: bridge
 
 volumes:
