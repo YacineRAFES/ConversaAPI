@@ -4,10 +4,5 @@ FROM tomcat:10.1.34-jdk21-temurin
 #ENV SPRING.DATASOURCE.USERNAME=root
 #ENV SPRING.DATASOURCE.PASSWORD=root
 
-RUN rm -rf /usr/local/tomcat/webapps/ROOTAPI
-
-#Copie du ficher JAR recuperer de l'artefact de votre projet dans le conteneur
-COPY ConversaAPI-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/ROOTAPI.war
-
 #Exposer le port 9000
 EXPOSE 8080
