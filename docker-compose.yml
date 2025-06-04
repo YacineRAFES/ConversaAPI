@@ -17,7 +17,7 @@ services:
         image: yacinerafes/conversaapi:latest
         build:
             context: ./ConversaAPI
-        container_name: conversa-api
+        container_name: api
         ports:
             - "8080:8080"
         environment:
@@ -28,7 +28,7 @@ services:
             - DB_PASSWORD=${DB_PASSWORD}
     conversa-web:
         image: yacinerafes/conversaweb:latest
-        container_name: conversa-web
+        container_name: web
         build:
             context: ./ConversaWeb
         ports:
