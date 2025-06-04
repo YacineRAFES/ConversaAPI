@@ -6,11 +6,6 @@ services:
         restart: always
         build:
             context: ./infra/mysql
-        volumes:
-            - ${MYSQL_DATA_DIR}:/var/lib/mysql
-            - ${LOG_DIR_MYSQL}:/var/log/mysql
-            - ${MYSQL_CONF_FILE}:/etc/mysql/conf.d/my.cnf
-            - ${MYSQL_DUMP_DIR}:/docker-entrypoint-initdb.d
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ${MY_DATABASE}

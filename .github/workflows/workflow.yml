@@ -1,10 +1,8 @@
-name: CI build
+name: Build
 on:
     push:
         branches:
             - main
-    pull_request:
-        types: [opened, synchronize, reopened]
 jobs :
     build :
         name : Build and analyze
@@ -12,7 +10,7 @@ jobs :
         steps :
             - uses : actions/checkout@v4
               with :
-                  fetch-depth : 0  # Shallow clones should be disabled for a better relevancy of analysis
+                  fetch-depth : 0
                 # MYSQL
             - name: Start MYSQL
               run: sudo service mysql start
@@ -45,17 +43,11 @@ jobs :
                   key : ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
                   restore-keys : ${{ runner.os }}-m2
 
-            - name: List files in the repository
-              run: ls ${{ github.workspace }}
-
             # Build et analyse du projet
-            - name : Build and analyze
+            - name : Analyze project
               env :
                   SONAR_TOKEN : ${{ secrets.SONAR_TOKEN }}
               run : mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=YacineRAFES_ConversaAPI
-
-            - name: List files in target directory
-              run: ls -l target/
 
             - name : Charging artefact #permet de charger un artefact
               uses : actions/upload-artifact@v4
@@ -75,14 +67,6 @@ jobs :
               uses : sarisia/actions-status-discord@v1
               with :
                   description : 'Le projet ConversaAPI a été build avec succès'
-
-            - name : Discord notification (échec)
-              if : failure()
-              env :
-                  DISCORD_WEBHOOK : ${{ secrets.DISCORD_WEBHOOK }}
-              uses : sarisia/actions-status-discord@v1
-              with :
-                  description : 'Le projet ConversaAPI a échoué'
 
     docker-build-image-api:
         if: ${{ github.ref == 'refs/heads/main' }}
