@@ -41,7 +41,7 @@ services:
         build:
             context: ./ConversaWeb
         ports:
-            - "8090:8080"
+            - "9090:9090"
         networks:
             - conversa-network
 
