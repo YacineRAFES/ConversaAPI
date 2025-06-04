@@ -22,6 +22,8 @@ services:
         depends_on:
             -   mysql
         image: yacinerafes/conversaapi:latest
+        build:
+            context: ./ConversaAPI
         container_name: conversa-api
         ports:
             - "8080:8080"
@@ -36,10 +38,10 @@ services:
     conversa-web:
         image: yacinerafes/conversaweb:latest
         container_name: conversa-web
+        build:
+            context: ./ConversaWeb
         ports:
             - "8090:8080"
-        depends_on:
-            - conversa-api
         networks:
             - conversa-network
 
