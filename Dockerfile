@@ -9,4 +9,4 @@ RUN rm -rf /usr/local/tomcat/webapps/ROOT
 COPY ConversaAPI-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/api.war
 
 #Exposer le port 9000
-EXPOSE 8080
+EXPOSE 9000
