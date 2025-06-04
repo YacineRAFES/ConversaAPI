@@ -11,8 +11,6 @@ services:
             MYSQL_DATABASE: ${MY_DATABASE}
         ports:
             - "3307:3306"
-        networks:
-            - conversa-network
     conversa-api:
         depends_on:
             -   mysql
@@ -28,8 +26,6 @@ services:
             - DB_NAME=${MY_DATABASE}
             - DB_USER=${DB_USER}
             - DB_PASSWORD=${DB_PASSWORD}
-        networks:
-            - conversa-network
     conversa-web:
         image: yacinerafes/conversaweb:latest
         container_name: conversa-web
@@ -37,12 +33,3 @@ services:
             context: ./ConversaWeb
         ports:
             - "8090:8080"
-        networks:
-            - conversa-network
-
-networks:
-    conversa-network:
-        driver: bridge
-
-volumes:
-    maven_repo:
