@@ -186,7 +186,7 @@ public class SendJSON {
             // J'écris la réponse JSON.
             response.getWriter().write(jsonResponse.toString());
         } catch (Exception e) {
-            throw new JsonException("Erreur dans la méthode SendJSON.JWT : " + e.getMessage());
+            throw new JsonException("Erreur dans la méthode SendJSON.LoginUser : " + e.getMessage());
         }
     }
 
