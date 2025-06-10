@@ -6,6 +6,4 @@ public class Regex {
             + "[^-][\\p{L}0-9\\+-]+(\\.[\\p{L}0-9\\+-]+)*(\\.[\\p{L}]{2,})$";
     public static String PASSWORD = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
     public static String USERNAME = "^[a-zA-Z0-9]{6,50}$";
-
-    //TODO: REGEX A FAIRE
 }
