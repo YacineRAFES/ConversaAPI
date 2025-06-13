@@ -31,21 +31,23 @@ class UserDAOTest {
 
     @Test
     void create() {
-        User user = new User("JohnDoe", "ValidPassword1%$!", "john.doe@example.com", "user", Date.valueOf(LocalDate.now()), true);
-        userService.add(user);
+        User user = new User(
+                "JohnDoe",
+                "ValidPassword1%$!",
+                "john.doe@example.com",
+                "user",
+                Date.valueOf(LocalDate.now()),
+                true
+        );
+        int newID = userService.add(user);
 
-        List<User> users = userService.getAll();
+        User userFind = userService.get(newID);
 
-        // Vérifiez que l'utilisateur a été ajouté
-        User addedUser = users.stream()
-                .filter(u -> u.getName().equals("JohnDoe"))
-                .findFirst()
-                .orElse(null);
-        assertNotNull(addedUser, "L'utilisateur n'a pas été ajouté correctement");
-        log.info("Utilisateur ajouté : " + addedUser.getName());
+        assertNotNull(newID, "L'utilisateur n'a pas été ajouté correctement");
+        log.info("Utilisateur ajouté : " + userFind.getName());
 
         // Supprimez l'utilisateur après le test
-        userService.delete(addedUser);
+        userService.delete(userFind);
     }
 
     @Test
