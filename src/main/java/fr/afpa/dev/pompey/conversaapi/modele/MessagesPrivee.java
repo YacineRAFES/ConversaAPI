@@ -2,7 +2,6 @@ package fr.afpa.dev.pompey.conversaapi.modele;
 
 import fr.afpa.dev.pompey.conversaapi.exception.SaisieException;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 
